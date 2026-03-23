@@ -10,6 +10,10 @@ bool Game::Start()
 
 void Game::Update()
 {
-	
+	m_modelRender.Update();
 }
 
+void Game::Render(RenderContext& rc)
+{
+	m_modelRender.Draw(rc);
+}
