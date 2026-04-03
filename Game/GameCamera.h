@@ -32,7 +32,6 @@ private:
 	bool UpdatePlayer();
 	void UpdatePhase();
 	void UpdateZoom();
-	void UpdateRotate();
 	void ApplyCamera();
 
 	// フェーズ別処理
