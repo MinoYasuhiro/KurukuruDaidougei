@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GameClear.h"
+#include "Title.h"
 
 bool GameClear::Start()
 {
@@ -10,6 +11,12 @@ bool GameClear::Start()
 void GameClear::Update()
 {
 	m_SpriteRender.Update();
+
+	if (g_pad[0]->IsTrigger(enButtonA))
+	{
+		NewGO<Title>(0, "title");
+		DeleteGO(this);
+	}
 }
 
 
