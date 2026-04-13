@@ -26,6 +26,7 @@
     <ClCompile Include="SEManager.cpp" />
     <ClCompile Include="SoundUI.cpp" />
     <ClCompile Include="Title.cpp" />
+    <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -47,5 +48,6 @@
     <ClInclude Include="SEManager.h" />
     <ClInclude Include="SoundUI.h" />
     <ClInclude Include="Title.h" />
+    <ClInclude Include="Player.h" />
   </ItemGroup>
 </Project>
