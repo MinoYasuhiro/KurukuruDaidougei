@@ -30,6 +30,7 @@ bool SoundUI::Start()
 void SoundUI::Update()
 {
 	Input();
+	SelectScale();
 	FillBars();
 	ApplyVolumes();
 
@@ -106,6 +107,26 @@ void SoundUI::ApplyVolumes()
 	if (m_SESource)
 	{
 		m_SESource->SetVolume(m_masterValue * m_SEValue);
+	}
+}
+
+void SoundUI::SelectScale()
+{
+	m_mastarFillRender.SetScale({ 1.0f,1.0f,1.0f });
+	m_SEFillRender.SetScale({ 1.0f,1.0f,1.0f });
+	m_BGMFillRender.SetScale({ 1.0f,1.0f,1.0f });
+
+	switch (m_selectedIndex)
+	{
+	case 0:
+		m_mastarFillRender.SetScale({ 1.2f,1.2f,1.2f });
+		break;
+	case 1:
+		m_BGMFillRender.SetScale({ 1.2f,1.2f,1.2f });
+		break;
+	case 2:
+		m_SEFillRender.SetScale({ 1.2f,1.2f,1.2f });
+		break;
 	}
 }
 
