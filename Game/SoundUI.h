@@ -16,6 +16,7 @@ public:
 		m_SESource = se;
 	}
 	void ApplyVolumes();
+	void SelectScale();
 private:
 	SpriteRender m_masterBarRender;
 	SpriteRender m_SEBarRender;
