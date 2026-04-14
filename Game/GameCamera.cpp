@@ -25,6 +25,8 @@ void GameCamera::Update()
 
     UpdatePhase();
     UpdateZoom();
+
+
     ApplyCamera();
 }
 
@@ -79,7 +81,6 @@ void GameCamera::UpdateZoom()
 }
 
 
-
 void GameCamera::ApplyCamera()
 {
     Vector3 target = m_player->m_position;
@@ -127,6 +128,16 @@ void GameCamera::MoveCameraBehindPlayer()
 
         
 }
+
+void GameCamera::Reset()
+{
+    m_toCameraPos.Set(0.0f, 125.0f, -250.0f);
+
+    m_currentPhase = GamePhase::Start;
+    m_isZooming = false;
+    m_zoomT = 0.0f;
+}
+
 
 float GameCamera::EaseInOutCubic(float t)
 {
