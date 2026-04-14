@@ -12,7 +12,7 @@ public:
 
 	bool Start() override;
 	void Update() override;
-
+	void Reset();
 private:
 	// --- 基本 ---
 	Player* m_player = nullptr;
