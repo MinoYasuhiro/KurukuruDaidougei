@@ -11,12 +11,13 @@ bool Title::Start()
 
 void Title::Update()
 {
-	if (g_pad[0]->IsTrigger(enButtonA))
+
+	m_spriteRender.Update();
+
+	if (g_pad[0]->IsPress(enButtonA))
 	{
-		
 		//Gameクラスのオブジェクトを作成。
 		NewGO<Game>(0, "game");
-
 		DeleteGO(this);
 	}
 }
