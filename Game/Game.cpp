@@ -38,7 +38,6 @@ void Game::Update()
     nsK2EngineLow::GamePad::BeginFrame();
     g_pad[0]->Update();
 
-
     // Title中・GameClear中は一切処理しない
     if (m_gameState != GameState::Playing)
         return;
@@ -105,8 +104,6 @@ void Game::ResetGame()
 
     if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
         cam->Reset();
-
-    
 }
 
 

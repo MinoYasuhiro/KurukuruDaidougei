@@ -1,0 +1,223 @@
+﻿#include "stdafx.h"
+#include "Item.h"
+#include <random>
+Item::Item()
+{
+
+}
+
+Item::~Item()
+{
+
+}
+
+//落下処理のテスト
+void Item::StartFallTest()
+{
+	RandomSpawn();
+	m_position.y = 100.0f;
+	m_isFlying = true;
+	m_state = BallState::FailFall;
+	m_moveSpeed = { 0.0f,-2.0f,0.0f };
+}
+
+//放物運動のテスト
+void Item::StartParabolaTest()
+{
+	RandomSpawn();
+	m_isFlying = true;
+	Move();
+}
+
+//初期化
+bool Item::Start()
+{
+	//モデルを読み込む
+	//m_modelRender.Init("Assets/modelData/ball.tkm");
+	m_eggRender.Init("Assets/modelData/egg.tkm");
+	m_eggRender.SetScale({ 5.0f,5.0f,5.0f });
+
+	m_eggCrackedRender.Init("Assets/modelData/eggCracked.tkm");
+	m_eggCrackedRender.SetScale({ 5.0f,5.0f,5.0f });
+
+	
+	RandomSpawn();	//初期位置をランダムにする
+	
+	StartFallTest();		//落下処理のテスト
+	//StartParabolaTest();	//放物運動のテスト
+	return true;
+}
+
+//更新処理
+void Item::Update()
+{
+	switch (m_state)
+	{
+	//待機中は何もしない
+	case BallState::Idle:
+		StartFallTest();		//落下処理のテスト
+		//StartParabolaTest();	//放物運動のテスト
+		break;
+	case BallState::Flying:
+		ParabolicMotion();
+		break;
+	case BallState::OnUmbrella:
+		OnUmbrella();
+		break;
+	case BallState::Spinning:
+		StartQTE();
+		break;
+	case BallState::FailFall:
+		FailFallMotion();
+		break;
+	case BallState::SuccessThrow:
+		ParabolicMotion();
+		break;
+	}
+	if (!m_isCracked)
+	{
+		FailFallMotion();
+	}
+	if (m_isCracked)
+	{
+		m_eggCrackedRender.SetPosition(m_position);
+		m_eggCrackedRender.Update();
+	}
+	else
+	{
+		m_eggRender.SetPosition(m_position);
+		m_eggRender.Update();
+	}
+	//m_modelRender.SetPosition(m_position);
+	//m_modelRender.Update();
+	m_eggRender.SetPosition(m_position);
+	m_eggRender.Update();
+}
+
+//球の放物運動（重力による落下を含む）を処理する関数
+void Item::ParabolicMotion()
+{
+	if (m_isFlying)
+	{
+		//重力を速度に加算
+		m_moveSpeed += m_gravity;
+		//位置を更新
+		m_position += m_moveSpeed;
+
+		//地面に付いたらリセット
+		if (m_position.y <= 0.0f)
+		{
+			m_moveSpeed = { 0.0f,0.0f,0.0f };
+			m_isFlying = false;
+			m_state = BallState::Idle;
+			//OnBallLanded();	//後でUI・ゲーム側とつなげる用
+			//RandomSpawn();	//着地したら位置をランダムに変える
+		}
+	}
+}
+
+//球の状態を外部から変更するための関数
+void Item::SetState(BallState newState)
+{
+	m_state = newState;
+}
+
+//落下処理
+void Item::FailFallMotion()
+{
+	/*if (!m_isFlying)
+	{
+		SpinningFailed();
+	}*/
+	m_moveSpeed.y -= 0.3f;
+	m_position += m_moveSpeed;
+	if (m_position.y <= 0.0f)
+	{
+		m_position.y = 0.0f;
+		m_moveSpeed = Vector3::Zero;
+		m_isFlying = false;
+		m_isCracked = true;
+		m_state = BallState::Idle;
+	}
+}
+
+//外部からの球を飛ばす要求を処理する関数
+void Item::RequestFire()
+{
+	if (!m_isFlying)
+	{
+		Move();
+	}
+}
+
+//球を飛ばすための初速を設定し、飛行状態に移行させる関数
+void Item::Move()
+{
+	m_isFlying = true; //球が飛ぶフラグON
+	m_moveSpeed.y = 15.0f;
+	m_moveSpeed.z = 10.0f;
+
+	m_state = BallState::Flying;
+}
+
+//球が地面に着地したときに呼ばれる処理
+void Item::OnBallLanded()
+{
+	m_isFlying = false;
+	m_moveSpeed = { 0.0f,0.0f,0.0f };
+
+	m_state = BallState::Idle;
+	//Move();	//動作確認用
+}
+
+//球の位置をランダムな座標に設定する
+void Item::RandomSpawn()
+{
+	//一度だけ初期化される乱数デバイス(シード生成用)
+	static std::random_device rd;
+	//乱数生成期を初期化
+	static std::mt19937 mt(rd());
+	
+	//座標をランダム生成
+	std::uniform_real_distribution<float>distX(-100.0f, 100.0f);
+	std::uniform_real_distribution<float>distY(0.0f, 10.0f);
+	std::uniform_real_distribution<float>distZ(-50.0f, 50.0f);
+
+	//ランダムに生成した値をそれぞれの座標に代入
+	m_position.x = distX(mt);
+	m_position.y = distY(mt);
+	m_position.z = distZ(mt);
+}
+
+//傘の上に乗ったときの処理
+void Item::OnUmbrella()
+{
+	
+}
+
+//QTE開始処理
+void Item::StartQTE()
+{
+	
+}
+
+//傘回し失敗時の処理
+void Item::SpinningFailed()
+{
+	m_isFlying = true;
+	m_moveSpeed = { 0.0f,-2.0f,0.0f };
+	m_state = BallState::FailFall;
+}
+
+void Item::Render(RenderContext& rc)
+{
+	//m_modelRender.Draw(rc);
+	if (m_isCracked)
+	{
+		m_eggCrackedRender.Draw(rc);
+	}
+	else
+	{
+		m_eggRender.Draw(rc);
+	}
+}
