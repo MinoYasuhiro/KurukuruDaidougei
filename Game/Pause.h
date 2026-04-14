@@ -1,4 +1,5 @@
 #pragma once
+class Game;
 class Pause : public IGameObject
 {
 public:
