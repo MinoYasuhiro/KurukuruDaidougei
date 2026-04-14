@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Level3DRender/LevelRender.h"
 
 class BackGround;
@@ -50,9 +50,12 @@ private:
 	Player* m_player;
 	Umbrella* m_umbrella;
 	SpriteRender* m_SpriteRender;
+	SpriteRender m_startLetter;
 	GameCamera* m_gameCamera;
 	float m_movePhaseTimer = 0.0f;   // ★ 移動フェーズ経過時間
 	float m_clearTimer = 0.0f;      // 経過時間
+	float m_startTimer = 0.0f;
+	bool m_showStart = true;
 	bool  m_isGameClearShown = false; // すでに表示したか
 	static GamePhase m_phase;
 

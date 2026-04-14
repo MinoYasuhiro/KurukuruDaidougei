@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Game.h"
 #include "BackGround.h"
 #include "Player.h"
@@ -31,6 +31,13 @@ bool Game::Start()
     m_player = NewGO<Player>(0, "player");
     m_gameCamera = NewGO<GameCamera>(0, "gameCamera");
 
+    m_startLetter.Init("Assets/sprite/Start.dds", 800.0f, 200.0f);
+    m_startLetter.SetPosition({ 640.0f,360.0f,0.0f });
+    m_startLetter.SetScale({ 2.0f,2.0f,2.0f });
+
+    m_startTimer = 0.0f;
+    m_showStart = true;
+
 	return true;
 }
 void Game::Update()
@@ -60,7 +67,13 @@ void Game::Update()
     switch (m_phase)
     {
     case GamePhase::Start:
-        m_phase = GamePhase::MovePhase;
+        m_startTimer += deltaTime;
+        if (m_startTimer >= 2.0f)
+        {
+            m_showStart = false;
+            m_phase = GamePhase::MovePhase;
+            m_movePhaseTimer = 0.0f;
+        }
         break;
 
     case GamePhase::MovePhase:
@@ -109,5 +122,8 @@ void Game::ResetGame()
 
 void Game::Render(RenderContext& rc)
 {
-	
+    if (m_phase == GamePhase::Start && m_showStart)
+    {
+        m_startLetter.Draw(rc);
+    }
 }
