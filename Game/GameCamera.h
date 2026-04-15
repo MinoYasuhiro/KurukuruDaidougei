@@ -12,7 +12,7 @@ public:
 
 	bool Start() override;
 	void Update() override;
-
+	void Reset();
 private:
 	// --- 基本 ---
 	Player* m_player = nullptr;
@@ -32,7 +32,6 @@ private:
 	bool UpdatePlayer();
 	void UpdatePhase();
 	void UpdateZoom();
-	void UpdateRotate();
 	void ApplyCamera();
 
 	// フェーズ別処理

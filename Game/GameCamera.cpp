@@ -25,7 +25,8 @@ void GameCamera::Update()
 
     UpdatePhase();
     UpdateZoom();
-    UpdateRotate();
+
+
     ApplyCamera();
 }
 
@@ -79,24 +80,6 @@ void GameCamera::UpdateZoom()
         m_zoomToOffset * ease;
 }
 
-void GameCamera::UpdateRotate()
-{
-    if (m_isZooming) return;
-
-    float x = g_pad[0]->GetRStickXF();
-    float y = g_pad[0]->GetRStickYF();
-
-    Quaternion qRot;
-    qRot.SetRotationDeg(Vector3::AxisY, 1.3f * x);
-    qRot.Apply(m_toCameraPos);
-
-    Vector3 axisX;
-    axisX.Cross(Vector3::AxisY, m_toCameraPos);
-    axisX.Normalize();
-
-    qRot.SetRotationDeg(axisX, 1.3f * y);
-    qRot.Apply(m_toCameraPos);
-}
 
 void GameCamera::ApplyCamera()
 {
@@ -145,6 +128,16 @@ void GameCamera::MoveCameraBehindPlayer()
 
         
 }
+
+void GameCamera::Reset()
+{
+    m_toCameraPos.Set(0.0f, 125.0f, -250.0f);
+
+    m_currentPhase = GamePhase::Start;
+    m_isZooming = false;
+    m_zoomT = 0.0f;
+}
+
 
 float GameCamera::EaseInOutCubic(float t)
 {

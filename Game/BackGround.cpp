@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "BackGround.h"
 
 namespace {
@@ -11,7 +11,7 @@ namespace {
 
 bool BackGround::Start()
 {
-	m_modelRender.Init("Assets/modelData/StageGround.tkm");
+	m_modelRender.Init("Assets/modelData/ground.tkm");
 	m_modelRender.SetScale(Vector3(STEGE_SCALE));
 	m_physicsStaticObject.CreateFromModel(m_modelRender.GetModel(), m_modelRender.GetModel().GetWorldMatrix());
 	m_modelRender.Update();

@@ -12,6 +12,22 @@
       <Filter>system</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="BackGround.cpp" />
+    <ClCompile Include="BallState.cpp" />
+    <ClCompile Include="ButtonType.cpp" />
+    <ClCompile Include="GameCamera.cpp" />
+    <ClCompile Include="GameClear.cpp" />
+    <ClCompile Include="GameOver.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="MenuUI.cpp" />
+    <ClCompile Include="Pause.cpp" />
+    <ClCompile Include="QTEButton.cpp" />
+    <ClCompile Include="SE.cpp" />
+    <ClCompile Include="SEManager.cpp" />
+    <ClCompile Include="SoundUI.cpp" />
+    <ClCompile Include="Title.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Umbrella.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -19,5 +35,21 @@
       <Filter>system</Filter>
     </ClInclude>
     <ClInclude Include="Game.h" />
+    <ClInclude Include="BackGround.h" />
+    <ClInclude Include="BallState.h" />
+    <ClInclude Include="ButtonType.h" />
+    <ClInclude Include="GameCamera.h" />
+    <ClInclude Include="GameClear.h" />
+    <ClInclude Include="GameOver.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="MenuUI.h" />
+    <ClInclude Include="Pause.h" />
+    <ClInclude Include="QTEButton.h" />
+    <ClInclude Include="SE.h" />
+    <ClInclude Include="SEManager.h" />
+    <ClInclude Include="SoundUI.h" />
+    <ClInclude Include="Title.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Umbrella.h" />
   </ItemGroup>
 </Project>
