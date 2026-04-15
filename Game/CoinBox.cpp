@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "CoinBox.h"
+#include "Game.h"
 
 CoinBox::CoinBox()
 {
@@ -24,6 +25,8 @@ bool CoinBox::Start()
 
 void CoinBox::Update()
 {
+	if (Game::GetState() != GameState::Playing)
+		return;
 	float deltaTime =g_gameTime->GetFrameDeltaTime();
 	m_testTime += deltaTime;
 	if (m_testTime > 2.0f)

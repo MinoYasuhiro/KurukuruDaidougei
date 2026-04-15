@@ -12,6 +12,7 @@
 #include "QTE.h"
 #include <random>
 #include "Umbrella.h"
+#include "CoinBox.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -37,6 +38,8 @@ bool Game::Start()
 
     m_startTimer = 0.0f;
     m_showStart = true;
+
+    m_coinBox = NewGO<CoinBox>(0, "coinBox");
 
 	return true;
 }
@@ -91,6 +94,8 @@ void Game::Update()
         }
         break;
     }
+
+    m_coinBox->Update();
 }
 GamePhase Game::GetPhase()
 {
@@ -126,4 +131,6 @@ void Game::Render(RenderContext& rc)
     {
         m_startLetter.Draw(rc);
     }
+
+    m_coinBox->Render(rc);
 }

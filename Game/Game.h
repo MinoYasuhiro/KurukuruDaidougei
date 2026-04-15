@@ -8,6 +8,7 @@ class Pause;
 class Umbrella;
 class QTE;
 class BGMManager;
+class CoinBox;
 enum class GamePhase
 {
 	Start,
@@ -52,6 +53,7 @@ private:
 	SpriteRender* m_SpriteRender;
 	SpriteRender m_startLetter;
 	GameCamera* m_gameCamera;
+	CoinBox* m_coinBox = nullptr;
 	float m_movePhaseTimer = 0.0f;   // ★ 移動フェーズ経過時間
 	float m_clearTimer = 0.0f;      // 経過時間
 	float m_startTimer = 0.0f;

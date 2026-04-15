@@ -226,6 +226,7 @@
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="BallState.cpp" />
     <ClCompile Include="ButtonType.cpp" />
+    <ClCompile Include="CoinBox.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp" />
     <ClCompile Include="GameClear.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="BallState.h" />
     <ClInclude Include="ButtonType.h" />
+    <ClInclude Include="CoinBox.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h" />
     <ClInclude Include="GameClear.h" />
