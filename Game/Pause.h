@@ -13,6 +13,7 @@ public:
 private:
 	SpriteRender m_SpriteRender;
 	SpriteRender m_Sprite;
+	SpriteRender m_PauseRender;
 	Vector3 m_position;
 	Pause* m_pause;
 

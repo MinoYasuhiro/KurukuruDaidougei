@@ -16,6 +16,10 @@ bool Pause::Start()
     m_Sprite.SetPosition(Vector3(0, 200, 0)); // ★ 手前
     m_Sprite.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 
+    //Menu背景　表示
+    m_PauseRender.Init("Assets/Sprite/PauseBackground.DDS", 800, 800);
+    m_PauseRender.SetPosition(Vector3(0, 0, 0));
+
     return true;
 }
 
@@ -25,6 +29,7 @@ void Pause::Update()
 
     m_SpriteRender.Update();
     m_Sprite.Update();
+    m_PauseRender.Update();
 
 
     // 再開
@@ -48,8 +53,9 @@ void Pause::Update()
 
 void Pause::Render(RenderContext& rc)
 {
-   
+    m_PauseRender.Draw(rc);
 	m_SpriteRender.Draw(rc);
     m_Sprite.Draw(rc);
+    
 }
 
