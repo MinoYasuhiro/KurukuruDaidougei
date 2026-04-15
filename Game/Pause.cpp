@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Pause.h"
 #include "Title.h"
 #include "Game.h"
@@ -17,7 +17,7 @@ bool Pause::Start()
     m_Sprite.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 
     //Menu背景　表示
-    m_PauseRender.Init("Assets/Sprite/PauseBackground.DDS", 800, 800);
+    m_PauseRender.Init("Assets/Sprite/PauseBackground.DDS", 1920,1080);
     m_PauseRender.SetPosition(Vector3(0, 0, 0));
 
     return true;
