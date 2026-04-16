@@ -41,55 +41,52 @@ void MenuUI::Update()
 
 void MenuUI::Input()
 {
-	if (g_pad[0]->IsTrigger(enButtonUp))
+	if (g_pad[0]->IsPress(enButtonUp))
 	{
 		if (m_selectIndex == 0)m_selectIndex = 2;
 		else if (m_selectIndex == 1)m_selectIndex = 3;
 	}
-	if (g_pad[0]->IsTrigger(enButtonDown))
+	if (g_pad[0]->IsPress(enButtonDown))
 	{
 		if (m_selectIndex == 2)m_selectIndex = 0;
 		else if (m_selectIndex == 3)m_selectIndex = 1;
 	}
-	if (g_pad[0]->IsTrigger(enButtonLeft))
+	if (g_pad[0]->IsPress(enButtonLeft))
 	{
 		if (m_selectIndex % 2 == 1)
 		{
 			m_selectIndex -= 1;
 		}
 	}
-	if (g_pad[0]->IsTrigger(enButtonRight))
+	if (g_pad[0]->IsPress(enButtonRight))
 	{
 		if (m_selectIndex % 2 == 0)
 		{
 			m_selectIndex += 1;
 		}
 	}
-	if (g_pad[0]->IsTrigger(enButtonA))
+	if (g_pad[0]->IsPress(enButtonA))
 	{
 		switch (m_selectIndex)
 		{
+			//タイトルに戻る
 		case 0:
-			m_testFont.SetText(L"BackTitle");
-			m_testFont.SetPosition({ 0.0f,500.0f,0.0f });
-			m_testFont.SetColor(g_vec4White);
+			m_result = MenuResult::BackTitle;
 			break;
+			//ゲームを終わる
 		case 1:
-			m_testFont.SetText(L"EndGame");
-			m_testFont.SetPosition({ 0.0f,500.0f,0.0f });
-			m_testFont.SetColor(g_vec4White);
+			m_result = MenuResult::EndGame;
 			break;
+			//リスタート
 		case 2:
-			m_testFont.SetText(L"Restart");
-			m_testFont.SetPosition({ 0.0f,500.0f,0.0f });
-			m_testFont.SetColor(g_vec4White);
+			m_result = MenuResult::Restart;
 			break;
+			//サウンドオプション
 		case 3:
-			m_testFont.SetText(L"SoundTest");
-			m_testFont.SetPosition({ 0.0f,500.0f,0.0f });
-			m_testFont.SetColor(g_vec4White);
+			m_result = MenuResult::SoundOption;
 			break;
 		}
+		DeleteGO(this);
 	}
 }
 
@@ -123,5 +120,4 @@ void MenuUI::Render(RenderContext&rc)
 	m_endGameRender.Draw(rc);
 	m_restartRender.Draw(rc);
 	m_soundTestRender.Draw(rc);
-	m_testFont.Draw(rc);
 }

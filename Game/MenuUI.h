@@ -1,4 +1,14 @@
 ﻿#pragma once
+
+enum class MenuResult
+{
+	None,
+	BackTitle,
+	Restart,
+	EndGame,
+	SoundOption,
+};
+
 class MenuUI:public IGameObject
 {
 public:
@@ -11,12 +21,15 @@ public:
 	void Input();
 	void SelectScale();
 
+	MenuResult GetResult()const { return m_result; }
+
 private:
 	SpriteRender m_backTitleRender;
 	SpriteRender m_endGameRender;
 	SpriteRender m_restartRender;
 	SpriteRender m_soundTestRender;
-	FontRender m_testFont;	//テスト用
+	
+	MenuResult m_result = MenuResult::None;
 
 	int m_selectIndex = 0;
 };

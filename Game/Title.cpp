@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Title.h"
 #include "Game.h"
 
@@ -14,9 +14,16 @@ void Title::Update()
 
 	m_spriteRender.Update();
 
-	if (g_pad[0]->IsPress(enButtonA))
+
+	//…のちに統合版に加える…//
+	if (g_pad[0]->IsPress(enButtonSelect))
 	{
+		if (Game* game = FindGO<Game>("game"))
+		{
+			DeleteGO(game);
+		}
 		//Gameクラスのオブジェクトを作成。
+		Game::SetState(GameState::Playing);
 		NewGO<Game>(0, "game");
 		DeleteGO(this);
 	}
