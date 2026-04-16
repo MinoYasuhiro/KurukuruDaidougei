@@ -1,8 +1,9 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Pause.h"
 #include "Title.h"
 #include "Game.h"
-
+#include "MenuUI.h"
+#include "SoundUI.h"
 
 bool Pause::Start()
 {
@@ -17,8 +18,11 @@ bool Pause::Start()
     m_Sprite.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 
     //Menu背景　表示
-    m_PauseRender.Init("Assets/Sprite/PauseBackground.DDS", 800, 800);
+    m_PauseRender.Init("Assets/Sprite/PauseBackground.DDS", 1920,1080);
     m_PauseRender.SetPosition(Vector3(0, 0, 0));
+
+    m_menuUI = new MenuUI();    //メニューUIの生成
+    m_menuUI->Start();          //メニューUIの初期化
 
     return true;
 }
@@ -31,24 +35,41 @@ void Pause::Update()
     m_Sprite.Update();
     m_PauseRender.Update();
 
+    m_menuUI->Update();
 
-    // 再開
-    if (g_pad[0]->IsPress(enButtonB))
+    switch (m_menuUI->GetResult())
     {
-        Game::SetState(GameState::Playing);
-        DeleteGO(this);
-    }
-
-    if (g_pad[0]->IsPress(enButtonX))
-    {
+        //タイトルに戻る
+    case MenuResult::BackTitle:
         Game::SetState(GameState::Title);
         NewGO<Title>(0, "title");
+        delete m_menuUI;
+        m_menuUI = nullptr;
         DeleteGO(this);
-        
+        break;
+        //リスタート
+    case MenuResult::Restart:
+        Game::SetState(GameState::Playing);
+        delete m_menuUI;
+        m_menuUI = nullptr;
+        DeleteGO(this);
+        break;
+        //ゲームをやめる
+    case MenuResult::EndGame:
+
+        delete m_menuUI;
+        m_menuUI = nullptr;
+        DeleteGO(this);
+        break;
+        //サウンドオプション
+    case MenuResult::SoundOption:
+        Game::SetState(GameState::SoundTest);
+
+        delete m_menuUI;
+        m_menuUI = nullptr;
+        DeleteGO(this);
+        break;
     }
-
-    
-
 }
 
 void Pause::Render(RenderContext& rc)
@@ -57,5 +78,6 @@ void Pause::Render(RenderContext& rc)
 	m_SpriteRender.Draw(rc);
     m_Sprite.Draw(rc);
     
+    m_menuUI->Render(rc);
 }
 
