@@ -1,5 +1,6 @@
-#pragma once
+﻿#pragma once
 class Game;
+class MenuUI;
 class Pause : public IGameObject
 {
 public:
@@ -16,6 +17,6 @@ private:
 	SpriteRender m_PauseRender;
 	Vector3 m_position;
 	Pause* m_pause;
-
+	MenuUI* m_menuUI = nullptr;
 };
 
