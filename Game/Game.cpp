@@ -13,6 +13,7 @@
 #include <random>
 #include "Umbrella.h"
 #include "CoinBox.h"
+#include "SEManager.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -27,6 +28,8 @@ Game::~Game()
 }
 bool Game::Start()
 {
+    SEManager::Init();
+
     //ゲームの初期化
     m_phase = GamePhase::Start;
 

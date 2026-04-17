@@ -44,6 +44,8 @@ public:
 	Quaternion m_rotation;		//プレイヤーのスティックの回転。
 	CharacterController m_characterController;	//キャラクターコントローラー
 
+	bool m_wasMoving = false;
+	bool m_isRunSEPlaying = false;
 
 	////アニメーションの再生。
 	//enum EnAnimationClip {	//アニメーション

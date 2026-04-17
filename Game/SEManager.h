@@ -6,7 +6,11 @@ class SEManager
 public:
 	SEManager() {};
 	~SEManager() {};
-	void Init();
-	void Play(SE seID);
+
+	//効果音の初期化
+	static void Init();
+
+	//指定した効果音を再生
+	static void Play(SE seID);
 };
 
