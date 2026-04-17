@@ -10,11 +10,14 @@ public:
 
 	// ★追加
 	void SetSpinSpeed(float speed);
+	void SetPosition(const Vector3& pos);
+	void SetRotation(const Quaternion& rot);
 
 	//メンバ変数。
 	Vector3 m_position;	//傘の座標
 	Vector3 m_rot;		//傘の回転
 	ModelRender m_modelRender;	//傘の描画
+	Quaternion m_rotation;
 
 	// ★追加
 	float m_spinSpeed = 0.0f;
@@ -22,3 +25,4 @@ public:
 	Vector3 m_scale = Vector3(1.0f, 1.0f, 1.0f);
 	Vector3 m_respwnPosition; //傘の復活ポジション
 };
+
