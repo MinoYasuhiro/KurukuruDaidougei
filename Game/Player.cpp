@@ -3,6 +3,7 @@
 #include "sound/SoundEngine.h"
 #include "sound/SoundSource.h"
 #include "Umbrella.h"
+#include "SEManager.h"
 
 Player::Player()
 {
@@ -47,6 +48,9 @@ bool Player::Start()
     // 初期モード
     number = 1;
     m_state = 0;
+
+    m_runSound = NewGO<SoundSource>(0);
+    m_runSound->Init(SE_run);
 
     return true;
 }
@@ -98,6 +102,21 @@ void Player::Update()
         // 傘回転
         float spin = CalcStickRotationSpeed();
         m_umbrella->SetSpinSpeed(spin);
+    }
+
+    bool isMoving =
+        fabsf(m_moveSpeed.x) >= 0.001f ||
+        fabsf(m_moveSpeed.z) >= 0.001f;
+
+    if (isMoving && !m_wasMoving)
+    {
+        m_runSound->Play(true);
+        m_isRunSEPlaying = true;
+    }
+    if (!isMoving && m_isRunSEPlaying)
+    {
+        m_runSound->Stop();
+        m_isRunSEPlaying = false;
     }
 
     if (number == 3)

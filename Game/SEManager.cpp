@@ -5,6 +5,7 @@
 
 void SEManager::Init()
 {
+	//効果音ファイルをサウンドエンジンに登録
 	g_soundEngine->ResistWaveFileBank(SE_umbrellaSpinning, "Assets/sound/umbrellaSpinning.wav");
 	g_soundEngine->ResistWaveFileBank(SE_run, "Assets/sound/run.wav");
 	g_soundEngine->ResistWaveFileBank(SE_ball, "Assets/sound/ball.wav");
@@ -22,7 +23,12 @@ void SEManager::Init()
 
 void SEManager::Play(SE seID)
 {
+	//効果音用のサウンドソースを生成
 	SoundSource* se = NewGO<SoundSource>(seID);
+
+	//登録済みのSEを初期化
 	se->Init(seID);
+
+	//効果音を1回再生(ループなし)
 	se->Play(false);
 }
