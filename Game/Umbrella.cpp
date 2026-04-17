@@ -46,3 +46,15 @@ void Umbrella::Render(RenderContext& rc)
 {
     m_modelRender.Draw(rc);
 }
+
+void Umbrella::SetPosition(const Vector3& pos)
+{
+    m_position = pos;
+    m_modelRender.SetPosition(pos);
+}
+
+void Umbrella::SetRotation(const Quaternion& rot)
+{
+    m_rotation = rot;
+    m_modelRender.SetRotation(rot);
+}
