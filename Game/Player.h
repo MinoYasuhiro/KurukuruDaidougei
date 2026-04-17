@@ -19,7 +19,9 @@ public:
 	//ステート管理。
 	void ManageState();
 	//アニメーションの再生。
-	void PlayAnimation();
+	//void PlayAnimation();
+	//アニメーションの再生2。
+	void PlayAnimation2();
 	//走る音の再生。
 	//void PlayRunSound();
 	////座標を取得する。
@@ -31,6 +33,7 @@ public:
 	//ココからメンバ変数
 	//描画
 	ModelRender m_modelRender;
+	ModelRender m_NewModelRender;
 
 	//プレイヤーの位置や回転、当たり判定。
 	Vector3 m_position;			//プレイヤーの座標。
@@ -42,16 +45,26 @@ public:
 	CharacterController m_characterController;	//キャラクターコントローラー
 
 
-	//アニメーションの再生。
-	enum EnAnimationClip {	//アニメーション
-		enAnimationClip_Idle,
-		enAnimationClip_Walk,
-		enAnimationClip_Jump,
-		enAnimationClip_Run,
-		enAnimationClip_Num,
+	////アニメーションの再生。
+	//enum EnAnimationClip {	//アニメーション
+	//	enAnimationClip_Idle,
+	//	enAnimationClip_Walk,
+	//	enAnimationClip_Jump,
+	//	enAnimationClip_Run,
+	//	enAnimationClip_Num,
 
+	//};
+	//AnimationClip m_animationClips[enAnimationClip_Num];
+
+
+	enum EnPlayerAnimationState {	//アニメーションの状態
+		enPlayerAnimationState_Idle,
+		enPlayerAnimationState_Run,
+		enPlayerAnimationState_Rotation,
+		enPlayerAnimationState_success,
+		enPlayerAnimationState_Num,
 	};
-	AnimationClip m_animationClips[enAnimationClip_Num];
+	AnimationClip m_playerAnimationState[enPlayerAnimationState_Num];
 
 
 	//ステート管理用の変数。
@@ -71,9 +84,9 @@ private:
 	float CalcStickRotationSpeed();
 
 	int number = 1;
+
+	int m_state = 0;
 };
-
-
 
 
 
