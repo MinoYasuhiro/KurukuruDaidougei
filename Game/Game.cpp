@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "Game.h"
 #include "BackGround.h"
 #include "Player.h"
@@ -24,7 +24,7 @@ Game::Game()
 
 Game::~Game()
 {
-   
+
 }
 bool Game::Start()
 {
@@ -47,7 +47,7 @@ bool Game::Start()
 
     //m_coinBox = NewGO<CoinBox>(0, "coinBox");
 
-	return true;
+    return true;
 }
 void Game::Update()
 {
@@ -61,7 +61,7 @@ void Game::Update()
     // ===== ポーズ呼び出し =====
     if (g_pad[0]->IsPress(enButtonY) && m_gameState == GameState::Playing)
     {
-        NewGO<Pause>(1, "pause");   
+        NewGO<Pause>(1, "pause");
         m_gameState = GameState::Pause;
         return;                      // Game は消さない
     }
@@ -93,10 +93,11 @@ void Game::Update()
 
     case GamePhase::AfterMove:
         m_clearTimer += deltaTime;
-        if (m_clearTimer >= 3.0f)
+        if (m_clearTimer >= 10.0f)
         {
+            NewGO<GameClear>(10, "gameClear"); // 前面表示
             m_gameState = GameState::GameClear;
-           
+
         }
         break;
     }
@@ -105,12 +106,12 @@ void Game::Update()
 }
 GamePhase Game::GetPhase()
 {
-	return m_phase;
+    return m_phase;
 }
 
 void Game::ResetGame()
 {
-    
+
     m_gameState = GameState::Playing;
     m_phase = GamePhase::Start;
 
