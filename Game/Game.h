@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Level3DRender/LevelRender.h"
 
 class BackGround;
@@ -25,7 +25,7 @@ enum class GameState
 	GameClear,
 	SoundTest
 
-	
+
 };
 
 
@@ -38,12 +38,12 @@ public:
 	void Update();
 	static GamePhase GetPhase();
 	void Render(RenderContext& rc);
-
+	void RequestGameOver();
 	static void SetState(GameState state) { m_gameState = state; }
 	static GameState GetState() { return m_gameState; }
 	void ResetGame();
 
-	
+
 private:
 	ModelRender m_modelRender;
 	Vector3 m_pos;
@@ -62,5 +62,12 @@ private:
 	static GamePhase m_phase;
 
 	static GameState m_gameState;
-};
 
+	/// <summary>
+	/// ゲームオーバー（仮）
+	/// </summary>
+	Vector3 m_prevPlayerPos;
+	float   m_idleTimer = 0.0f;
+	const float m_idleLimitTime = 8.0f; // 何秒でGameOverにするか
+
+};

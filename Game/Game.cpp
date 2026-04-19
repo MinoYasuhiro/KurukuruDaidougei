@@ -34,7 +34,7 @@ bool Game::Start()
     m_phase = GamePhase::Start;
 
     m_backGround = NewGO<BackGround>(0, "background");
-    m_umbrella = NewGO<Umbrella>(0, "umbrella");
+    //m_umbrella = NewGO<Umbrella>(0, "umbrella");
     m_player = NewGO<Player>(0, "player");
     m_gameCamera = NewGO<GameCamera>(0, "gameCamera");
 
@@ -70,6 +70,8 @@ void Game::Update()
     if (m_gameState == GameState::Pause)
         return;
 
+    
+
     // ===== 通常ゲーム更新 =====
     const float deltaTime = 1.0f / 60.0f;
 
@@ -100,6 +102,39 @@ void Game::Update()
 
         }
         break;
+
+    }
+
+
+    // ===== ここから追加（Game.cpp完結のGameOver判定）=====
+    if (m_gameState == GameState::Playing)
+    {
+        if (Player* player = FindGO<Player>("player"))
+        {
+            Vector3 pos = player->GetPosition();
+
+            // ◆ 何もしなかった判定（位置がほぼ変わらない）
+            static Vector3 prevPos = pos;
+            static float idleTimer = 0.0f;
+
+            const float moveThreshold = 0.05f; // 動いたとみなす距離
+
+            if ((pos - prevPos).Length() < moveThreshold)
+            {
+                idleTimer += 1.0f / 60.0f;
+            }
+            else
+            {
+                idleTimer = 0.0f;
+                prevPos = pos;
+            }
+
+            // 8秒何もしなかったらGameOver
+            if (idleTimer >= 8.0f)
+            {
+                RequestGameOver();
+            }
+        }
     }
 
     //m_coinBox->Update();
@@ -129,6 +164,19 @@ void Game::ResetGame()
 
     if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
         cam->Reset();
+}
+
+
+void Game::RequestGameOver()
+{
+    // すでに終了状態なら無視
+    if (m_gameState != GameState::Playing)
+        return;
+
+    NewGO<GameOver>(10, "gameOver");
+    m_gameState = GameState::GameOver;
+
+
 }
 
 
