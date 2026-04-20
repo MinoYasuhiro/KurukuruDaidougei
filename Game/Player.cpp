@@ -4,6 +4,7 @@
 #include "sound/SoundSource.h"
 #include "Umbrella.h"
 #include "SEManager.h"
+#include "Game.h"
 
 Player::Player()
 {
@@ -48,6 +49,7 @@ bool Player::Start()
     // 初期モード
     number = 1;
     m_state = 0;
+    m_prevNumber = 1;
 
     m_runSound = NewGO<SoundSource>(0);
     m_runSound->Init(SE_run);
@@ -57,10 +59,12 @@ bool Player::Start()
 
 void Player::Update()
 {
-    if (number > 3 and g_pad[0]->IsTrigger(enButtonSelect))
+    m_prevNumber = number;
+
+    /*if (number > 3 and g_pad[0]->IsTrigger(enButtonSelect))
     {
         number = 1;
-    }
+    }*/
 
     // =========================
     // モード切り替え（Aボタン）
@@ -68,6 +72,18 @@ void Player::Update()
     if (g_pad[0]->IsTrigger(enButtonA))
     {
         number += 1;
+        if (number > 3)
+        {
+            number = 1;
+        }
+    }
+
+    if (m_prevNumber != 1 && number == 1)
+    {
+        if (Game* game = FindGO<Game>("game"))
+        {
+            game->RequestMovePhase();
+        }
     }
 
     // =========================

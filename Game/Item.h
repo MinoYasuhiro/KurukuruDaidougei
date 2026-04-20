@@ -26,9 +26,9 @@ public:
 
 private:
 	BallState m_state = BallState::Idle;
-	//ModelRender m_modelRender;
-	ModelRender m_eggRender;
-	ModelRender m_eggCrackedRender;
+	ModelRender m_modelRender;
+	//ModelRender m_eggRender;
+	//ModelRender m_eggCrackedRender;
 	Vector3 m_position = Vector3::Zero;
 	Vector3 m_moveSpeed = Vector3::Zero;
 	Vector3 m_gravity = { 0.0f,-0.5f,0.0f };

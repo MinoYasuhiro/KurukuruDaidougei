@@ -88,6 +88,8 @@ private:
 	int number = 1;
 
 	int m_state = 0;
+
+	int m_prevNumber = 1;
 };
 
 
