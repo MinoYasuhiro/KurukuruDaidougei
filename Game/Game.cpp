@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Game.h"
 #include "BackGround.h"
 #include "Player.h"
@@ -14,6 +14,7 @@
 #include "Umbrella.h"
 #include "CoinBox.h"
 #include "SEManager.h"
+#include "Item.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -84,11 +85,23 @@ void Game::Update()
             m_showStart = false;
             m_phase = GamePhase::MovePhase;
             m_movePhaseTimer = 0.0f;
+            m_itemMove = false;
         }
         break;
 
     case GamePhase::MovePhase:
         m_movePhaseTimer += deltaTime;
+        if (!m_itemMove)
+        {
+            if (m_item)
+            {
+                DeleteGO(m_item);
+                m_item = nullptr;
+            }
+            m_item = NewGO<Item>(0, "item");
+            m_item->StartParabolaTest();
+            m_itemMove = true;
+        }
         if (m_movePhaseTimer >= 15.0f)
             m_phase = GamePhase::AfterMove;
         break;
@@ -164,6 +177,13 @@ void Game::ResetGame()
 
     if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
         cam->Reset();
+}
+
+void Game::RequestMovePhase()
+{
+    m_phase = GamePhase::MovePhase;
+    m_movePhaseTimer = 0.0f;
+    m_itemMove = false;
 }
 
 
