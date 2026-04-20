@@ -199,20 +199,6 @@ void Game::RequestGameOver()
 
 }
 
-
-void Game::RequestGameOver()
-{
-    // すでに終了状態なら無視
-    if (m_gameState != GameState::Playing)
-        return;
-
-    NewGO<GameOver>(10, "gameOver");
-    m_gameState = GameState::GameOver;
-
-
-}
-
-
 void Game::Render(RenderContext& rc)
 {
     if (m_phase == GamePhase::Start && m_showStart)
