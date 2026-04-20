@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "Game.h"
 #include "BackGround.h"
 #include "Player.h"
@@ -198,7 +198,6 @@ void Game::RequestGameOver()
 
 
 }
-
 
 void Game::Render(RenderContext& rc)
 {

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Level3DRender/LevelRender.h"
 
 class BackGround;
