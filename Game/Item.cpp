@@ -14,6 +14,8 @@ Item::~Item()
 //落下処理のテスト
 void Item::StartFallTest()
 {
+	m_isCracked = false;
+	m_moveSpeed = Vector3::Zero;
 	RandomSpawn();
 	m_position.y = 100.0f;
 	m_isFlying = true;
@@ -33,17 +35,18 @@ void Item::StartParabolaTest()
 bool Item::Start()
 {
 	//モデルを読み込む
-	//m_modelRender.Init("Assets/modelData/ball.tkm");
-	m_eggRender.Init("Assets/modelData/egg.tkm");
-	m_eggRender.SetScale({ 5.0f,5.0f,5.0f });
+	m_modelRender.Init("Assets/modelData/ball.tkm");
+	m_modelRender.SetScale({ 3.0f,3.0f,3.0f });
+	//m_eggRender.Init("Assets/modelData/egg.tkm");
+	//m_eggRender.SetScale({ 5.0f,5.0f,5.0f });
 
-	m_eggCrackedRender.Init("Assets/modelData/eggCracked.tkm");
-	m_eggCrackedRender.SetScale({ 5.0f,5.0f,5.0f });
+	//m_eggCrackedRender.Init("Assets/modelData/eggCracked.tkm");
+	//m_eggCrackedRender.SetScale({ 5.0f,5.0f,5.0f });
 
 	
 	RandomSpawn();	//初期位置をランダムにする
 	
-	StartFallTest();		//落下処理のテスト
+	//StartFallTest();		//落下処理のテスト
 	//StartParabolaTest();	//放物運動のテスト
 	return true;
 }
@@ -55,7 +58,7 @@ void Item::Update()
 	{
 	//待機中は何もしない
 	case BallState::Idle:
-		StartFallTest();		//落下処理のテスト
+		//StartFallTest();		//落下処理のテスト
 		//StartParabolaTest();	//放物運動のテスト
 		break;
 	case BallState::Flying:
@@ -74,11 +77,11 @@ void Item::Update()
 		ParabolicMotion();
 		break;
 	}
-	if (!m_isCracked)
+	/*if (!m_isCracked)
 	{
 		FailFallMotion();
-	}
-	if (m_isCracked)
+	}*/
+	/*if (m_isCracked)
 	{
 		m_eggCrackedRender.SetPosition(m_position);
 		m_eggCrackedRender.Update();
@@ -87,11 +90,11 @@ void Item::Update()
 	{
 		m_eggRender.SetPosition(m_position);
 		m_eggRender.Update();
-	}
-	//m_modelRender.SetPosition(m_position);
-	//m_modelRender.Update();
-	m_eggRender.SetPosition(m_position);
-	m_eggRender.Update();
+	}*/
+	m_modelRender.SetPosition(m_position);
+	m_modelRender.Update();
+	//m_eggRender.SetPosition(m_position);
+	//m_eggRender.Update();
 }
 
 //球の放物運動（重力による落下を含む）を処理する関数
@@ -211,13 +214,13 @@ void Item::SpinningFailed()
 
 void Item::Render(RenderContext& rc)
 {
-	//m_modelRender.Draw(rc);
-	if (m_isCracked)
+	m_modelRender.Draw(rc);
+	/*if (m_isCracked)
 	{
 		m_eggCrackedRender.Draw(rc);
 	}
 	else
 	{
 		m_eggRender.Draw(rc);
-	}
+	}*/
 }
