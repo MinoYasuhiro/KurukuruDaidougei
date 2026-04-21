@@ -15,6 +15,7 @@
 #include "CoinBox.h"
 #include "SEManager.h"
 #include "Item.h"
+#include "Title.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -27,12 +28,14 @@ Game::~Game()
 {
 
 }
+
 bool Game::Start()
 {
     SEManager::Init();
 
     //ゲームの初期化
     m_phase = GamePhase::Start;
+
 
     m_backGround = NewGO<BackGround>(0, "background");
     //m_umbrella = NewGO<Umbrella>(0, "umbrella");
@@ -50,14 +53,76 @@ bool Game::Start()
 
     return true;
 }
+
 void Game::Update()
 {
     nsK2EngineLow::GamePad::BeginFrame();
     g_pad[0]->Update();
 
-    // Title中・GameClear中は一切処理しない
-    if (m_gameState != GameState::Playing)
+
+    switch (m_gameState)
+    {
+    case GameState::Playing:
+        UpdatePlaying();   // ← 今の Playing 用ロジックをここに分離
+        break;
+
+    case GameState::GameClear:
+        // GameClear が Update / Render するので Game は何もしない
+        break;
+
+    case GameState::Title:
+        // Title が Update / Render するので Game は何もしない
+        break;
+
+    case GameState::Pause:
+        break;
+
+    case GameState::GameOver:
+        break;
+    }
+
+    m_modelRender.Update();
+    //m_coinBox->Update();
+}
+
+GamePhase Game::GetPhase()
+{
+    return m_phase;
+}
+
+void Game::ResetGame()
+{
+    // Title からのみ許可
+    if (m_gameState != GameState::Title)
         return;
+
+    m_gameState = GameState::Playing;
+    m_phase = GamePhase::Start;
+
+    m_movePhaseTimer = 0.0f;
+    m_clearTimer = 0.0f;
+    m_isGameClearShown = false;
+
+
+    // ★ プレイヤー初期化
+    if (Player* player = FindGO<Player>("player"))
+    {
+        player->Reset();
+    }
+
+    if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
+        cam->Reset();
+}
+
+void Game::RequestMovePhase()
+{
+    m_phase = GamePhase::MovePhase;
+    m_movePhaseTimer = 0.0f;
+    m_itemMove = false;
+}
+
+void Game::UpdatePlaying()
+{
 
     // ===== ポーズ呼び出し =====
     if (g_pad[0]->IsPress(enButtonY) && m_gameState == GameState::Playing)
@@ -65,13 +130,14 @@ void Game::Update()
         NewGO<Pause>(1, "pause");
         m_gameState = GameState::Pause;
         return;                      // Game は消さない
+
     }
 
     // ===== ポーズ中は「更新だけ」止める =====
     if (m_gameState == GameState::Pause)
         return;
 
-    
+
 
     // ===== 通常ゲーム更新 =====
     const float deltaTime = 1.0f / 60.0f;
@@ -108,16 +174,14 @@ void Game::Update()
 
     case GamePhase::AfterMove:
         m_clearTimer += deltaTime;
-        if (m_clearTimer >= 10.0f)
+        if (m_clearTimer >= 10.0f && !m_isGameClearShown)
         {
             NewGO<GameClear>(10, "gameClear"); // 前面表示
             m_gameState = GameState::GameClear;
-
+            m_isGameClearShown = true;
         }
         break;
-
     }
-
 
     // ===== ここから追加（Game.cpp完結のGameOver判定）=====
     if (m_gameState == GameState::Playing)
@@ -126,7 +190,7 @@ void Game::Update()
         {
             Vector3 pos = player->GetPosition();
 
-            // ◆ 何もしなかった判定（位置がほぼ変わらない）
+            // ◆ 何もしなかった判定
             static Vector3 prevPos = pos;
             static float idleTimer = 0.0f;
 
@@ -149,41 +213,31 @@ void Game::Update()
             }
         }
     }
-
-    //m_coinBox->Update();
-}
-GamePhase Game::GetPhase()
-{
-    return m_phase;
 }
 
-void Game::ResetGame()
+void Game::RequestGameClear()
 {
+    if (m_gameState != GameState::Playing)
+        return;
 
-    m_gameState = GameState::Playing;
-    m_phase = GamePhase::Start;
-
-    // タイマー初期化
-    m_movePhaseTimer = 0.0f;
-    m_clearTimer = 0.0f;
-    m_isGameClearShown = false;
-
-    //// Player 初期化
-    //Player* player = FindGO<Player>("player");
-    //if (player)
-    //{
-    //    player->Reset();
-    //}
-
-    if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
-        cam->Reset();
+    m_gameState = GameState::GameClear;
+    m_isGameClearShown = true;
+    NewGO<GameClear>(10, "gameClear");
 }
 
-void Game::RequestMovePhase()
+void Game::RequestTitle()
 {
-    m_phase = GamePhase::MovePhase;
-    m_movePhaseTimer = 0.0f;
-    m_itemMove = false;
+
+    // すでに Title なら何もしない
+    if (m_gameState == GameState::Title)
+        return;
+
+    // Title状態
+    m_gameState = GameState::Title;
+
+    // Title を前面に生成
+    NewGO<Title>(20, "title");
+
 }
 
 

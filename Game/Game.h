@@ -25,8 +25,6 @@ enum class GameState
 	GameOver,
 	GameClear,
 	SoundTest
-
-
 };
 
 
@@ -44,6 +42,9 @@ public:
 	static GameState GetState() { return m_gameState; }
 	void RequestMovePhase();
 	void ResetGame();
+	void RequestGameClear();
+	void RequestTitle();
+	void UpdatePlaying();
 
 
 private:

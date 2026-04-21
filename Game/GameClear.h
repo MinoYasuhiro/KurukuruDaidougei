@@ -11,6 +11,7 @@ public:
 private:
 	SpriteRender m_SpriteRender;
 	Vector3 m_position;
+	
 
 
 };
