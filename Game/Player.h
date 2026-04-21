@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "sound/SoundSource.h"
 #include "Umbrella.h"
 
@@ -29,7 +29,7 @@ public:
 	{
 		return m_position;
 	}
-
+	void Reset();   // ★ 追加
 	//ココからメンバ変数
 	//描画
 	ModelRender m_modelRender;
@@ -89,8 +89,8 @@ private:
 
 	int m_state = 0;
 
+
 	int m_prevNumber = 1;
+
+	Vector3 m_startPos = { 0.0f, 0.0f, 0.0f }
 };
-
-
-

@@ -39,7 +39,7 @@ bool Player::Start()
     m_playerAnimationState[enPlayerAnimationState_success].SetLoopFlag(true);
 
     m_NewModelRender.Init("Assets/modelData/Player2.tkm", m_playerAnimationState, enPlayerAnimationState_Num, enModelUpAxisZ);
-
+    //m_NewModelRender.SetPosition({ 0, 0, 0 });
     // 傘生成
     m_umbrella = NewGO<Umbrella>(0);
 
@@ -55,6 +55,12 @@ bool Player::Start()
     m_runSound->Init(SE_run);
 
     return true;
+}
+
+
+void Player::Reset()
+{
+    m_position = m_startPos;
 }
 
 void Player::Update()
