@@ -18,12 +18,10 @@ public:
 	void Rotation();
 	//ステート管理。
 	void ManageState();
-	//アニメーションの再生。
-	//void PlayAnimation();
+	//プレイヤーのアクション
+	void PlayerAction();
 	//アニメーションの再生2。
 	void PlayAnimation2();
-	//走る音の再生。
-	//void PlayRunSound();
 	////座標を取得する。
 	Vector3 GetPosition() const
 	{
@@ -47,23 +45,18 @@ public:
 	bool m_wasMoving = false;
 	bool m_isRunSEPlaying = false;
 
-	////アニメーションの再生。
-	//enum EnAnimationClip {	//アニメーション
-	//	enAnimationClip_Idle,
-	//	enAnimationClip_Walk,
-	//	enAnimationClip_Jump,
-	//	enAnimationClip_Run,
-	//	enAnimationClip_Num,
-
-	//};
-	//AnimationClip m_animationClips[enAnimationClip_Num];
-
-
 	enum EnPlayerAnimationState {	//アニメーションの状態
 		enPlayerAnimationState_Idle,
 		enPlayerAnimationState_Run,
 		enPlayerAnimationState_Rotation,
-		enPlayerAnimationState_success,
+		enPlayerAnimationState_Success,
+		enPlayerAnimationState_Normal,
+		enPlayerAnimationState_QTEsippai,
+		enPlayerAnimationState_QTEseikou,
+		enPlayerAnimationState_GameClear1,
+		enPlayerAnimationState_GameClear2,
+		enPlayerAnimationState_GameOver,
+		enPlayerAnimationState_GameOverRun,
 		enPlayerAnimationState_Num,
 	};
 	AnimationClip m_playerAnimationState[enPlayerAnimationState_Num];
@@ -86,9 +79,10 @@ private:
 	float CalcStickRotationSpeed();
 
 	int number = 1;
-
 	int m_state = 0;
-
+	int m_prevPlayerState = -1;
+	Quaternion m_finishRot;
+	int playerSpeed = 10;
 
 	int m_prevNumber = 1;
 
