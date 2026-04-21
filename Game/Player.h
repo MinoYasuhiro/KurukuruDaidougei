@@ -92,5 +92,5 @@ private:
 
 	int m_prevNumber = 1;
 
-	Vector3 m_startPos = { 0.0f, 0.0f, 0.0f }
+	Vector3 m_startPos = { 0.0f, 0.0f, 0.0f };
 };
