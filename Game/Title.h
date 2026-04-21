@@ -12,6 +12,7 @@ public:
 private:
 	SpriteRender m_spriteRender;
 	Vector3 m_position;
+	bool m_canInput = false;
 
 
 };
