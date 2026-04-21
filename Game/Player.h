@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "sound/SoundSource.h"
 #include "Umbrella.h"
 
@@ -85,5 +85,6 @@ private:
 	int playerSpeed = 10;
 
 	int m_prevNumber = 1;
+
 	Vector3 m_startPos = { 0.0f, 0.0f, 0.0f };
 };

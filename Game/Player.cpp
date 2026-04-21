@@ -41,7 +41,7 @@ bool Player::Start()
     m_playerAnimationState[enPlayerAnimationState_GameOverRun].SetLoopFlag(true);
 
     m_NewModelRender.Init("Assets/modelData/Player2.tkm", m_playerAnimationState, enPlayerAnimationState_Num, enModelUpAxisZ);
-   
+    //m_NewModelRender.SetPosition({ 0, 0, 0 });
     // 傘生成
     m_umbrella = NewGO<Umbrella>(0);
 
