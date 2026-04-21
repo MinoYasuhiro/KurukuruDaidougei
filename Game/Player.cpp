@@ -16,40 +16,44 @@ Player::~Player()
 
 bool Player::Start()
 {
-    //// アニメーション読み込み
-    //m_animationClips[enAnimationClip_Idle].Load("Assets/animData/idle.tka");
-    //m_animationClips[enAnimationClip_Idle].SetLoopFlag(true);
-    //m_animationClips[enAnimationClip_Walk].Load("Assets/animData/walk.tka");
-    //m_animationClips[enAnimationClip_Walk].SetLoopFlag(true);
-    //m_animationClips[enAnimationClip_Jump].Load("Assets/animData/jump.tka");
-    //m_animationClips[enAnimationClip_Jump].SetLoopFlag(false);
-    //m_animationClips[enAnimationClip_Run].Load("Assets/animData/run.tka");
-    //m_animationClips[enAnimationClip_Run].SetLoopFlag(true);
-
-    //// モデル
-    //m_modelRender.Init("Assets/modelData/unityChan.tkm", m_animationClips, enAnimationClip_Num, enModelUpAxisY);
-
+    
     m_playerAnimationState[enPlayerAnimationState_Idle].Load("Assets/animData/PlayerIdle.tka");
     m_playerAnimationState[enPlayerAnimationState_Idle].SetLoopFlag(true);
     m_playerAnimationState[enPlayerAnimationState_Run].Load("Assets/animData/PlayerRun.tka");
     m_playerAnimationState[enPlayerAnimationState_Run].SetLoopFlag(true);
     m_playerAnimationState[enPlayerAnimationState_Rotation].Load("Assets/animData/PlayerRotation.tka");
     m_playerAnimationState[enPlayerAnimationState_Rotation].SetLoopFlag(true);
-    m_playerAnimationState[enPlayerAnimationState_success].Load("Assets/animData/PlayerSuccess.tka");
-    m_playerAnimationState[enPlayerAnimationState_success].SetLoopFlag(true);
+    m_playerAnimationState[enPlayerAnimationState_Success].Load("Assets/animData/PlayerSuccess.tka");
+    m_playerAnimationState[enPlayerAnimationState_Success].SetLoopFlag(false);
+    m_playerAnimationState[enPlayerAnimationState_Normal].Load("Assets/animData/normal.tka");
+    m_playerAnimationState[enPlayerAnimationState_Normal].SetLoopFlag(false);
+    m_playerAnimationState[enPlayerAnimationState_QTEsippai].Load("Assets/animData/QTEsippai.tka");
+    m_playerAnimationState[enPlayerAnimationState_QTEsippai].SetLoopFlag(false);
+    m_playerAnimationState[enPlayerAnimationState_QTEseikou].Load("Assets/animData/QTEseikou.tka");
+    m_playerAnimationState[enPlayerAnimationState_QTEseikou].SetLoopFlag(true);
+    m_playerAnimationState[enPlayerAnimationState_GameClear1].Load("Assets/animData/gameClear.tka");
+    m_playerAnimationState[enPlayerAnimationState_GameClear1].SetLoopFlag(false);
+    m_playerAnimationState[enPlayerAnimationState_GameClear2].Load("Assets/animData/gameClear2.tka");
+    m_playerAnimationState[enPlayerAnimationState_GameClear2].SetLoopFlag(false);
+    m_playerAnimationState[enPlayerAnimationState_GameOver].Load("Assets/animData/gameover.tka");
+    m_playerAnimationState[enPlayerAnimationState_GameOver].SetLoopFlag(false);
+    m_playerAnimationState[enPlayerAnimationState_GameOverRun].Load("Assets/animData/PlayerRun.tka");
+    m_playerAnimationState[enPlayerAnimationState_GameOverRun].SetLoopFlag(true);
 
     m_NewModelRender.Init("Assets/modelData/Player2.tkm", m_playerAnimationState, enPlayerAnimationState_Num, enModelUpAxisZ);
-    //m_NewModelRender.SetPosition({ 0, 0, 0 });
+   
     // 傘生成
     m_umbrella = NewGO<Umbrella>(0);
 
     // キャラコン
-    m_characterController.Init(25.0f, 75.0f, m_position);
+    m_characterController.Init(10.0f, 50.0f, m_position);
 
     // 初期モード
     number = 1;
     m_state = 0;
     m_prevNumber = 1;
+    m_prevPlayerState = -1;
+    m_finishRot.SetRotationY(Math::DegToRad(-90.0f));
 
     m_runSound = NewGO<SoundSource>(0);
     m_runSound->Init(SE_run);
@@ -66,11 +70,6 @@ void Player::Reset()
 void Player::Update()
 {
     m_prevNumber = number;
-
-    /*if (number > 3 and g_pad[0]->IsTrigger(enButtonSelect))
-    {
-        number = 1;
-    }*/
 
     // =========================
     // モード切り替え（Aボタン）
@@ -92,40 +91,6 @@ void Player::Update()
         }
     }
 
-    // =========================
-    // モードごとの処理
-    // =========================
-    if (number == 1)
-    {
-        m_playerState = 0;
-
-        // 移動モード
-        Move();
-        Rotation();
-        ManageState();
-        //PlayAnimation();
-        PlayAnimation2();
-
-        // 傘は止める
-        m_umbrella->SetSpinSpeed(0.0f);
-    }
-    if (number == 2)
-    {
-        // 傘回しモード
-
-        // プレイヤーを止める
-        m_moveSpeed = Vector3::Zero;
-
-        // アニメーションは待機固定
-        m_playerState = 3;
-        //PlayAnimation();
-        PlayAnimation2();
-
-        // 傘回転
-        float spin = CalcStickRotationSpeed();
-        m_umbrella->SetSpinSpeed(spin);
-    }
-
     bool isMoving =
         fabsf(m_moveSpeed.x) >= 0.001f ||
         fabsf(m_moveSpeed.z) >= 0.001f;
@@ -141,18 +106,17 @@ void Player::Update()
         m_isRunSEPlaying = false;
     }
 
-    if (number == 3)
+    ManageState();     // 状態決定
+    PlayerAction();    // 行動
+
+    if (m_prevPlayerState != m_playerState)
     {
-        m_moveSpeed = Vector3::Zero;
-
-        m_playerState = 4;
         PlayAnimation2();
-
     }
 
-    // モデル更新
-    //m_modelRender.Update();
     m_NewModelRender.Update();
+
+    m_prevPlayerState = m_playerState;
 
     int boneNo = m_NewModelRender.FindBoneID(L"Middle_r");
 
@@ -194,11 +158,6 @@ void Player::Move()
     if (m_characterController.IsOnGround())
     {
         m_moveSpeed.y = 0.0f;
-
-        /* if (g_pad[0]->IsPress(enButtonSelect) || g_pad[0]->IsPress(enButtonLB2) || g_pad[0]->IsPress(enButtonRB2))
-         {
-             m_moveSpeed.y = 240.0f;
-         }*/
     }
     else
     {
@@ -222,68 +181,136 @@ void Player::Rotation()
 
 void Player::ManageState()
 {
-    // すでにステート3なら何もしない
-    if (m_playerState == 3)
+    Vector2 stick;
+    stick.x = g_pad[0]->GetLStickXF();
+    stick.y = g_pad[0]->GetLStickYF();
+
+    // 通常時待機と走るの状態遷移
+    if (m_playerState == 0 || m_playerState == 2)
     {
-        return;
+        if (fabsf(stick.x) >= 0.1f || fabsf(stick.y) >= 0.1f)
+        {
+            m_playerState = 2;
+        }
+        else
+        {
+            m_playerState = 0;
+        }
     }
 
-    if (m_characterController.IsOnGround() == false)
+    // ゲームクリアの状態遷移
+    if (m_playerState == 7 && !m_NewModelRender.IsPlayingAnimation())
     {
-        m_playerState = 1;
-        return;
+        m_playerState = 8;
     }
 
-
-
-    if (fabsf(m_moveSpeed.x) >= 0.001f || fabsf(m_moveSpeed.z) >= 0.001f)
+    // ゲームオーバーの状態遷移
+    if (m_playerState == 9 && !m_NewModelRender.IsPlayingAnimation())
     {
-        m_playerState = 2;
+        m_playerState = 10;
     }
-    else
-    {
-        m_playerState = 0;
-    }
-
-
 }
 
-//void Player::PlayAnimation()
-//{
-//    switch (m_playerState) {
-//    case 0:
-//        m_modelRender.PlayAnimation(enAnimationClip_Idle);
-//        break;
-//    case 1:
-//        m_modelRender.PlayAnimation(enAnimationClip_Jump);
-//        break;
-//    case 2:
-//        m_modelRender.PlayAnimation(enAnimationClip_Run);
-//        break;
-//    }
-//}
+void Player::PlayerAction()
+{
+    switch (m_playerState)
+    {
+    case 0:
+        //通常時待機のアクション
+        break;
+    case 1:
+        //通常時失敗のアクション
+        break;
+    case 2:
+        //走るアクション
+        Move();
+        Rotation();
+        break;
+    case 3:
+    {
+        //傘を回すアクション
+        // 傘回転
+        float spin = CalcStickRotationSpeed();
+        m_umbrella->SetSpinSpeed(spin);
+    }
+    break;
+    case 4:
+        //通常時成功のアクション
+        break;
+    case 5:
+        //QTE失敗のアクション
+        break;
+    case 6:
+        //QTE成功のアクション
+        break;
+    case 7:
+        //ゲームクリアのアクション1
+        break;
+    case 8:
+        //ゲームクリアのアクション2
+        break;
+    case 9:
+        //ゲームオーバーのアクション
+        break;
+    case 10:
+        //ゲームオーバーの走るアクション
+        m_moveSpeed = Vector3(-400.0f, 0.0f, 0.0f); // 左方向
+        m_position += m_moveSpeed * (1.0f / 60.0f);
+        m_NewModelRender.SetRotation(m_finishRot);
+        m_NewModelRender.SetPosition(m_position);
+
+        break;
+    }
+}
 
 void Player::PlayAnimation2()
 {
     switch (m_playerState) {
     case 0:
+        //通常時待機のアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Idle);
         break;
     case 1:
-        //m_NewModelRender.PlayAnimation(enPlayerAnimationState_Jump);
+        //通常時失敗のアニメーション
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_Normal);
         break;
     case 2:
+        //走るアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Run);
         break;
     case 3:
+        //傘を回すアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Rotation);
         break;
     case 4:
-        m_NewModelRender.PlayAnimation(enPlayerAnimationState_success);
+        //通常時成功のアニメーション
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_Success);
+        break;
+    case 5:
+        //QTE失敗のアニメーション
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_QTEsippai);
+        break;
+    case 6:
+        //QTE成功のアニメーション
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_QTEseikou);
+        break;
+    case 7:
+        //ゲームクリアのアニメーション1
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameClear1);
+        break;
+    case 8:
+        //ゲームクリアのアニメーション2
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameClear2);
+        break;
+    case 9:
+        //ゲームオーバーのアニメーション
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameOver);
+        break;
+    case 10:
+        //ゲームオーバーの走るアニメーション
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameOverRun);
         break;
     }
-
-
 }
 
 
@@ -364,8 +391,5 @@ float Player::CalcStickRotationSpeed()
 
 void Player::Render(RenderContext& rc)
 {
-    //ユニティーちゃんを表示する。
-   // m_modelRender.Draw(rc);
-
     m_NewModelRender.Draw(rc);
 }
