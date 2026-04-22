@@ -75,7 +75,13 @@ void Game::Update()
     nsK2EngineLow::GamePad::BeginFrame();
     g_pad[0]->Update();
 
-
+    // ★ 次フレーム開始処理
+    if (m_requestStart)
+    {
+        m_requestStart = false;
+        m_gameState = GameState::Playing;
+        return; // ← 今フレームは何も動かさない
+    }
     switch (m_gameState)
     {
     case GameState::Playing:
@@ -110,16 +116,27 @@ GamePhase Game::GetPhase()
 void Game::ResetGame()
 {
     // Title からのみ許可
-    if (m_gameState != GameState::Title)
+    if (m_gameState != GameState::Title &&
+        m_gameState != GameState::GameClear)
         return;
 
-    m_gameState = GameState::Playing;
+    // 一旦停止状態にする
+    m_gameState = GameState::Pause;
+    
     m_phase = GamePhase::Start;
-
+    m_startTimer = 0.0f;
+    m_showStart = true;
     m_movePhaseTimer = 0.0f;
     m_clearTimer = 0.0f;
     m_isGameClearShown = false;
+    m_itemMove = false;
 
+    // ★ 残っているオブジェクトを消す
+    if (m_item)
+    {
+        DeleteGO(m_item);
+        m_item = nullptr;
+    }
 
     // ★ プレイヤー初期化
     if (Player* player = FindGO<Player>("player"))
@@ -129,6 +146,8 @@ void Game::ResetGame()
 
     if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
         cam->Reset();
+
+    m_requestStart = true;
 }
 
 void Game::RequestMovePhase()
@@ -210,25 +229,20 @@ void Game::UpdatePlaying()
         if (Player* player = FindGO<Player>("player"))
         {
             Vector3 pos = player->GetPosition();
-
-            // ◆ 何もしなかった判定
-            static Vector3 prevPos = pos;
-            static float idleTimer = 0.0f;
-
             const float moveThreshold = 0.05f; // 動いたとみなす距離
 
-            if ((pos - prevPos).Length() < moveThreshold)
+            if ((pos - m_prevPos).Length() < moveThreshold)
             {
-                idleTimer += 1.0f / 60.0f;
+                m_idleTimer += 1.0f / 60.0f;
             }
             else
             {
-                idleTimer = 0.0f;
-                prevPos = pos;
+                m_idleTimer = 0.0f;
+                m_prevPos = pos;
             }
 
             // 8秒何もしなかったらGameOver
-            if (idleTimer >= 8.0f)
+            if (m_idleTimer >= m_idleLimitTime)
             {
                 RequestGameOver();
             }

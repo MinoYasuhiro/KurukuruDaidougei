@@ -10,9 +10,9 @@ public:
 
 private:
 	SpriteRender m_SpriteRender;
+	SpriteRender m_RetryRender;
 	Vector3 m_position;
-	
-
+	bool m_canInput = false;
 
 };
 

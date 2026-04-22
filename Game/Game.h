@@ -79,11 +79,12 @@ private:
 	static GamePhase m_phase;
 
 	static GameState m_gameState;
-
+	bool m_requestStart = false;
+	bool m_isStarting = false;
 	/// <summary>
 	/// ゲームオーバー（仮）
 	/// </summary>
-	Vector3 m_prevPlayerPos;
+	Vector3 m_prevPos = Vector3::Zero;
 	float   m_idleTimer = 0.0f;
 	const float m_idleLimitTime = 8.0f; // 何秒でGameOverにするか
 
