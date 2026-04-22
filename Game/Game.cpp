@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Game.h"
 #include "BackGround.h"
 #include "Player.h"
@@ -16,6 +16,7 @@
 #include "SEManager.h"
 #include "Item.h"
 #include "Title.h"
+#include "Circle.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -36,6 +37,7 @@ bool Game::Start()
     //ゲームの初期化
     m_phase = GamePhase::Start;
 
+    m_circle = NewGO<Circle>(0, "circle");
 
     m_backGround = NewGO<BackGround>(0, "background");
     //m_umbrella = NewGO<Umbrella>(0, "umbrella");
@@ -46,8 +48,22 @@ bool Game::Start()
     m_startLetter.SetPosition({ 640.0f,360.0f,0.0f });
     m_startLetter.SetScale({ 2.0f,2.0f,2.0f });
 
+    m_failureLetter.Init("Assets/sprite/Failure.dds", 800.0f, 200.0f);
+    m_failureLetter.SetPosition({ 640.0f,360.0f,0.0f });
+    m_failureLetter.SetScale({ 2.0f,2.0f,2.0f });
+
+    m_successLetter.Init("Assets/sprite/Success.dds", 800.0f, 200.0f);
+    m_successLetter.SetPosition({ 640.0f,360.0f,0.0f });
+    m_successLetter.SetScale({ 2.0f,2.0f,2.0f });
+
     m_startTimer = 0.0f;
     m_showStart = true;
+
+    m_failureTimer = 0.0f;
+    m_showFailure = false;
+
+    m_successTimer = 0.0f;
+    m_showSuccess = false;
 
     //m_coinBox = NewGO<CoinBox>(0, "coinBox");
 
@@ -83,6 +99,7 @@ void Game::Update()
 
     m_modelRender.Update();
     //m_coinBox->Update();
+    m_circle->Update();
 }
 
 GamePhase Game::GetPhase()
@@ -149,14 +166,13 @@ void Game::UpdatePlaying()
         if (m_startTimer >= 2.0f)
         {
             m_showStart = false;
-            m_phase = GamePhase::MovePhase;
-            m_movePhaseTimer = 0.0f;
-            m_itemMove = false;
+            RequestMovePhase();
         }
         break;
 
     case GamePhase::MovePhase:
         m_movePhaseTimer += deltaTime;
+        //アイテム未生成時のみ生成
         if (!m_itemMove)
         {
             if (m_item)
@@ -164,9 +180,14 @@ void Game::UpdatePlaying()
                 DeleteGO(m_item);
                 m_item = nullptr;
             }
+
             m_item = NewGO<Item>(0, "item");
-            m_item->StartParabolaTest();
+
+            //放物運動準備
+            m_item->PrepareParabola();
+
             m_itemMove = true;
+            m_hasThrownItem = false;
         }
         if (m_movePhaseTimer >= 15.0f)
             m_phase = GamePhase::AfterMove;
@@ -213,6 +234,43 @@ void Game::UpdatePlaying()
             }
         }
     }
+
+    //アイテムが飛んでいない間は着地点予測を表示
+    if (m_item && m_phase == GamePhase::MovePhase && !m_hasThrownItem && !m_item->IsFlying())
+    {
+        Vector3 landingPosition = m_item->GetPlannedLandingPosition();
+        m_circle->SetPosition(landingPosition);
+        m_circle->SetVisible(true);
+    }
+    else
+    {
+        m_circle->SetVisible(false);
+    }
+
+    //一定時間後にアイテムを投げる
+    if (m_item && !m_item->IsFlying() && !m_hasThrownItem && m_movePhaseTimer >= 2.0f)
+    {
+        m_item->Move();
+        m_hasThrownItem = true;
+    }
+
+    if (m_showFailure)
+    {
+        m_failureTimer += 1.0f / 60.0f;
+        if (m_failureTimer >= 2.0f)
+        {
+            m_showFailure = false;
+        }
+    }
+
+    if (m_showSuccess)
+    {
+        m_successTimer += 1.0f / 60.0f;
+        if (m_successTimer >= 2.0f)
+        {
+            m_showSuccess = false;
+        }
+    }
 }
 
 void Game::RequestGameClear()
@@ -253,6 +311,18 @@ void Game::RequestGameOver()
 
 }
 
+void Game::RequestFailureLetter()
+{
+    m_showFailure = true;
+    m_failureTimer = 0.0f;
+}
+
+void Game::RequestSuccessLetter()
+{
+    m_showSuccess = true;
+    m_successTimer = 0.0f;
+}
+
 void Game::Render(RenderContext& rc)
 {
     if (m_phase == GamePhase::Start && m_showStart)
@@ -260,5 +330,16 @@ void Game::Render(RenderContext& rc)
         m_startLetter.Draw(rc);
     }
 
+    if (m_showFailure)
+    {
+        m_failureLetter.Draw(rc);
+    }
+
+    if (m_showSuccess)
+    {
+        m_successLetter.Draw(rc);
+    }
+
     //m_coinBox->Render(rc);
+    m_circle->Render(rc);
 }

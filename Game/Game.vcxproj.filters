@@ -29,6 +29,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Umbrella.cpp" />
     <ClCompile Include="CoinBox.cpp" />
+    <ClCompile Include="Circle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -53,5 +54,6 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Umbrella.h" />
     <ClInclude Include="CoinBox.h" />
+    <ClInclude Include="Circle.h" />
   </ItemGroup>
 </Project>
