@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Level3DRender/LevelRender.h"
 
 class BackGround;
@@ -10,6 +10,7 @@ class QTE;
 class BGMManager;
 class CoinBox;
 class Item;
+class Circle;
 enum class GamePhase
 {
 	Start,
@@ -45,7 +46,10 @@ public:
 	void RequestGameClear();
 	void RequestTitle();
 	void UpdatePlaying();
+	void RequestFailureLetter();
+	void RequestSuccessLetter();
 
+	Circle* GetCircle()const { return m_circle; }
 
 private:
 	ModelRender m_modelRender;
@@ -55,15 +59,23 @@ private:
 	Umbrella* m_umbrella;
 	SpriteRender* m_SpriteRender;
 	SpriteRender m_startLetter;
+	SpriteRender m_failureLetter;
+	SpriteRender m_successLetter;
 	GameCamera* m_gameCamera;
 	CoinBox* m_coinBox = nullptr;
 	Item* m_item = nullptr;
+	Circle* m_circle = nullptr;
 	float m_movePhaseTimer = 0.0f;   // ★ 移動フェーズ経過時間
 	float m_clearTimer = 0.0f;      // 経過時間
 	float m_startTimer = 0.0f;
+	float m_failureTimer = 0.0f;
+	float m_successTimer = 0.0f;
 	bool m_showStart = true;
+	bool m_showFailure = false;
+	bool m_showSuccess = false;
 	bool  m_isGameClearShown = false; // すでに表示したか
 	bool m_itemMove = false;
+	bool m_hasThrownItem = false;
 	static GamePhase m_phase;
 
 	static GameState m_gameState;
