@@ -22,6 +22,8 @@ public:
 	void PlayerAction();
 	//アニメーションの再生2。
 	void PlayAnimation2();
+	//サウンドの再生。
+	void SoundPlay();
 	////座標を取得する。
 	Vector3 GetPosition() const
 	{

@@ -54,6 +54,7 @@ private:
 	bool m_isFlying = false;	//球が飛んでいるかどうか
 	bool m_isCracked = false;	//割れ状態かどうか
 	bool m_wasOnUmbrella = false;
+	bool m_hasPlayedLandSE = false;
 	float m_onUmbrellaTimer = 0.0f;
 	float m_onUmbrellaLimitTimer = 2.0f;
 };
