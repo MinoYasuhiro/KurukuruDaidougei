@@ -117,7 +117,8 @@ void Game::ResetGame()
 {
     // Title からのみ許可
     if (m_gameState != GameState::Title &&
-        m_gameState != GameState::GameClear)
+        m_gameState != GameState::GameClear && 
+        m_gameState != GameState::GameOver)
         return;
 
     // 一旦停止状態にする
@@ -304,6 +305,13 @@ void Game::RequestTitle()
     if (m_gameState == GameState::Title)
         return;
 
+    // ★ これが重要
+    m_requestStart = false;
+
+    // ★ GameOver判定用リセット
+    m_idleTimer = 0.0f;
+    m_prevPos = Vector3::Zero;
+
     // Title状態
     m_gameState = GameState::Title;
 
@@ -318,6 +326,12 @@ void Game::RequestGameOver()
     // すでに終了状態なら無視
     if (m_gameState != GameState::Playing)
         return;
+
+    m_requestStart = false;
+
+    // ★ GameOver判定用リセット
+    m_idleTimer = 0.0f;
+    m_prevPos = Vector3::Zero;
 
     NewGO<GameOver>(10, "gameOver");
     m_gameState = GameState::GameOver;
