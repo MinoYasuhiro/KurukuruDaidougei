@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "sound/SoundSource.h"
 #include "Umbrella.h"
 
@@ -24,6 +24,8 @@ public:
 	void PlayAnimation2();
 	//サウンドの再生。
 	void SoundPlay();
+	//傘回しの回転数保持
+	void SpinCount();
 	////座標を取得する。
 	Vector3 GetPosition() const
 	{
@@ -89,4 +91,12 @@ private:
 	int m_prevNumber = 1;
 
 	Vector3 m_startPos = { 0.0f, 0.0f, 0.0f };
+
+	Vector2 m_prevStick2 = Vector2(0, 0);
+	float   m_inputCooldown = 0.0f;
+	int     m_spinCount = 0;   // カチカチ回数
+
+	float m_spinSpeed = 0.0f;
+
+	FontRender m_font;
 };
