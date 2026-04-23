@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "GameOver.h"
+#include "Game.h"
 #include "Title.h"
 
 
@@ -14,9 +15,21 @@ void GameOver::Update()
 
     m_SpriteRender.Update();
 
-    if (g_pad[0]->IsTrigger(enButtonA))
+    // ★ 入力持ち越し対策
+    if (!m_canInput)
     {
-        NewGO<Title>(0, "title");
+        m_canInput = true;
+        return;
+    }
+    
+    //タイトル
+    if (g_pad[0]->IsPress(enButtonB))
+    {
+        if (Game* game = FindGO<Game>("game"))
+        {
+            game->RequestTitle();
+        }
+        
         DeleteGO(this);
     }
 

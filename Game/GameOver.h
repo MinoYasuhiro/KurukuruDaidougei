@@ -1,4 +1,6 @@
 #pragma once
+class Title;
+class Game;
 class GameOver : public IGameObject
 {
 public:
@@ -11,6 +13,10 @@ public:
 private:
 	SpriteRender m_SpriteRender;
 	Vector3 m_position;
+	SpriteRender m_RetryRender;
+	bool m_canInput = false;
+
+
 
 };
 
