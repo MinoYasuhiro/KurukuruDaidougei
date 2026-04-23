@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "Player.h"
 #include "Circle.h"
+#include "SEManager.h"
 Item::Item()
 {
 
@@ -178,6 +179,13 @@ void Item::FailFallMotion()
 		m_moveSpeed = Vector3::Zero;
 		m_isFlying = false;
 		m_isCracked = true;
+
+		if (!m_hasPlayedLandSE)
+		{
+			SEManager::Play(SE_ball);
+			//SEManager::Play(SE_crackedEgg);
+			m_hasPlayedLandSE = true;
+		}
 
 		if (m_wasOnUmbrella)
 		{
