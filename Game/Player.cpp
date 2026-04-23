@@ -91,23 +91,24 @@ void Player::Update()
         }
     }
 
-    bool isMoving =
-        fabsf(m_moveSpeed.x) >= 0.001f ||
-        fabsf(m_moveSpeed.z) >= 0.001f;
+    //bool isMoving =
+    //    fabsf(m_moveSpeed.x) >= 0.001f ||
+    //    fabsf(m_moveSpeed.z) >= 0.001f;
 
-    if (isMoving && !m_wasMoving)
-    {
-        m_runSound->Play(true);
-        m_isRunSEPlaying = true;
-    }
-    if (!isMoving && m_isRunSEPlaying)
-    {
-        m_runSound->Stop();
-        m_isRunSEPlaying = false;
-    }
+    //if (isMoving && !m_wasMoving)
+    //{
+    //    m_runSound->Play(true);
+    //    m_isRunSEPlaying = true;
+    //}
+    //if (!isMoving && m_isRunSEPlaying)
+    //{
+    //    m_runSound->Stop();
+    //    m_isRunSEPlaying = false;
+    //}
 
     ManageState();     // 状態決定
     PlayerAction();    // 行動
+	SoundPlay();      // サウンド再生
 
     if (m_prevPlayerState != m_playerState)
     {
@@ -132,6 +133,24 @@ void Player::Update()
 
         m_umbrella->SetPosition(pos);
         m_umbrella->SetRotation(rot);
+    }
+}
+
+void Player::SoundPlay()
+{
+    bool isMoveInput =
+        fabsf(g_pad[0]->GetLStickXF()) >= 0.1f ||
+        fabsf(g_pad[0]->GetLStickYF()) >= 0.1f;
+
+    if (m_playerState == 2 && isMoveInput && !m_isRunSEPlaying)
+    {
+        m_runSound->Play(true);
+        m_isRunSEPlaying = true;
+    }
+    else if ((!isMoveInput || m_playerState != 2) && m_isRunSEPlaying)
+    {
+        m_runSound->Stop();
+        m_isRunSEPlaying = false;
     }
 }
 
