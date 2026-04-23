@@ -41,7 +41,6 @@ bool Player::Start()
     m_playerAnimationState[enPlayerAnimationState_GameOverRun].SetLoopFlag(true);
 
     m_NewModelRender.Init("Assets/modelData/Player2.tkm", m_playerAnimationState, enPlayerAnimationState_Num, enModelUpAxisZ);
-    //m_NewModelRender.SetPosition({ 0, 0, 0 });
     // 傘生成
     m_umbrella = NewGO<Umbrella>(0);
 
@@ -58,6 +57,12 @@ bool Player::Start()
     m_runSound = NewGO<SoundSource>(0);
     m_runSound->Init(SE_run);
 
+    //カウントの初期化
+    m_font.SetText(L"");
+    m_font.SetPosition(0.0f, 0.0f, 0.0f);
+    m_font.SetColor({ 1.0f,1.0f,1.0f,1.0f });
+    m_font.SetScale(1.0f);
+
     return true;
 }
 
@@ -69,19 +74,25 @@ void Player::Reset()
 
 void Player::Update()
 {
+    wchar_t text[256];
+    swprintf_s(text, 256, L"Spin Count : %d", m_spinCount);
+
+    m_font.SetText(text);
+
     m_prevNumber = number;
 
-    // =========================
-    // モード切り替え（Aボタン）
-    // =========================
+    // デバッグ用（あとで消す）
+    if (m_playerState > 9 and g_pad[0]->IsTrigger(enButtonSelect))
+    {
+        m_playerState = 0;
+    }
+
+    // デバッグ用（あとで消す）
     if (g_pad[0]->IsTrigger(enButtonA))
     {
-        number += 1;
-        if (number > 3)
-        {
-            number = 1;
-        }
+        m_playerState++;
     }
+    
 
     if (m_prevNumber != 1 && number == 1)
     {
@@ -90,21 +101,6 @@ void Player::Update()
             game->RequestMovePhase();
         }
     }
-
-    //bool isMoving =
-    //    fabsf(m_moveSpeed.x) >= 0.001f ||
-    //    fabsf(m_moveSpeed.z) >= 0.001f;
-
-    //if (isMoving && !m_wasMoving)
-    //{
-    //    m_runSound->Play(true);
-    //    m_isRunSEPlaying = true;
-    //}
-    //if (!isMoving && m_isRunSEPlaying)
-    //{
-    //    m_runSound->Stop();
-    //    m_isRunSEPlaying = false;
-    //}
 
     ManageState();     // 状態決定
     PlayerAction();    // 行動
@@ -248,9 +244,21 @@ void Player::PlayerAction()
     case 3:
     {
         //傘を回すアクション
-        // 傘回転
-        float spin = CalcStickRotationSpeed();
-        m_umbrella->SetSpinSpeed(spin);
+        float inputSpin = CalcStickRotationSpeed();
+
+        // 入力で加速
+        m_spinSpeed += inputSpin * 0.1f;
+
+        // 減衰（勝手に止まる）
+        m_spinSpeed *= 0.98f;
+
+        // 上限
+        if (m_spinSpeed > 10.0f) m_spinSpeed = 10.0f;
+        if (m_spinSpeed < -10.0f) m_spinSpeed = -10.0f;
+
+        m_umbrella->SetSpinSpeed(m_spinSpeed);
+
+        SpinCount();
     }
     break;
     case 4:
@@ -280,6 +288,44 @@ void Player::PlayerAction()
 
         break;
     }
+}
+
+void Player::SpinCount()
+{
+    Vector2 current;
+    current.x = g_pad[0]->GetLStickXF();
+    current.y = g_pad[0]->GetLStickYF();
+
+    float len = sqrtf(current.x * current.x + current.y * current.y);
+
+    // デッドゾーン
+    if (len < 0.2f)
+    {
+        current = Vector2(0, 0);
+    }
+
+    // 前フレとの差
+    Vector2 delta;
+    delta.x = current.x - m_prevStick2.x;
+    delta.y = current.y - m_prevStick2.y;
+
+    float change = sqrtf(delta.x * delta.x + delta.y * delta.y);
+
+    // クールタイム
+    m_inputCooldown -= 1.0f / 60.0f;
+
+    // ★ここがポイント
+    bool isInput = (current.x != 0.0f || current.y != 0.0f);
+    bool wasInput = (m_prevStick2.x != 0.0f || m_prevStick2.y != 0.0f);
+
+    // 「入力がある状態で変化したときだけカウント」
+    if (change > 0.2f && m_inputCooldown <= 0.0f && isInput)
+    {
+        m_spinCount++;
+        m_inputCooldown = 0.05f;
+    }
+
+    m_prevStick2 = current;
 }
 
 void Player::PlayAnimation2()
@@ -411,4 +457,5 @@ float Player::CalcStickRotationSpeed()
 void Player::Render(RenderContext& rc)
 {
     m_NewModelRender.Draw(rc);
+    //m_font.Draw(rc);
 }
