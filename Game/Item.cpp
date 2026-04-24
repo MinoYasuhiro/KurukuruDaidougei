@@ -85,6 +85,9 @@ void Item::Update()
 	case BallState::Spinning:
 		StartQTE();
 		break;
+	case BallState::DropPrepare:
+		DropPrepare();
+		break;
 	case BallState::FailFall:
 		FailFallMotion();
 		break;
@@ -272,9 +275,50 @@ void Item::StartQTE()
 //傘回し失敗時の処理
 void Item::SpinningFailed()
 {
-	m_isFlying = true;
+	/*m_isFlying = true;
 	m_moveSpeed = { 0.0f,-2.0f,0.0f };
-	m_state = BallState::FailFall;
+	m_state = BallState::FailFall;*/
+	m_state = BallState::DropPrepare;
+}
+
+void Item::DropPrepare()
+{
+	//傘判定用の円が取得できない場合は処理しない
+	if (!m_circle)return;
+
+	//円の中心位置
+	Vector3 center = m_circle->GetPosition();
+
+	//円中心から現在位置への方向ベクトル
+	Vector3 diff = m_position - center;
+	diff.y = 0.0f;
+
+	//中心からの距離
+	float dist = diff.Length();
+	//円の半径
+	float radius = m_circle->GetRadius();
+
+	//円(開いた傘)の中心付近にいる場合、外側へ少しずつ移動させる
+	if (dist > 0.01f)
+	{
+		Vector3 dir = diff;
+		dir.Normalize();
+		m_position += dir * 1.0f;
+	}
+
+	//円(開いた傘)の外に出たら落下処理へ移行
+	if (dist >= radius)
+	{
+		Vector3 dir = diff;
+		dir.Normalize();
+
+		//外向き+下向きの初速を設定
+		m_moveSpeed = dir * 2.0f;
+		m_moveSpeed.y = -1.0f;
+
+		m_isFlying = true;
+		m_state = BallState::FailFall;
+	}
 }
 
 //現在の速度から地面に到達する位置を掲載
