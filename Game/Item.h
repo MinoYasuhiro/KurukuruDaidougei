@@ -23,6 +23,7 @@ public:
 	void StartQTE();		//QTE開始
 	void SpinningFailed();	//傘回し失敗時
 	void FailFallMotion();	//失敗時の落下モーション
+	void DropPrepare();
 
 	void StartFallTest();
 	void StartParabolaTest();

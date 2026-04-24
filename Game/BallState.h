@@ -6,6 +6,7 @@ enum class BallState
 	Flying,			//観客から飛んでくる
 	OnUmbrella,		//傘に乗った
 	Spinning,		//傘回し中
+	DropPrepare,	//落下前の準備状態
 	FailFall,		//失敗時
 	SuccessThrow,	//球を放る
 };
