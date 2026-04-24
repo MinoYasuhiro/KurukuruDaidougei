@@ -344,12 +344,14 @@ void Game::RequestFailureLetter()
 {
     m_showFailure = true;
     m_failureTimer = 0.0f;
+    SEManager::Play(SE_booing);
 }
 
 void Game::RequestSuccessLetter()
 {
     m_showSuccess = true;
     m_successTimer = 0.0f;
+    SEManager::Play(SE_cheers);
 }
 
 void Game::Render(RenderContext& rc)
