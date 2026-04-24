@@ -148,6 +148,7 @@ void Game::ResetGame()
     if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
         cam->Reset();
 
+    m_phase = GamePhase::Start;
     m_requestStart = true;
 }
 
