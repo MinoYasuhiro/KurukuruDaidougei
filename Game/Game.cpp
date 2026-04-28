@@ -149,6 +149,7 @@ void Game::ResetGame()
         cam->Reset();
 
     m_phase = GamePhase::Start;
+
     m_requestStart = true;
 }
 
@@ -352,6 +353,26 @@ void Game::RequestSuccessLetter()
     m_showSuccess = true;
     m_successTimer = 0.0f;
     SEManager::Play(SE_cheers);
+}
+
+void Game::RequestSoundTest()
+{
+    //サウンドテスト中は何もしない
+    if (m_gameState == GameState::SoundTest)
+        return;
+
+    //リトライ用の再開要求の無効化
+    m_requestStart = false;
+
+    //GameOver判定を止める
+    m_idleTimer = 0.0f;
+    m_prevPos = Vector3::Zero;
+
+    //状態遷移
+    m_gameState = GameState::SoundTest;
+
+    //SoundTestを前面に生成
+    NewGO<SoundTest>(100, "soundTest");
 }
 
 void Game::Render(RenderContext& rc)

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 class Game;
 class MenuUI;
 class Pause : public IGameObject
@@ -9,6 +9,7 @@ public:
 
 	bool Start();
 	void Update();
+	void Cleanup();
 	void Render(RenderContext& renderContext);
 
 private:
@@ -19,4 +20,5 @@ private:
 	Pause* m_pause;
 	MenuUI* m_menuUI = nullptr;
 };
+
 

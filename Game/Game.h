@@ -48,6 +48,7 @@ public:
 	void UpdatePlaying();
 	void RequestFailureLetter();
 	void RequestSuccessLetter();
+	void RequestSoundTest();
 
 	Circle* GetCircle()const { return m_circle; }
 
