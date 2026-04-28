@@ -8,6 +8,8 @@ MenuUI::MenuUI()
 MenuUI::~MenuUI()
 {
 
+
+
 }
 
 bool MenuUI::Start()
@@ -86,7 +88,7 @@ void MenuUI::Input()
 			m_result = MenuResult::SoundOption;
 			break;
 		}
-		DeleteGO(this);
+		
 	}
 }
 
@@ -114,7 +116,7 @@ void MenuUI::SelectScale()
 	}
 }
 
-void MenuUI::Render(RenderContext&rc)
+void MenuUI::Render(RenderContext& rc)
 {
 	m_backTitleRender.Draw(rc);
 	m_endGameRender.Draw(rc);

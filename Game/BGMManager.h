@@ -8,7 +8,7 @@ public:
 	~BGMManager() {}
 	void Init();
 	void Play(BGM bgmID);
-	//void Stop();
+	void Stop();
 
 private:
 	SoundSource* m_currentBGM = nullptr;
