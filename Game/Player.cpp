@@ -5,6 +5,7 @@
 #include "Umbrella.h"
 #include "SEManager.h"
 #include "Game.h"
+#include "Item.h"
 
 Player::Player()
 {
@@ -52,6 +53,7 @@ bool Player::Start()
     m_state = 0;
     m_prevNumber = 1;
     m_prevPlayerState = -1;
+    m_playerState = 0;
     m_finishRot.SetRotationY(Math::DegToRad(-90.0f));
 
     m_runSound = NewGO<SoundSource>(0);
@@ -62,6 +64,8 @@ bool Player::Start()
     m_font.SetPosition(0.0f, 0.0f, 0.0f);
     m_font.SetColor({ 1.0f,1.0f,1.0f,1.0f });
     m_font.SetScale(1.0f);
+
+	m_itemOnUmbrella = false;
 
     return true;
 }
@@ -74,6 +78,20 @@ void Player::Reset()
 
 void Player::Update()
 {
+    if (m_resetGame)
+    {
+		m_playerState = 0;
+		m_spinCount = 0;
+		m_itemOnUmbrella = false;
+        m_position = m_startPos;
+        m_NewModelRender.SetPosition(m_position);
+        m_NewModelRender.Update();
+        m_umbrella->Reset();
+
+        m_resetGame = false;
+    }
+
+
     wchar_t text[256];
     swprintf_s(text, 256, L"Spin Count : %d", m_spinCount);
 
@@ -81,17 +99,17 @@ void Player::Update()
 
     m_prevNumber = number;
 
-    // デバッグ用（あとで消す）
-    if (m_playerState > 9 and g_pad[0]->IsTrigger(enButtonSelect))
-    {
-        m_playerState = 0;
-    }
+    //// デバッグ用（あとで消す）
+    //if (m_playerState > 9 and g_pad[0]->IsTrigger(enButtonSelect))
+    //{
+    //    m_playerState = 0;
+    //}
 
-    // デバッグ用（あとで消す）
-    if (g_pad[0]->IsTrigger(enButtonA))
-    {
-        m_playerState++;
-    }
+    //// デバッグ用（あとで消す）
+    //if (g_pad[0]->IsTrigger(enButtonA))
+    //{
+    //    m_playerState++;
+    //}
     
 
     if (m_prevNumber != 1 && number == 1)
@@ -106,8 +124,14 @@ void Player::Update()
     PlayerAction();    // 行動
 	SoundPlay();      // サウンド再生
 
+    // ★ここに追加
     if (m_prevPlayerState != m_playerState)
     {
+        if (m_playerState == 3)
+        {
+            m_umbrella->OnStartSpin();
+        }
+
         PlayAnimation2();
     }
 
@@ -128,7 +152,7 @@ void Player::Update()
         bone->CalcWorldTRS(pos, rot, scale);
 
         m_umbrella->SetPosition(pos);
-        m_umbrella->SetRotation(rot);
+       m_umbrella->SetRotation(rot);
     }
 }
 
@@ -200,10 +224,15 @@ void Player::ManageState()
     stick.x = g_pad[0]->GetLStickXF();
     stick.y = g_pad[0]->GetLStickYF();
 
-    // 通常時待機と走るの状態遷移
-    if (m_playerState == 0 || m_playerState == 2)
+    switch (m_playerState)
     {
-        if (fabsf(stick.x) >= 0.1f || fabsf(stick.y) >= 0.1f)
+    case 0: // 待機
+    case 2: // 移動
+        if (m_itemOnUmbrella)
+        {
+            m_playerState = 3;
+        }
+        else if (fabsf(stick.x) >= 0.1f || fabsf(stick.y) >= 0.1f)
         {
             m_playerState = 2;
         }
@@ -211,18 +240,21 @@ void Player::ManageState()
         {
             m_playerState = 0;
         }
-    }
+        break;
 
-    // ゲームクリアの状態遷移
-    if (m_playerState == 7 && !m_NewModelRender.IsPlayingAnimation())
-    {
-        m_playerState = 8;
-    }
+    case 7: // クリア中
+        if (!m_NewModelRender.IsPlayingAnimation())
+        {
+            m_playerState = 8;
+        }
+        break;
 
-    // ゲームオーバーの状態遷移
-    if (m_playerState == 9 && !m_NewModelRender.IsPlayingAnimation())
-    {
-        m_playerState = 10;
+    case 9: // ゲームオーバー中
+        if (!m_NewModelRender.IsPlayingAnimation())
+        {
+            m_playerState = 10;
+        }
+        break;
     }
 }
 
@@ -247,14 +279,13 @@ void Player::PlayerAction()
         float inputSpin = CalcStickRotationSpeed();
 
         // 入力で加速
-        m_spinSpeed += inputSpin * 0.1f;
+        m_spinSpeed += inputSpin * 0.2f;
 
         // 減衰（勝手に止まる）
-        m_spinSpeed *= 0.98f;
+       m_spinSpeed *= 0.96f;
 
-        // 上限
-        if (m_spinSpeed > 10.0f) m_spinSpeed = 10.0f;
-        if (m_spinSpeed < -10.0f) m_spinSpeed = -10.0f;
+       if (m_spinSpeed > 20.0f) m_spinSpeed = 30.0f;
+       if (m_spinSpeed < -20.0f) m_spinSpeed = -30.0f;
 
         m_umbrella->SetSpinSpeed(m_spinSpeed);
 

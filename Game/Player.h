@@ -1,6 +1,7 @@
-#pragma once
+﻿#pragma once
 #include "sound/SoundSource.h"
 #include "Umbrella.h"
+#include "Item.h"
 
 class Player : public IGameObject
 {
@@ -74,6 +75,9 @@ public:
 	SoundSource* m_jumpSound = nullptr;	//ジャンプの音
 	SoundSource* m_runSound = nullptr;	//走る音
 
+	bool m_itemOnUmbrella = false;	//アイテムが傘の上にあるかどうか
+
+	bool m_resetGame = false;	//ゲームリセットフラグ
 private:
 	Umbrella* m_umbrella = nullptr;
 
@@ -99,4 +103,8 @@ private:
 	float m_spinSpeed = 0.0f;
 
 	FontRender m_font;
+
+	Item* m_item = nullptr;
+	
+	
 };

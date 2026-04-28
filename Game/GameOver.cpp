@@ -1,7 +1,8 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "GameOver.h"
 #include "Game.h"
 #include "Title.h"
+#include "Player.h"
 
 
 bool GameOver::Start()
@@ -11,6 +12,8 @@ bool GameOver::Start()
     m_RetryRender.Init("Assets/Sprite/Retry.DDS", 500, 500);
     m_RetryRender.SetPosition(Vector3(0, -200, 0)); // ★ 手前
     m_RetryRender.SetScale(Vector3(1.5f, 1.5f, 1.5f));
+
+	m_player = FindGO<Player>("player");
 
 	return true;
 }
@@ -33,6 +36,7 @@ void GameOver::Update()
         if (Game* game = FindGO<Game>("game"))
         {
             game->ResetGame();
+			m_player->m_resetGame = true;
         }
 
         DeleteGO(this);
@@ -44,6 +48,7 @@ void GameOver::Update()
         if (Game* game = FindGO<Game>("game"))
         {
             game->RequestTitle();
+			m_player->m_resetGame = true;
         }
         
         DeleteGO(this);
