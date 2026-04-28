@@ -1,4 +1,5 @@
 ﻿#pragma once
+class Player;
 class Umbrella : public IGameObject
 {
 public:
@@ -7,6 +8,9 @@ public:
 	bool Start() override;
 	void Update() override;
 	void Render(RenderContext& rc) override;
+	void Reset();
+	void OnStartSpin();
+	Quaternion GetRotation() const;
 
 	// ★追加
 	void SetSpinSpeed(float speed);
@@ -24,5 +28,9 @@ public:
 	float m_rotationY = 0.0f;
 	Vector3 m_scale = Vector3(1.0f, 1.0f, 1.0f);
 	Vector3 m_respwnPosition; //傘の復活ポジション
+	Player* m_player = nullptr; //プレイヤーへのポインタ
+	Vector3 m_forward = Vector3::AxisZ; // 傘の向き
+	float m_angleY = 0.0f;
+	float m_angleX = 0.0f;
 };
 
