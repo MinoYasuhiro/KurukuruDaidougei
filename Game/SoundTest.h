@@ -1,4 +1,5 @@
 #pragma once
+#include "SoundUI.h"
 #include "BGMManager.h"
 
 class SoundTest : public IGameObject
@@ -13,5 +14,7 @@ public:
 
 private:
 	SpriteRender m_background;
+	SpriteRender m_backgroundTitle;
 	BGMManager* m_bgmManager = nullptr;
+	SoundUI* m_soundUI = nullptr;   
 };
