@@ -43,8 +43,8 @@ void SoundTest::Update()
     if (g_pad[0]->IsPress(enButtonB) ||
         g_pad[0]->IsPress(enButtonX))
     {
-        if (m_bgmManager)
-            m_bgmManager->Stop();
+        //if (m_bgmManager)
+            //m_bgmManager->Stop();
 
         // ★ SoundUI を消す
         if (m_soundUI)
