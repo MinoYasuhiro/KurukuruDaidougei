@@ -225,7 +225,9 @@
   <ItemGroup>
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="BallState.cpp" />
-    <ClCompile Include="BGM.cpp" />
+    <ClCompile Include="BGM.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="BGMManager.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
@@ -244,7 +246,9 @@
     <ClCompile Include="QTEButton.cpp" />
     <ClCompile Include="SE.cpp" />
     <ClCompile Include="SEManager.cpp" />
-    <ClCompile Include="SoundTest.cpp" />
+    <ClCompile Include="SoundTest.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="SoundUI.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -258,8 +262,12 @@
   <ItemGroup>
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="BallState.h" />
-    <ClInclude Include="BGM.h" />
-    <ClInclude Include="BGMManager.h" />
+    <ClInclude Include="BGM.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="BGMManager.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="ButtonType.h" />
     <ClInclude Include="Circle.h" />
     <ClInclude Include="CoinBox.h" />
@@ -274,7 +282,9 @@
     <ClInclude Include="QTEButton.h" />
     <ClInclude Include="SE.h" />
     <ClInclude Include="SEManager.h" />
-    <ClInclude Include="SoundTest.h" />
+    <ClInclude Include="SoundTest.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="SoundUI.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />
