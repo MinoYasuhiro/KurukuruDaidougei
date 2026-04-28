@@ -80,15 +80,15 @@ void Player::Update()
 {
     if (m_resetGame)
     {
-        m_position = m_startPos;
 		m_playerState = 0;
 		m_spinCount = 0;
 		m_itemOnUmbrella = false;
-		m_resetGame = false;
-		m_rotation = Quaternion::Identity;
-        m_NewModelRender.SetRotation(m_rotation);
-
+        m_position = m_startPos;
+        m_NewModelRender.SetPosition(m_position);
         m_NewModelRender.Update();
+        m_umbrella->Reset();
+
+        m_resetGame = false;
     }
 
 
@@ -124,8 +124,14 @@ void Player::Update()
     PlayerAction();    // 行動
 	SoundPlay();      // サウンド再生
 
+    // ★ここに追加
     if (m_prevPlayerState != m_playerState)
     {
+        if (m_playerState == 3)
+        {
+            m_umbrella->OnStartSpin();
+        }
+
         PlayAnimation2();
     }
 
@@ -146,7 +152,7 @@ void Player::Update()
         bone->CalcWorldTRS(pos, rot, scale);
 
         m_umbrella->SetPosition(pos);
-        m_umbrella->SetRotation(rot);
+       m_umbrella->SetRotation(rot);
     }
 }
 
@@ -273,14 +279,13 @@ void Player::PlayerAction()
         float inputSpin = CalcStickRotationSpeed();
 
         // 入力で加速
-        m_spinSpeed += inputSpin * 0.1f;
+        m_spinSpeed += inputSpin * 0.2f;
 
         // 減衰（勝手に止まる）
-        m_spinSpeed *= 0.98f;
+       m_spinSpeed *= 0.96f;
 
-        // 上限
-        if (m_spinSpeed > 10.0f) m_spinSpeed = 10.0f;
-        if (m_spinSpeed < -10.0f) m_spinSpeed = -10.0f;
+       if (m_spinSpeed > 20.0f) m_spinSpeed = 30.0f;
+       if (m_spinSpeed < -20.0f) m_spinSpeed = -30.0f;
 
         m_umbrella->SetSpinSpeed(m_spinSpeed);
 
