@@ -15,19 +15,19 @@ void BGMManager::Init()
 
 void BGMManager::Play(BGM bgmID)
 {
-    //Stop();
+    Stop();
 
     m_currentBGM = NewGO<SoundSource>(0);
     m_currentBGM->Init(bgmID);
-    //m_currentBGM->Play(true); // ループ
+    m_currentBGM->Play(true); // ループ
 }
 
-//void BGMManager::Stop()
-//{
-//    if (m_currentBGM)
-//    {
-//        DeleteGO(m_currentBGM);
-//        m_currentBGM = nullptr;
-//    }
-//}
+void BGMManager::Stop()
+{
+    if (m_currentBGM)
+    {
+        DeleteGO(m_currentBGM);
+        m_currentBGM = nullptr;
+    }
+}
 
