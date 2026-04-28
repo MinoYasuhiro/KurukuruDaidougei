@@ -11,7 +11,7 @@ bool SoundTest::Start()
 
     //サウンド文字
     m_backgroundTitle.Init("Assets/Sprite/Sound.DDS", 300, 300);
-    m_backgroundTitle.SetPosition({ 0,1200,0 });
+    m_backgroundTitle.SetPosition({ 0.0f, 1200.0f, 0.0f });
 
 
     // BGM管理取得
