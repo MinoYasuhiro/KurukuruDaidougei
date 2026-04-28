@@ -61,6 +61,8 @@ bool Item::Start()
 
 	RandomSpawn();	//初期位置をランダムにする
 
+	m_player = FindGO<Player>("player");
+
 	//StartFallTest();		//落下処理のテスト
 	//StartParabolaTest();	//放物運動のテスト
 	return true;
@@ -146,6 +148,7 @@ void Item::ParabolicMotion()
 					if (success)
 					{
 						m_wasOnUmbrella = true;
+						m_player->m_itemOnUmbrella = true;
 						m_state = BallState::OnUmbrella;
 						return;
 					}
@@ -279,6 +282,7 @@ void Item::SpinningFailed()
 	m_moveSpeed = { 0.0f,-2.0f,0.0f };
 	m_state = BallState::FailFall;*/
 	m_state = BallState::DropPrepare;
+	m_player->m_playerState = 1;
 }
 
 void Item::DropPrepare()

@@ -5,6 +5,7 @@
 #include "Umbrella.h"
 #include "SEManager.h"
 #include "Game.h"
+#include "Item.h"
 
 Player::Player()
 {
@@ -52,6 +53,7 @@ bool Player::Start()
     m_state = 0;
     m_prevNumber = 1;
     m_prevPlayerState = -1;
+    m_playerState = 0;
     m_finishRot.SetRotationY(Math::DegToRad(-90.0f));
 
     m_runSound = NewGO<SoundSource>(0);
@@ -62,6 +64,8 @@ bool Player::Start()
     m_font.SetPosition(0.0f, 0.0f, 0.0f);
     m_font.SetColor({ 1.0f,1.0f,1.0f,1.0f });
     m_font.SetScale(1.0f);
+
+	m_itemOnUmbrella = false;
 
     return true;
 }
@@ -74,6 +78,20 @@ void Player::Reset()
 
 void Player::Update()
 {
+    if (m_resetGame)
+    {
+        m_position = m_startPos;
+		m_playerState = 0;
+		m_spinCount = 0;
+		m_itemOnUmbrella = false;
+		m_resetGame = false;
+		m_rotation = Quaternion::Identity;
+        m_NewModelRender.SetRotation(m_rotation);
+
+        m_NewModelRender.Update();
+    }
+
+
     wchar_t text[256];
     swprintf_s(text, 256, L"Spin Count : %d", m_spinCount);
 
@@ -81,17 +99,17 @@ void Player::Update()
 
     m_prevNumber = number;
 
-    // デバッグ用（あとで消す）
-    if (m_playerState > 9 and g_pad[0]->IsTrigger(enButtonSelect))
-    {
-        m_playerState = 0;
-    }
+    //// デバッグ用（あとで消す）
+    //if (m_playerState > 9 and g_pad[0]->IsTrigger(enButtonSelect))
+    //{
+    //    m_playerState = 0;
+    //}
 
-    // デバッグ用（あとで消す）
-    if (g_pad[0]->IsTrigger(enButtonA))
-    {
-        m_playerState++;
-    }
+    //// デバッグ用（あとで消す）
+    //if (g_pad[0]->IsTrigger(enButtonA))
+    //{
+    //    m_playerState++;
+    //}
     
 
     if (m_prevNumber != 1 && number == 1)
@@ -200,10 +218,15 @@ void Player::ManageState()
     stick.x = g_pad[0]->GetLStickXF();
     stick.y = g_pad[0]->GetLStickYF();
 
-    // 通常時待機と走るの状態遷移
-    if (m_playerState == 0 || m_playerState == 2)
+    switch (m_playerState)
     {
-        if (fabsf(stick.x) >= 0.1f || fabsf(stick.y) >= 0.1f)
+    case 0: // 待機
+    case 2: // 移動
+        if (m_itemOnUmbrella)
+        {
+            m_playerState = 3;
+        }
+        else if (fabsf(stick.x) >= 0.1f || fabsf(stick.y) >= 0.1f)
         {
             m_playerState = 2;
         }
@@ -211,18 +234,21 @@ void Player::ManageState()
         {
             m_playerState = 0;
         }
-    }
+        break;
 
-    // ゲームクリアの状態遷移
-    if (m_playerState == 7 && !m_NewModelRender.IsPlayingAnimation())
-    {
-        m_playerState = 8;
-    }
+    case 7: // クリア中
+        if (!m_NewModelRender.IsPlayingAnimation())
+        {
+            m_playerState = 8;
+        }
+        break;
 
-    // ゲームオーバーの状態遷移
-    if (m_playerState == 9 && !m_NewModelRender.IsPlayingAnimation())
-    {
-        m_playerState = 10;
+    case 9: // ゲームオーバー中
+        if (!m_NewModelRender.IsPlayingAnimation())
+        {
+            m_playerState = 10;
+        }
+        break;
     }
 }
 
