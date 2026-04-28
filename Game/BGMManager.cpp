@@ -11,11 +11,23 @@ void BGMManager::Init()
 	g_soundEngine->ResistWaveFileBank(BGM_GameClear, "Assets/BGM/GmeClear.wav");
 }
 
+
+
 void BGMManager::Play(BGM bgmID)
 {
+    Stop();
 
-
-	SoundSource* bgm = NewGO<SoundSource>(bgmID);
-	bgm->Init(bgmID);
-	bgm->Play(false);
+    m_currentBGM = NewGO<SoundSource>(0);
+    m_currentBGM->Init(bgmID);
+    m_currentBGM->Play(true); // ループ
 }
+
+void BGMManager::Stop()
+{
+    if (m_currentBGM)
+    {
+        DeleteGO(m_currentBGM);
+        m_currentBGM = nullptr;
+    }
+}
+
