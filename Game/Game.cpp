@@ -175,6 +175,8 @@ void Game::UpdatePlaying()
     // ===== ポーズ呼び出し =====
     if (g_pad[0]->IsPress(enButtonY) && m_gameState == GameState::Playing)
     {
+        SEManager::StopLoop(SE_run);
+
         NewGO<Pause>(1, "pause");
         m_gameState = GameState::Pause;
         return;                      // Game は消さない
@@ -354,14 +356,14 @@ void Game::RequestFailureLetter()
 {
     m_showFailure = true;
     m_failureTimer = 0.0f;
-    SEManager::Play(SE_booing);
+    SEManager::Play(SE_booing,false);
 }
 
 void Game::RequestSuccessLetter()
 {
     m_showSuccess = true;
     m_successTimer = 0.0f;
-    SEManager::Play(SE_cheers);
+    SEManager::Play(SE_cheers,false);
 }
 
 void Game::Render(RenderContext& rc)

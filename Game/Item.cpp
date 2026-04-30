@@ -189,7 +189,7 @@ void Item::FailFallMotion()
 
 		if (!m_hasPlayedLandSE)
 		{
-			SEManager::Play(SE_ball);
+			SEManager::Play(SE_ball,false);
 			//SEManager::Play(SE_crackedEgg);
 			m_hasPlayedLandSE = true;
 		}

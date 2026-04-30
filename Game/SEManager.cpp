@@ -25,7 +25,7 @@ void SEManager::Init()
 	g_soundEngine->ResistWaveFileBank(SE_smartphone, "Assets/sound/smartphone.wav");
 }
 
-void SEManager::Play(SE seID)
+void SEManager::Play(SE seID,bool loop)
 {
 	SoundSource* se = nullptr;
 
@@ -44,19 +44,9 @@ void SEManager::Play(SE seID)
 	se->SetVolume(SoundSettings::Master * SoundSettings::SE);
 
 	//効果音を1回再生(ループなし)
-	se->Play(false);
+	se->Play(loop);
 
 	g_seSources[seID] = se;
-}
-
-void SEManager::Stop(SE seID)
-{
-	auto it = g_seSources.find(seID);
-	if (it == g_seSources.end())return;
-
-	if (!it->second)return;
-
-	it->second->Stop();
 }
 
 void SEManager::ClearCache()
@@ -69,4 +59,13 @@ void SEManager::ClearCache()
 		}
 	}
 	g_seSources.clear();
+}
+
+void SEManager::StopLoop(SE seID)
+{
+	auto it = g_seSources.find(seID);
+	if (it == g_seSources.end())return;
+
+	DeleteGO(it->second);
+	g_seSources.erase(it);
 }

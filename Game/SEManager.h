@@ -11,9 +11,9 @@ public:
 	static void Init();
 
 	//指定した効果音を再生
-	static void Play(SE seID);
+	static void Play(SE seID,bool loop);
 
-	static void Stop(SE seID);
+	static void StopLoop(SE seID);
 
 	static void ClearCache();
 };
