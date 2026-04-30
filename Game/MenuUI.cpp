@@ -15,13 +15,13 @@ MenuUI::~MenuUI()
 bool MenuUI::Start()
 {
 	m_backTitleRender.Init("Assets/sprite/Backritle.dds", 800.0f, 800.0f);
-	m_endGameRender.Init("Assets/sprite/Endgame.dds", 800.0f, 800.0f);
+	m_retryRender.Init("Assets/sprite/Endgame.dds", 800.0f, 800.0f);
 	m_restartRender.Init("Assets/sprite/Restart.dds", 800.0f, 800.0f);
 	m_soundTestRender.Init("Assets/sprite/Soundtest.dds", 800.0f, 800.0f);
 
 
 	m_backTitleRender.SetPosition({ -200.0f, -200.0f, 0.0f });
-	m_endGameRender.SetPosition({ 200.0f, -200.0f, 0.0f });
+	m_retryRender.SetPosition({ 200.0f, -200.0f, 0.0f });
 	m_restartRender.SetPosition({ -200.0f, 0.0f, 0.0f });
 	m_soundTestRender.SetPosition({ 200.0f, 0.0f, 0.0f });
 
@@ -36,7 +36,7 @@ void MenuUI::Update()
 	SelectScale();
 
 	m_backTitleRender.Update();
-	m_endGameRender.Update();
+	m_retryRender.Update();
 	m_restartRender.Update();
 	m_soundTestRender.Update();
 }
@@ -77,7 +77,7 @@ void MenuUI::Input()
 			break;
 			//ゲームを終わる
 		case 1:
-			m_result = MenuResult::EndGame;
+			m_result = MenuResult::Retry;
 			break;
 			//リスタート
 		case 2:
@@ -95,7 +95,7 @@ void MenuUI::Input()
 void MenuUI::SelectScale()
 {
 	m_backTitleRender.SetScale({ 1.0f,1.0f,1.0f });
-	m_endGameRender.SetScale({ 1.0f,1.0f,1.0f });
+	m_retryRender.SetScale({ 1.0f,1.0f,1.0f });
 	m_restartRender.SetScale({ 1.0f,1.0f,1.0f });
 	m_soundTestRender.SetScale({ 1.0f,1.0f,1.0f });
 
@@ -105,7 +105,7 @@ void MenuUI::SelectScale()
 		m_backTitleRender.SetScale({ 1.2f,1.2f,1.2f });
 		break;
 	case 1:
-		m_endGameRender.SetScale({ 1.2f,1.2f,1.2f });
+		m_retryRender.SetScale({ 1.2f,1.2f,1.2f });
 		break;
 	case 2:
 		m_restartRender.SetScale({ 1.2f,1.2f,1.2f });
@@ -119,7 +119,7 @@ void MenuUI::SelectScale()
 void MenuUI::Render(RenderContext& rc)
 {
 	m_backTitleRender.Draw(rc);
-	m_endGameRender.Draw(rc);
+	m_retryRender.Draw(rc);
 	m_restartRender.Draw(rc);
 	m_soundTestRender.Draw(rc);
 }

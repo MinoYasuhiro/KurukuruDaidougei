@@ -1,10 +1,10 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Pause.h"
 #include "Title.h"
 #include "Game.h"
 #include "MenuUI.h"
 #include "SoundUI.h"
-#include "SoundTest.h"
+#include "SoundOption.h"
 
 bool Pause::Start()
 {
@@ -38,6 +38,7 @@ void Pause::Update()
     m_PauseRender.Update();
     m_SpriteRender.Update();
 
+    if (!m_menuUI)return;
     m_menuUI->Update();
 
     switch (m_menuUI->GetResult())
@@ -46,35 +47,41 @@ void Pause::Update()
     case MenuResult::BackTitle:
         Game::SetState(GameState::Title);
         NewGO<Title>(0, "title");
-        delete m_menuUI;
-        m_menuUI = nullptr;
+        CleanupMenu();
         DeleteGO(this);
         break;
         //リスタート
     case MenuResult::Restart:
         Game::SetState(GameState::Playing);
-        delete m_menuUI;
-        m_menuUI = nullptr;
+        CleanupMenu();
         DeleteGO(this);
         break;
-        //ゲームをやめる
-    case MenuResult::EndGame:
-
-        delete m_menuUI;
-        m_menuUI = nullptr;
+        //リトライ
+    case MenuResult::Retry:
+        if (Game* game = FindGO<Game>("game"))
+        {
+            game->ResetGame();
+        }
+        CleanupMenu();
         DeleteGO(this);
         break;
         //サウンドオプション
     case MenuResult::SoundOption:
+        Game::SetState(GameState::SoundTest);
+        NewGO<SoundOption>(1, "soundOption");
 
-        if (Game* game = FindGO<Game>("game"))
-            game->RequestSoundTest();
-      
-
-        delete m_menuUI;
-        m_menuUI = nullptr;
+        CleanupMenu();
         DeleteGO(this);
         break;
+    }
+}
+
+void Pause::CleanupMenu()
+{
+    if (m_menuUI)
+    {
+        delete m_menuUI;
+        m_menuUI = nullptr;
     }
 }
 
@@ -84,6 +91,9 @@ void Pause::Render(RenderContext& rc)
     m_SpriteRender.Draw(rc);
     m_Sprite.Draw(rc);
 
-    m_menuUI->Render(rc);
+    if (m_menuUI)
+    {
+        m_menuUI->Render(rc);
+    }
 }
 

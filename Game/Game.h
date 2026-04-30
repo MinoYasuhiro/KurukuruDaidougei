@@ -48,7 +48,6 @@ public:
 	void UpdatePlaying();
 	void RequestFailureLetter();
 	void RequestSuccessLetter();
-	void RequestSoundTest();
 
 	Circle* GetCircle()const { return m_circle; }
 
@@ -77,6 +76,7 @@ private:
 	bool  m_isGameClearShown = false; // すでに表示したか
 	bool m_itemMove = false;
 	bool m_hasThrownItem = false;
+	bool m_isResetting = false;
 	static GamePhase m_phase;
 
 	static GameState m_gameState;

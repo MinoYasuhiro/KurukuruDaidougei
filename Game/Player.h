@@ -38,6 +38,8 @@ public:
 	ModelRender m_modelRender;
 	ModelRender m_NewModelRender;
 
+	Game* m_game = nullptr;
+
 	//プレイヤーの位置や回転、当たり判定。
 	Vector3 m_position;			//プレイヤーの座標。
 	Vector3 m_playerPosition;	//プレイヤーの初期位置
@@ -49,6 +51,7 @@ public:
 
 	bool m_wasMoving = false;
 	bool m_isRunSEPlaying = false;
+	bool m_isSpinSEPlaying = false;
 
 	enum EnPlayerAnimationState {	//アニメーションの状態
 		enPlayerAnimationState_Idle,

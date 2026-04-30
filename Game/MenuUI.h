@@ -1,11 +1,11 @@
-#pragma once
+﻿#pragma once
 
 enum class MenuResult
 {
 	None,
 	BackTitle,
 	Restart,
-	EndGame,
+	Retry,
 	SoundOption,
 };
 
@@ -25,7 +25,7 @@ public:
 
 private:
 	SpriteRender m_backTitleRender;
-	SpriteRender m_endGameRender;
+	SpriteRender m_retryRender;
 	SpriteRender m_restartRender;
 	SpriteRender m_soundTestRender;
 
