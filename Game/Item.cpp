@@ -71,6 +71,7 @@ bool Item::Start()
 //更新処理
 void Item::Update()
 {
+	if (m_game->GetState() != GameState::Playing)return;
 	switch (m_state)
 	{
 		//待機中は何もしない

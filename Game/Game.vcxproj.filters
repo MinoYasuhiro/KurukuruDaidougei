@@ -30,9 +30,10 @@
     <ClCompile Include="Umbrella.cpp" />
     <ClCompile Include="CoinBox.cpp" />
     <ClCompile Include="Circle.cpp" />
-    <ClCompile Include="SoundTest.cpp" />
     <ClCompile Include="BGMManager.cpp" />
     <ClCompile Include="BGM.cpp" />
+    <ClCompile Include="SoundOption.cpp" />
+    <ClCompile Include="SoundSettings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -58,8 +59,9 @@
     <ClInclude Include="Umbrella.h" />
     <ClInclude Include="CoinBox.h" />
     <ClInclude Include="Circle.h" />
-    <ClInclude Include="SoundTest.h" />
     <ClInclude Include="BGM.h" />
     <ClInclude Include="BGMManager.h" />
+    <ClInclude Include="SoundOption.h" />
+    <ClInclude Include="SoundSettings.h" />
   </ItemGroup>
 </Project>

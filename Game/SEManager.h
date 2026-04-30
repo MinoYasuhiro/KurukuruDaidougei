@@ -12,5 +12,9 @@ public:
 
 	//指定した効果音を再生
 	static void Play(SE seID);
+
+	static void Stop(SE seID);
+
+	static void ClearCache();
 };
 

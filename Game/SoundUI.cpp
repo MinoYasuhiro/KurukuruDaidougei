@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SoundUI.h"
+#include "SEManager.h"
+#include "SoundSettings.h"
 
 SoundUI::SoundUI()
 {
@@ -12,6 +14,14 @@ SoundUI::~SoundUI()
 
 bool SoundUI::Start()
 {
+	//保存されている音量設定を読み込む
+	SoundSettings::Load();
+
+	//読み込んだ値をUI用の変数に反映
+	m_masterValue = SoundSettings::Master;
+	m_BGMValue = SoundSettings::BGM;
+	m_SEValue = SoundSettings::SE;
+
 	m_masterBarRender.Init("Assets/sprite/Whitebar.dds",1000.0f,400.0f);
 	m_SEBarRender.Init("Assets/sprite/Whitebar.dds",1000.0f,400.0f);
 	m_BGMBarRender.Init("Assets/sprite/Whitebar.dds", 1000.0f, 400.0f);
@@ -29,10 +39,17 @@ bool SoundUI::Start()
 
 void SoundUI::Update()
 {
+	//現在の値を設定クラスへ保存
+	SoundSettings::Master = m_masterValue;
+	SoundSettings::BGM = m_BGMValue;
+	SoundSettings::SE = m_SEValue;
+
+	//入力クールタイム減少
+	m_inputTimer -= 1.0f / 60.0f;
+
 	Input();
 	SelectScale();
 	FillBars();
-	ApplyVolumes();
 
 	m_masterBarRender.Update();
 	m_SEBarRender.Update();
@@ -45,45 +62,71 @@ void SoundUI::Update()
 
 void SoundUI::Input()
 {
+	if (m_inputTimer > 0.0f)return;
+
+	//編集モード中の処理
 	if (m_isEditing)
 	{
-		if (g_pad[0]->IsTrigger(enButtonRight))
+		//右入力で音量アップ
+		if (g_pad[0]->IsPress(enButtonRight))
 		{
-			if (m_selectedIndex == 0)m_masterValue += 0.05f;
-			if (m_selectedIndex == 2)m_SEValue += 0.05f;
-			if (m_selectedIndex == 1)m_BGMValue += 0.05f;
+			if (m_selectedIndex == 0)m_masterValue += 0.1f;
+			if (m_selectedIndex == 2)m_SEValue += 0.1f;
+			if (m_selectedIndex == 1)m_BGMValue += 0.1f;
+
+			m_inputTimer = m_inputInterval;
 		}
-		if (g_pad[0]->IsTrigger(enButtonLeft))
+		//左入力で音量ダウン
+		if (g_pad[0]->IsPress(enButtonLeft))
 		{
-			if (m_selectedIndex == 0)m_masterValue -= 0.05f;
-			if (m_selectedIndex == 2)m_SEValue -= 0.05f;
-			if (m_selectedIndex == 1)m_BGMValue -= 0.05f;
+			if (m_selectedIndex == 0)m_masterValue -= 0.1f;
+			if (m_selectedIndex == 2)m_SEValue -= 0.1f;
+			if (m_selectedIndex == 1)m_BGMValue -= 0.1f;
+
+			m_inputTimer = m_inputInterval;
 		}
+		//音量値を0.0～1.0に制限
 		if (m_masterValue < 0.0f)m_masterValue = 0.0f;
 		if (m_masterValue > 1.0f)m_masterValue = 1.0f;
 		if (m_SEValue < 0.0f)m_SEValue = 0.0f;
 		if (m_SEValue > 1.0f)m_SEValue = 1.0f;
 		if (m_BGMValue < 0.0f)m_BGMValue = 0.0f;
 		if (m_BGMValue > 1.0f)m_BGMValue = 1.0f;
-		if (g_pad[0]->IsTrigger(enButtonB))
+		//Bボタンで編集終了
+		if (g_pad[0]->IsPress(enButtonB))
 		{
 			m_isEditing = false;
+			m_inputTimer = m_inputInterval;
 		}
 		return;
 	}
-	if (g_pad[0]->IsTrigger(enButtonUp))
-	{
-		m_selectedIndex--;
-		if (m_selectedIndex < 0)m_selectedIndex = 2;
-	}
-	if (g_pad[0]->IsTrigger(enButtonDown))
+	//選択モード中の処理
+	if (g_pad[0]->IsPress(enButtonUp))
 	{
 		m_selectedIndex++;
 		if (m_selectedIndex > 2)m_selectedIndex = 0;
+		m_inputTimer = m_inputInterval;
 	}
-	if (g_pad[0]->IsTrigger(enButtonA))
+	if (g_pad[0]->IsPress(enButtonDown))
+	{
+		m_selectedIndex--;
+		if (m_selectedIndex < 0)m_selectedIndex = 2;
+		m_inputTimer = m_inputInterval;
+	}
+	//Aボタンで編集モードに入る
+	if (g_pad[0]->IsPress(enButtonA))
 	{
 		m_isEditing = true;
+		m_inputTimer = m_inputInterval;
+	}
+	if (g_pad[0]->IsPress(enButtonB))
+	{
+		SoundSettings::Save();
+
+		SEManager::ClearCache();
+
+		m_isFinished = true;
+		m_inputTimer = m_inputInterval;
 	}
 }
 
@@ -96,18 +139,6 @@ void SoundUI::FillBars()
 	m_mastarFillRender.SetPosition({ calcX(m_masterValue),100.0f,0.0f });
 	m_SEFillRender.SetPosition({ calcX(m_SEValue),-100.0f,0.0f });
 	m_BGMFillRender.SetPosition({ calcX(m_BGMValue),-300.0f,0.0f });
-}
-
-void SoundUI::ApplyVolumes()
-{
-	if (m_BGMSource)
-	{
-		m_BGMSource->SetVolume(m_masterValue * m_BGMValue);
-	}
-	if (m_SESource)
-	{
-		m_SESource->SetVolume(m_masterValue * m_SEValue);
-	}
 }
 
 void SoundUI::SelectScale()
@@ -128,6 +159,11 @@ void SoundUI::SelectScale()
 		m_SEFillRender.SetScale({ 1.2f,1.2f,1.2f });
 		break;
 	}
+}
+
+bool SoundUI::IsFinished()const
+{
+	return m_isFinished;
 }
 
 void SoundUI::Render(RenderContext& rc)
