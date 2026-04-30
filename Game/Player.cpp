@@ -186,7 +186,6 @@ void Player::SoundPlay()
     }
     else if (!isMoveInput && m_isRunSEPlaying)
     {
-        SEManager::Stop(SE_run);
         m_isRunSEPlaying = false;
     }
 }
