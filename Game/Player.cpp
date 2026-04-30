@@ -56,9 +56,6 @@ bool Player::Start()
     m_playerState = 0;
     m_finishRot.SetRotationY(Math::DegToRad(-90.0f));
 
-    m_runSound = NewGO<SoundSource>(0);
-    m_runSound->Init(SE_run);
-
     //カウントの初期化
     m_font.SetText(L"");
     m_font.SetPosition(0.0f, 0.0f, 0.0f);
@@ -66,6 +63,7 @@ bool Player::Start()
     m_font.SetScale(1.0f);
 
 	m_itemOnUmbrella = false;
+    m_isRunSEPlaying = false;
 
     return true;
 }
@@ -74,10 +72,16 @@ bool Player::Start()
 void Player::Reset()
 {
     m_position = m_startPos;
+    m_isRunSEPlaying = false;
 }
 
 void Player::Update()
 {
+    if (m_game->GetState() != GameState::Playing)
+    {
+        m_isRunSEPlaying = false;
+        return;
+    }
     if (m_resetGame)
     {
 		m_playerState = 0;
@@ -158,18 +162,35 @@ void Player::Update()
 
 void Player::SoundPlay()
 {
+    if (Game::GetState() != GameState::Playing)
+    {
+        SEManager::StopLoop(SE_run);
+        m_isRunSEPlaying = false;
+        return;
+    }
+
+    if (m_playerState != 2)
+    {
+        if (m_isRunSEPlaying)
+        {
+            SEManager::StopLoop(SE_run);
+            m_isRunSEPlaying = false;
+        }
+        return;
+    }
+
     bool isMoveInput =
         fabsf(g_pad[0]->GetLStickXF()) >= 0.1f ||
         fabsf(g_pad[0]->GetLStickYF()) >= 0.1f;
 
-    if (m_playerState == 2 && isMoveInput && !m_isRunSEPlaying)
+    if (isMoveInput && !m_isRunSEPlaying)
     {
-        m_runSound->Play(true);
+        SEManager::Play(SE_run,true);
         m_isRunSEPlaying = true;
     }
-    else if ((!isMoveInput || m_playerState != 2) && m_isRunSEPlaying)
+    else if (!isMoveInput && m_isRunSEPlaying)
     {
-        m_runSound->Stop();
+        SEManager::StopLoop(SE_run);
         m_isRunSEPlaying = false;
     }
 }

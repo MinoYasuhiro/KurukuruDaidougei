@@ -246,9 +246,8 @@
     <ClCompile Include="QTEButton.cpp" />
     <ClCompile Include="SE.cpp" />
     <ClCompile Include="SEManager.cpp" />
-    <ClCompile Include="SoundTest.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="SoundOption.cpp" />
+    <ClCompile Include="SoundSettings.cpp" />
     <ClCompile Include="SoundUI.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -282,9 +281,8 @@
     <ClInclude Include="QTEButton.h" />
     <ClInclude Include="SE.h" />
     <ClInclude Include="SEManager.h" />
-    <ClInclude Include="SoundTest.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="SoundOption.h" />
+    <ClInclude Include="SoundSettings.h" />
     <ClInclude Include="SoundUI.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="system\system.h" />

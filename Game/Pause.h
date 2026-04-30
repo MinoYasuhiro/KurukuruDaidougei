@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 class Game;
 class MenuUI;
 class Pause : public IGameObject
@@ -9,7 +9,7 @@ public:
 
 	bool Start();
 	void Update();
-	void Cleanup();
+	void CleanupMenu();
 	void Render(RenderContext& renderContext);
 
 private:

@@ -71,6 +71,7 @@ bool Item::Start()
 //更新処理
 void Item::Update()
 {
+	if (m_game->GetState() != GameState::Playing)return;
 	switch (m_state)
 	{
 		//待機中は何もしない
@@ -188,7 +189,7 @@ void Item::FailFallMotion()
 
 		if (!m_hasPlayedLandSE)
 		{
-			SEManager::Play(SE_ball);
+			SEManager::Play(SE_ball,false);
 			//SEManager::Play(SE_crackedEgg);
 			m_hasPlayedLandSE = true;
 		}

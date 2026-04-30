@@ -2,6 +2,10 @@
 #include "SEManager.h"
 #include "sound/SoundSource.h"
 #include "sound/SoundEngine.h"
+#include "SoundSettings.h"
+#include <unordered_map>
+
+static std::unordered_map<SE, SoundSource*>g_seSources;
 
 void SEManager::Init()
 {
@@ -21,14 +25,47 @@ void SEManager::Init()
 	g_soundEngine->ResistWaveFileBank(SE_smartphone, "Assets/sound/smartphone.wav");
 }
 
-void SEManager::Play(SE seID)
+void SEManager::Play(SE seID,bool loop)
 {
+	SoundSource* se = nullptr;
+
+	auto it = g_seSources.find(seID);
+	if (it != g_seSources.end())
+	{
+		DeleteGO(it->second);
+		g_seSources.erase(it);
+	}
 	//効果音用のサウンドソースを生成
-	SoundSource* se = NewGO<SoundSource>(seID);
+	se = NewGO<SoundSource>(seID);
 
 	//登録済みのSEを初期化
 	se->Init(seID);
 
+	se->SetVolume(SoundSettings::Master * SoundSettings::SE);
+
 	//効果音を1回再生(ループなし)
-	se->Play(false);
+	se->Play(loop);
+
+	g_seSources[seID] = se;
+}
+
+void SEManager::ClearCache()
+{
+	for (auto& pair : g_seSources)
+	{
+		if (pair.second)
+		{
+			DeleteGO(pair.second);
+		}
+	}
+	g_seSources.clear();
+}
+
+void SEManager::StopLoop(SE seID)
+{
+	auto it = g_seSources.find(seID);
+	if (it == g_seSources.end())return;
+
+	DeleteGO(it->second);
+	g_seSources.erase(it);
 }

@@ -8,7 +8,6 @@
 #include "Pause.h" 
 #include "BGM.h"
 #include "BGMManager.h"
-#include "SoundTest.h"
 #include "QTE.h"
 #include <random>
 #include "Umbrella.h"
@@ -17,6 +16,7 @@
 #include "Item.h"
 #include "Title.h"
 #include "Circle.h"
+#include "SoundSettings.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -32,6 +32,7 @@ Game::~Game()
 
 bool Game::Start()
 {
+    SoundSettings::Load();
     SEManager::Init();
 
     //ゲームの初期化
@@ -80,6 +81,7 @@ void Game::Update()
     {
         m_requestStart = false;
         m_gameState = GameState::Playing;
+        m_isResetting = false;
         return; // ← 今フレームは何も動かさない
     }
     switch (m_gameState)
@@ -105,7 +107,10 @@ void Game::Update()
 
     m_modelRender.Update();
     //m_coinBox->Update();
-    m_circle->Update();
+    if (m_circle)
+    {
+        m_circle->Update();
+    }
 }
 
 GamePhase Game::GetPhase()
@@ -118,8 +123,12 @@ void Game::ResetGame()
     // Title からのみ許可
     if (m_gameState != GameState::Title &&
         m_gameState != GameState::GameClear && 
-        m_gameState != GameState::GameOver)
+        m_gameState != GameState::GameOver&&
+        m_gameState !=GameState::Pause)
         return;
+
+    m_isResetting = true;
+    SEManager::ClearCache();
 
     // 一旦停止状態にする
     m_gameState = GameState::Pause;
@@ -166,6 +175,8 @@ void Game::UpdatePlaying()
     // ===== ポーズ呼び出し =====
     if (g_pad[0]->IsPress(enButtonY) && m_gameState == GameState::Playing)
     {
+        SEManager::StopLoop(SE_run);
+
         NewGO<Pause>(1, "pause");
         m_gameState = GameState::Pause;
         return;                      // Game は消さない
@@ -345,34 +356,14 @@ void Game::RequestFailureLetter()
 {
     m_showFailure = true;
     m_failureTimer = 0.0f;
-    SEManager::Play(SE_booing);
+    SEManager::Play(SE_booing,false);
 }
 
 void Game::RequestSuccessLetter()
 {
     m_showSuccess = true;
     m_successTimer = 0.0f;
-    SEManager::Play(SE_cheers);
-}
-
-void Game::RequestSoundTest()
-{
-    //サウンドテスト中は何もしない
-    if (m_gameState == GameState::SoundTest)
-        return;
-
-    //リトライ用の再開要求の無効化
-    m_requestStart = false;
-
-    //GameOver判定を止める
-    m_idleTimer = 0.0f;
-    m_prevPos = Vector3::Zero;
-
-    //状態遷移
-    m_gameState = GameState::SoundTest;
-
-    //SoundTestを前面に生成
-    NewGO<SoundTest>(100, "soundTest");
+    SEManager::Play(SE_cheers,false);
 }
 
 void Game::Render(RenderContext& rc)
@@ -393,5 +384,8 @@ void Game::Render(RenderContext& rc)
     }
 
     //m_coinBox->Render(rc);
-    m_circle->Render(rc);
+    if (m_circle)
+    {
+        m_circle->Render(rc);
+    }
 }
