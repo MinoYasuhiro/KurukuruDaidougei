@@ -79,7 +79,6 @@ void Player::Update()
 {
     if (m_game->GetState() != GameState::Playing)
     {
-        SEManager::Stop(SE_run);
         m_isRunSEPlaying = false;
         return;
     }
@@ -163,13 +162,18 @@ void Player::Update()
 
 void Player::SoundPlay()
 {
-    if (Game::GetState() != GameState::Playing)return;
+    if (Game::GetState() != GameState::Playing)
+    {
+        SEManager::StopLoop(SE_run);
+        m_isRunSEPlaying = false;
+        return;
+    }
 
     if (m_playerState != 2)
     {
         if (m_isRunSEPlaying)
         {
-            SEManager::Stop(SE_run);
+            SEManager::StopLoop(SE_run);
             m_isRunSEPlaying = false;
         }
         return;
@@ -181,11 +185,12 @@ void Player::SoundPlay()
 
     if (isMoveInput && !m_isRunSEPlaying)
     {
-        SEManager::Play(SE_run);
+        SEManager::Play(SE_run,true);
         m_isRunSEPlaying = true;
     }
     else if (!isMoveInput && m_isRunSEPlaying)
     {
+        SEManager::StopLoop(SE_run);
         m_isRunSEPlaying = false;
     }
 }
