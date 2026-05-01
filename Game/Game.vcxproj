@@ -273,7 +273,9 @@
     <ClInclude Include="Circle.h" />
     <ClInclude Include="CoinBox.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="GameCamera.h" />
+    <ClInclude Include="GameCamera.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="GameClear.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="Item.h" />
