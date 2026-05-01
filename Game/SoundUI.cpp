@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SoundUI.h"
 #include "SEManager.h"
+#include "BGMManager.h"
 #include "SoundSettings.h"
 
 SoundUI::SoundUI()
@@ -43,6 +44,11 @@ void SoundUI::Update()
 	SoundSettings::Master = m_masterValue;
 	SoundSettings::BGM = m_BGMValue;
 	SoundSettings::SE = m_SEValue;
+
+	if (BGMManager* bgm = FindGO<BGMManager>("bgmManager"))
+	{
+		bgm->ApplyVolume();
+	}
 
 	//入力クールタイム減少
 	m_inputTimer -= 1.0f / 60.0f;

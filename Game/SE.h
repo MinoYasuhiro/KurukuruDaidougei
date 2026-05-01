@@ -1,7 +1,7 @@
 ﻿#pragma once
 enum SE
 {
-	SE_umbrellaSpinning,	//傘回しの音
+	SE_umbrellaSpinning=10,	//傘回しの音
 	SE_run,					//走る音
 	SE_ball,				//ボールを落とす音
 	SE_teaBowl,				//茶碗が割れる音
