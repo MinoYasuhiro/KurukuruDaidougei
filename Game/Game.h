@@ -65,6 +65,7 @@ private:
 	CoinBox* m_coinBox = nullptr;
 	Item* m_item = nullptr;
 	Circle* m_circle = nullptr;
+	BGMManager* m_BGM = nullptr;
 	float m_movePhaseTimer = 0.0f;   // ★ 移動フェーズ経過時間
 	float m_clearTimer = 0.0f;      // 経過時間
 	float m_startTimer = 0.0f;
