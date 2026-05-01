@@ -66,6 +66,10 @@ bool Game::Start()
     m_successTimer = 0.0f;
     m_showSuccess = false;
 
+    m_BGM = NewGO<BGMManager>(0, "bgmManager");
+    m_BGM->Init();
+    m_BGM->Play(BGM_NormalUmbrella);
+
     //m_coinBox = NewGO<CoinBox>(0, "coinBox");
 
     return true;

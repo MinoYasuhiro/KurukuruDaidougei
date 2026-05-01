@@ -1,7 +1,8 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "BGMManager.h"
 #include "sound/SoundSource.h"
 #include "sound/SoundEngine.h"
+#include "SoundSettings.h"
 
 void BGMManager::Init()
 {
@@ -19,6 +20,9 @@ void BGMManager::Play(BGM bgmID)
 
     m_currentBGM = NewGO<SoundSource>(0);
     m_currentBGM->Init(bgmID);
+
+    m_currentBGM->SetVolume(SoundSettings::Master * SoundSettings::BGM);
+
     m_currentBGM->Play(true); // ループ
 }
 
@@ -29,5 +33,12 @@ void BGMManager::Stop()
         DeleteGO(m_currentBGM);
         m_currentBGM = nullptr;
     }
+}
+
+void BGMManager::ApplyVolume()
+{
+    if (!m_currentBGM)return;
+
+    m_currentBGM->SetVolume(SoundSettings::Master * SoundSettings::BGM);
 }
 
