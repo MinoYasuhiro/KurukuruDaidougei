@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Title.h"
 #include "Game.h"
-
+#include "SoundOption.h"
 
 bool Title::Start()
 {
@@ -32,6 +32,16 @@ void Title::Update()
 		}
 		DeleteGO(this);
 	}
+
+
+	// ★ サウンドオプションへ（Xボタン）
+	if (g_pad[0]->IsPress(enButtonX))
+	{
+		Game::SetState(GameState::Pause);
+		NewGO<SoundOption>(0, "soundOption");
+		DeleteGO(this);
+	}
+
 }
 
 void Title::Render(RenderContext& rc)
