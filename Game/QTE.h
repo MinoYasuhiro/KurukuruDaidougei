@@ -4,31 +4,53 @@
 class QTE : public IGameObject
 {
 public:
-	QTE() {}
-	~QTE() {}
-	bool Start();
-	void Update();
-    
+    bool Start()
+    {
+        m_button = NewGO<QTEButton>(0, "qteButton");
+        m_state = State::Idle;
+        return true;
+    }
 
-    // QTE開始
-    void StartQTE(ButtonType button);
+    void StartQTE(ButtonType button, float limitTime)
+    {
+        m_button->StartQTE(button, limitTime);
+        m_state = State::Playing;
+    }
 
-    // 状態取得（必要なら）
-    bool IsActive() const { return m_state != State::Idle; }
+    void Update()
+    {
+        if (m_state != State::Playing)
+            return;
+
+        if (!m_button->IsFinished())
+            return;
+
+        m_state = m_button->IsSuccess()
+            ? State::Success
+            : State::Failure;
+    }
+
+    bool IsFinished() const
+    {
+        return m_state == State::Success || m_state == State::Failure;
+    }
+
+    bool IsSuccess() const
+    {
+        return m_state == State::Success;
+    }
 
 private:
     enum class State
     {
-        Idle,      // 何もしていない
-        Playing,   // 入力待ち
-        Success,   // 成功演出中
-        Failure    // 失敗演出中
+        Idle,
+        Playing,
+        Success,
+        Failure
     };
 
     State m_state = State::Idle;
-
-    QTEButton* m_qteButton = nullptr;
+    QTEButton* m_button = nullptr;
 };
-
 
 

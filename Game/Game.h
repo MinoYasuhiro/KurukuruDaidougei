@@ -15,7 +15,9 @@ enum class GamePhase
 {
 	Start,
 	MovePhase,   // 傘回し移動フェーズ
-	AfterMove
+	AfterMove,   //傘回しフェーズ
+	SpecialMove, //傘回し特殊フェーズ
+	QTEMove  //傘回しQTEフェーズ
 };
 
 enum class GameState
@@ -89,5 +91,16 @@ private:
 	Vector3 m_prevPos = Vector3::Zero;
 	float   m_idleTimer = 0.0f;
 	const float m_idleLimitTime = 8.0f; // 何秒でGameOverにするか
-
+	int m_phaseStep = 0;
+	// 0: 通常傘回し
+	// 1: 特殊傘回し
+	// 2: QTE
+	
+	// ======================================
+	// ■ QTEフェーズ用
+	// ======================================
+	QTE* m_qte = nullptr;
+	float m_qteTimer = 0.0f;
+	const float m_qteLimitTime = 3.0f;
+	bool  m_qteStarted = false;
 };
