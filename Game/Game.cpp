@@ -138,6 +138,7 @@ void Game::ResetGame()
     m_gameState = GameState::Pause;
     
     m_phase = GamePhase::Start;
+    m_phaseStep;
     m_startTimer = 0.0f;
     m_showStart = true;
     m_movePhaseTimer = 0.0f;
@@ -227,45 +228,98 @@ void Game::UpdatePlaying()
             m_hasThrownItem = false;
         }
         if (m_movePhaseTimer >= 15.0f)
-            m_phase = GamePhase::AfterMove;
+        {
+            m_movePhaseTimer = 0.0f;
+
+            if (m_phaseStep == 0)
+            {
+                m_phase = GamePhase::AfterMove;      // 通常傘回し
+            }
+            else if (m_phaseStep == 1)
+            {
+                m_phase = GamePhase::SpecialMove;    // 特殊傘回し
+            }
+            else
+            {
+                m_phase = GamePhase::QTEMove;        // QTE
+            }
+        }
         break;
 
     case GamePhase::AfterMove:
+        ////////通常傘回し用の処理////////
         m_clearTimer += deltaTime;
-        if (m_clearTimer >= 10.0f && !m_isGameClearShown)
+        if (m_clearTimer >= 30.0f)
         {
-            NewGO<GameClear>(10, "gameClear"); // 前面表示
-            m_gameState = GameState::GameClear;
-            m_isGameClearShown = true;
+            m_clearTimer = 0.0f;
+            m_phaseStep = 1;          // 次は特殊
+            m_phase = GamePhase::MovePhase;
+        }
+        break;
+
+    case GamePhase::SpecialMove:
+        //特殊傘回し用の処理
+        m_clearTimer += deltaTime;
+
+        if (m_clearTimer >= 30.0f)    // 秒数
+        {
+            m_clearTimer = 0.0f;
+            m_phaseStep = 2;          // 次はQTE
+            m_phase = GamePhase::MovePhase;
+        }
+        break;
+
+    case GamePhase::QTEMove:
+        if (!m_qteStarted)
+        {
+            m_qte = NewGO<QTE>(0, "qte");
+            m_qte->StartQTE(ButtonType::Y, 3.0f);
+            m_qteStarted = true;
+        }
+
+        if (m_qte->IsFinished())
+        {
+            if (m_qte->IsSuccess())
+                // 成功処理
+                // QTE成功 → ゲームクリア
+                m_gameState = GameState::GameClear;
+            else
+                // 失敗処理
+                // QTE失敗 → ゲームオーバー
+                m_gameState = GameState::GameOver;
+
+            DeleteGO(m_qte);
+            m_qte = nullptr;
+            m_qteStarted = false;
         }
         break;
     }
 
     // ===== ここから追加（Game.cpp完結のGameOver判定）=====
-    if (m_gameState == GameState::Playing)
-    {
-        if (Player* player = FindGO<Player>("player"))
-        {
-            Vector3 pos = player->GetPosition();
-            const float moveThreshold = 0.05f; // 動いたとみなす距離
+    //if (m_gameState == GameState::Playing)
+    //{
+        //if (Player* player = FindGO<Player>("player"))
+        //{
+           // Vector3 pos = player->GetPosition();
+           // const float moveThreshold = 0.05f; // 動いたとみなす距離
 
-            if ((pos - m_prevPos).Length() < moveThreshold)
-            {
-                m_idleTimer += 1.0f / 60.0f;
-            }
-            else
-            {
-                m_idleTimer = 0.0f;
-                m_prevPos = pos;
-            }
+            //if ((pos - m_prevPos).Length() < moveThreshold)
+            //{
+                //m_idleTimer += 1.0f / 60.0f;
+            //}
+            //else
+            //{
+                //m_idleTimer = 0.0f;
+                //m_prevPos = pos;
+            ////}
 
             // 8秒何もしなかったらGameOver
-            if (m_idleTimer >= m_idleLimitTime)
-            {
-                RequestGameOver();
-            }
-        }
-    }
+            //if (m_idleTimer >= m_idleLimitTime)
+            //{
+                //RequestGameOver();
+            //}
+       // }
+   // }
 
     //アイテムが飛んでいない間は着地点予測を表示
     if (m_item && m_phase == GamePhase::MovePhase && !m_hasThrownItem && !m_item->IsFlying())
