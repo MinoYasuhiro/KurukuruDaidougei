@@ -91,30 +91,28 @@ void Player::Update()
         m_NewModelRender.SetPosition(m_position);
         m_NewModelRender.Update();
         m_umbrella->Reset();
+        m_gameStartTimer = 0.0f;
+        m_canPlayerMove = false;
 
         m_resetGame = false;
     }
 
+    // ゲーム開始タイマー   例えばこれで3秒後に操作可能になります。
+    m_gameStartTimer += 1.0f / 60.0f;
 
+    if (m_gameStartTimer >= 2.0f)
+    {
+        m_canPlayerMove = true;
+    }
+
+	// ★スティック回転の計算
     wchar_t text[256];
     swprintf_s(text, 256, L"Spin Count : %d", m_spinCount);
 
     m_font.SetText(text);
 
     m_prevNumber = number;
-
-    //// デバッグ用（あとで消す）
-    //if (m_playerState > 9 and g_pad[0]->IsTrigger(enButtonSelect))
-    //{
-    //    m_playerState = 0;
-    //}
-
-    //// デバッグ用（あとで消す）
-    //if (g_pad[0]->IsTrigger(enButtonA))
-    //{
-    //    m_playerState++;
-    //}
-    
+   
 
     if (m_prevNumber != 1 && number == 1)
     {
@@ -124,9 +122,18 @@ void Player::Update()
         }
     }
 
-    ManageState();     // 状態決定
-    PlayerAction();    // 行動
-	SoundPlay();      // サウンド再生
+
+    if (m_canPlayerMove)
+    {
+        ManageState();     // 状態決定
+        PlayerAction();    // 行動
+        SoundPlay();       // サウンド再生
+    }
+    else
+    {
+        // 開始前は待機状態
+        m_playerState = 0;
+    }
 
     // ★ここに追加
     if (m_prevPlayerState != m_playerState)
@@ -143,29 +150,7 @@ void Player::Update()
 
     m_prevPlayerState = m_playerState;
 
-    //int boneNo = m_NewModelRender.FindBoneID(L"Middle_r");
-
-    //if (boneNo != -1)
-    //{
-    //    Bone* bone = m_NewModelRender.GetBone(boneNo);
-
-    //    Vector3 pos;
-    //    Quaternion rot;
-    //    Vector3 scale;
-
-    //    bone->CalcWorldTRS(pos, rot, scale);
-
-    //    // 傘モデル用の回転補正
-    //    Quaternion offsetRot;
-    //    offsetRot.SetRotationDeg(Vector3::AxisX, 360.0f);
-
-    //    // ボーン回転 × 補正
-    //    Quaternion finalRot = rot * offsetRot;
-
-    //    m_umbrella->SetPosition(pos);
-    //    m_umbrella->SetRotation(finalRot);
-    //}
-
+	// ★傘の位置を更新
     int boneNo = m_NewModelRender.FindBoneID(L"Middle_r");
 
     if (boneNo != -1)
@@ -183,6 +168,7 @@ void Player::Update()
     }
 }
 
+//サウンドの再生。
 void Player::SoundPlay()
 {
     if (Game::GetState() != GameState::Playing)
@@ -218,6 +204,7 @@ void Player::SoundPlay()
     }
 }
 
+//移動処理。
 void Player::Move()
 {
     m_moveSpeed.x = 0.0f;
@@ -233,8 +220,8 @@ void Player::Move()
     forward.y = 0.0f;
     right.y = 0.0f;
 
-    right *= stickL.x * 800.0f;
-    forward *= stickL.y * 800.0f;
+    right *= stickL.x * 400.0f;
+    forward *= stickL.y * 400.0f;
 
     m_moveSpeed += right + forward;
 
@@ -252,6 +239,7 @@ void Player::Move()
     m_NewModelRender.SetPosition(m_position);
 }
 
+//回転処理。
 void Player::Rotation()
 {
     if (fabsf(m_moveSpeed.x) >= 0.001f || fabsf(m_moveSpeed.z) >= 0.001f)
@@ -262,12 +250,13 @@ void Player::Rotation()
     }
 }
 
+//状態管理。
 void Player::ManageState()
 {
     Vector2 stick;
     stick.x = g_pad[0]->GetLStickXF();
     stick.y = g_pad[0]->GetLStickYF();
-
+    
     switch (m_playerState)
     {
     case 0: // 待機
@@ -302,6 +291,7 @@ void Player::ManageState()
     }
 }
 
+//プレイヤーのアクション。
 void Player::PlayerAction()
 {
     switch (m_playerState)
@@ -319,11 +309,27 @@ void Player::PlayerAction()
         break;
     case 3:
     {
+        // 目標回転（正面）
+        Quaternion targetRot;
+        targetRot.SetRotationY(0.0f);
+
+        // 現在回転 → 正面へ補間
+        Quaternion rot;
+        rot.Slerp(0.08f, m_rotation, targetRot);
+
+        // 保存
+        m_rotation = rot;
+
+        // モデルへ反映
+        m_NewModelRender.SetRotation(m_rotation);
+
+
+
         //傘を回すアクション
         float inputSpin = CalcStickRotationSpeed();
 
         // 入力で加速
-        m_spinSpeed += inputSpin * 0.2f;
+        m_spinSpeed += inputSpin * 0.11f;
 
         // 減衰（勝手に止まる）
        m_spinSpeed *= 0.96f;
@@ -334,6 +340,7 @@ void Player::PlayerAction()
         m_umbrella->SetSpinSpeed(m_spinSpeed);
 
         SpinCount();
+		
     }
     break;
     case 4:
@@ -365,6 +372,7 @@ void Player::PlayerAction()
     }
 }
 
+//傘回しの回転数保持
 void Player::SpinCount()
 {
     Vector2 current;
@@ -403,6 +411,7 @@ void Player::SpinCount()
     m_prevStick2 = current;
 }
 
+//アニメーションの再生。
 void Player::PlayAnimation2()
 {
     switch (m_playerState) {
@@ -454,11 +463,14 @@ void Player::PlayAnimation2()
 }
 
 
+// ベクトルの長さを計算
 float Length(Vector2 v)
 {
     return sqrtf(v.x * v.x + v.y * v.y);
 }
 
+
+// ベクトルを正規化
 Vector2 Normalize(Vector2 v)
 {
     float len = sqrtf(v.x * v.x + v.y * v.y);
@@ -471,6 +483,7 @@ Vector2 Normalize(Vector2 v)
     return v;
 }
 
+// ベクトルの内積を計算
 float Dot(Vector2 a, Vector2 b)
 {
     return a.x * b.x + a.y * b.y;
@@ -483,6 +496,7 @@ float Clamp(float v, float min, float max)
     return v;
 }
 
+// スティックの回転速度を計算
 float Player::CalcStickRotationSpeed()
 {
     Vector2 current;
@@ -529,6 +543,7 @@ float Player::CalcStickRotationSpeed()
 }
 
 
+//描画処理。
 void Player::Render(RenderContext& rc)
 {
     m_NewModelRender.Draw(rc);

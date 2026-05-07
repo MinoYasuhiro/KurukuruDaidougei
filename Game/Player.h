@@ -109,5 +109,7 @@ private:
 
 	Item* m_item = nullptr;
 	
+	float m_gameStartTimer = 0.0f;
+	bool m_canPlayerMove = false;
 	
 };
