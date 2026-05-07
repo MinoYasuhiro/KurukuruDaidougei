@@ -1,4 +1,5 @@
-#pragma once
+﻿#pragma once
+class BGMManager;
 class GameClear : public IGameObject
 {
 public:
@@ -14,5 +15,6 @@ private:
 	Vector3 m_position;
 	bool m_canInput = false;
 
+	BGMManager* m_BGM = nullptr;
 };
 

@@ -19,9 +19,12 @@ namespace
 {
 	bool IsInsideCircle(const Vector3& playerPosition, const Vector3& circlePosition, float radius)
 	{
+		//プレイヤー位置と円の中心位置の差を計算(距離ベクトル)
 		Vector3 diff = playerPosition - circlePosition;
+		//高さ方向は無視して、XZ平面のみで判定する
 		diff.y = 0.0f;
 
+		//ベクトルの長さを求めて、半径以内かどうかを判定
 		return diff.Length() <= radius;
 	}
 }
@@ -189,7 +192,7 @@ void Item::FailFallMotion()
 
 		if (!m_hasPlayedLandSE)
 		{
-			SEManager::Play(SE_ball,false);
+			SEManager::Play(SE_ball, false);
 			//SEManager::Play(SE_crackedEgg);
 			m_hasPlayedLandSE = true;
 		}

@@ -23,7 +23,7 @@ public:
 	void StartQTE();		//QTE開始
 	void SpinningFailed();	//傘回し失敗時
 	void FailFallMotion();	//失敗時の落下モーション
-	void DropPrepare();
+	void DropPrepare();		//傘から落とす準備
 
 	void StartFallTest();
 	void StartParabolaTest();
@@ -52,11 +52,11 @@ private:
 	Vector3 m_moveSpeed = Vector3::Zero;	//現在の移動速度
 	Vector3 m_gravity = { 0.0f,-0.5f,0.0f };//重力加速度
 	Vector3 m_plannedVelocity;				//発射予定の初速
-	bool m_isFlying = false;	//球が飛んでいるかどうか
-	bool m_isCracked = false;	//割れ状態かどうか
-	bool m_wasOnUmbrella = false;
-	bool m_hasPlayedLandSE = false;
-	float m_onUmbrellaTimer = 0.0f;
-	float m_onUmbrellaLimitTimer = 2.0f;
+	bool m_isFlying = false;				//球が飛んでいるかどうか
+	bool m_isCracked = false;				//割れ状態かどうか
+	bool m_wasOnUmbrella = false;			//傘に一度乗ったか
+	bool m_hasPlayedLandSE = false;			//SE再生済みフラグ
+	float m_onUmbrellaTimer = 0.0f;			//傘の上にいる時間
+	float m_onUmbrellaLimitTimer = 2.0f;	//制限時間
 };
 
