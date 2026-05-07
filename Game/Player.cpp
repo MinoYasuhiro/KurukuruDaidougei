@@ -139,6 +139,29 @@ void Player::Update()
 
     m_prevPlayerState = m_playerState;
 
+    //int boneNo = m_NewModelRender.FindBoneID(L"Middle_r");
+
+    //if (boneNo != -1)
+    //{
+    //    Bone* bone = m_NewModelRender.GetBone(boneNo);
+
+    //    Vector3 pos;
+    //    Quaternion rot;
+    //    Vector3 scale;
+
+    //    bone->CalcWorldTRS(pos, rot, scale);
+
+    //    // 傘モデル用の回転補正
+    //    Quaternion offsetRot;
+    //    offsetRot.SetRotationDeg(Vector3::AxisX, 360.0f);
+
+    //    // ボーン回転 × 補正
+    //    Quaternion finalRot = rot * offsetRot;
+
+    //    m_umbrella->SetPosition(pos);
+    //    m_umbrella->SetRotation(finalRot);
+    //}
+
     int boneNo = m_NewModelRender.FindBoneID(L"Middle_r");
 
     if (boneNo != -1)
@@ -151,8 +174,8 @@ void Player::Update()
 
         bone->CalcWorldTRS(pos, rot, scale);
 
+        // 手首位置だけ追従
         m_umbrella->SetPosition(pos);
-       m_umbrella->SetRotation(rot);
     }
 }
 
