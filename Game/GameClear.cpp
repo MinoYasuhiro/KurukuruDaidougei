@@ -1,7 +1,8 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "GameClear.h"
 #include "Title.h"
 #include "Game.h"
+#include "BGMManager.h"
 
 
 bool GameClear::Start()
@@ -13,6 +14,15 @@ bool GameClear::Start()
     m_RetryRender.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 
     m_canInput = false;
+
+    m_BGM = FindGO<BGMManager>("bgmManager");
+    if (m_BGM == nullptr)
+    {
+        m_BGM = NewGO<BGMManager>(0, "bgmManager");
+        m_BGM->Init();
+    }
+
+    m_BGM->Play(BGM_GameClear);
 
     return true;
 }

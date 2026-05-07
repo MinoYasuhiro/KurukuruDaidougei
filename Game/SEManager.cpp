@@ -3,8 +3,10 @@
 #include "sound/SoundSource.h"
 #include "sound/SoundEngine.h"
 #include "SoundSettings.h"
-#include <unordered_map>
+#include <unordered_map>	//キーと値のセットで管理する箱
 
+//再生中のSEを管理するキャッシュ
+//キャッシュ→作ったものを覚えておく仕組み
 static std::unordered_map<SE, SoundSource*>g_seSources;
 
 void SEManager::Init()
@@ -29,6 +31,8 @@ void SEManager::Play(SE seID,bool loop)
 {
 	SoundSource* se = nullptr;
 
+	//すでに同じSEが再生中なら一度削除
+	//同じ音を重複管理しないため
 	auto it = g_seSources.find(seID);
 	if (it != g_seSources.end())
 	{
@@ -41,31 +45,41 @@ void SEManager::Play(SE seID,bool loop)
 	//登録済みのSEを初期化
 	se->Init(seID);
 
+	//音量設定(マスター音量×SE音量）
 	se->SetVolume(SoundSettings::Master * SoundSettings::SE);
 
-	//効果音を1回再生(ループなし)
+	//効果音再生(loop=trueでループ)
 	se->Play(loop);
 
+	//キャッシュに保存(後で停止や管理に使う)
 	g_seSources[seID] = se;
 }
 
+//キャッシュ全削除
 void SEManager::ClearCache()
 {
 	for (auto& pair : g_seSources)
 	{
 		if (pair.second)
 		{
+			//再生中のSEを削除
 			DeleteGO(pair.second);
 		}
 	}
+	//マップを空にする
 	g_seSources.clear();
 }
 
 void SEManager::StopLoop(SE seID)
 {
 	auto it = g_seSources.find(seID);
+
+	//見つからなければ何もしない
 	if (it == g_seSources.end())return;
 
+	//サウンド削除→再生停止
 	DeleteGO(it->second);
+
+	//キャッシュからも削除
 	g_seSources.erase(it);
 }
