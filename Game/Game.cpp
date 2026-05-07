@@ -273,6 +273,7 @@ void Game::UpdatePlaying()
         if (!m_qteStarted)
         {
             m_qte = NewGO<QTE>(0, "qte");
+            m_qte->Start();                      // ★ 先に初期化
             m_qte->StartQTE(ButtonType::Y, 3.0f);
             m_qteStarted = true;
         }
