@@ -62,8 +62,8 @@ void Umbrella::Update()
     }
 
     // ===== 傾き =====
-    m_angleX += y * 2.0f;
-    m_angleY += -x * 2.0f;
+    m_angleX += y * 1.2f;
+    m_angleY += -x * 1.2f;
 
     Quaternion rotX;
     rotX.SetRotationDeg(Vector3::AxisX, m_angleX);
