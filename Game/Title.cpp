@@ -1,13 +1,24 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Title.h"
 #include "Game.h"
 #include "SoundOption.h"
+#include "BGMManager.h"
 
 bool Title::Start()
 {
 	m_spriteRender.Init("Assets/Sprite/Title.DDS", 1920, 1080);
 	m_spriteRender.SetPosition({ 0, 0, 0 });
 	m_canInput = false;
+
+	m_BGM = FindGO<BGMManager>("bgmManager");
+	if (m_BGM == nullptr)
+	{
+		m_BGM = NewGO<BGMManager>(0, "bgmManager");
+		m_BGM->Init();
+	}
+
+	m_BGM->Play(BGM_GameClear);
+
 	return true;
 }
 

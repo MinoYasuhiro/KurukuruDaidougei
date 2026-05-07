@@ -30,6 +30,11 @@ public:
 	//選択中のバーを拡大表示
 	void SelectScale();
 private:
+	//各選択肢
+	SpriteRender m_masterRender;
+	SpriteRender m_SERender;
+	SpriteRender m_BGMRender;
+
 	//各音量バー
 	SpriteRender m_masterBarRender;
 	SpriteRender m_SEBarRender;

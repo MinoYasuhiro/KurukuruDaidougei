@@ -23,14 +23,27 @@ bool SoundUI::Start()
 	m_BGMValue = SoundSettings::BGM;
 	m_SEValue = SoundSettings::SE;
 
+	//選択肢の初期化
+	m_masterRender.Init("Assets/sprite/Master.dds", 225.0f, 225.0f);
+	m_SERender.Init("Assets/sprite/SE.dds", 150.0f, 150.0f);
+	m_BGMRender.Init("Assets/sprite/BGM.dds", 175.0f, 175.0f);
+
+	//各選択肢の位置設定
+	m_masterRender.SetPosition({ -750.0f,100.0f,0.0f });
+	m_SERender.SetPosition({ -750.0f,-100.0f,0.0f });
+	m_BGMRender.SetPosition({ -750.0f,-300.0f,0.0f });
+
+	//バーの初期化
 	m_masterBarRender.Init("Assets/sprite/Whitebar.dds",1000.0f,400.0f);
 	m_SEBarRender.Init("Assets/sprite/Whitebar.dds",1000.0f,400.0f);
 	m_BGMBarRender.Init("Assets/sprite/Whitebar.dds", 1000.0f, 400.0f);
 
+	//各バーの位置設定
 	m_masterBarRender.SetPosition({ 0.0f,100.0f,0.0f });
 	m_SEBarRender.SetPosition({ 0.0f,-300.0f,0.0f });
 	m_BGMBarRender.SetPosition({ 0.0f,-100.0f,0.0f });
 
+	//つまみ部分の初期化
 	m_mastarFillRender.Init("Assets/sprite/memory.dds", 1000.0f, 400.0f);
 	m_SEFillRender.Init("Assets/sprite/memory.dds", 1000.0f, 400.0f);
 	m_BGMFillRender.Init("Assets/sprite/memory.dds", 1000.0f, 400.0f);
@@ -57,6 +70,10 @@ void SoundUI::Update()
 	SelectScale();
 	FillBars();
 
+	m_masterRender.Update();
+	m_SERender.Update();
+	m_BGMRender.Update();
+
 	m_masterBarRender.Update();
 	m_SEBarRender.Update();
 	m_BGMBarRender.Update();
@@ -68,6 +85,7 @@ void SoundUI::Update()
 
 void SoundUI::Input()
 {
+	//クールタイム中は入力無効
 	if (m_inputTimer > 0.0f)return;
 
 	//編集モード中の処理
@@ -125,12 +143,16 @@ void SoundUI::Input()
 		m_isEditing = true;
 		m_inputTimer = m_inputInterval;
 	}
+	//Bボタンで終了&保存
 	if (g_pad[0]->IsPress(enButtonB))
 	{
+		//設定を保存
 		SoundSettings::Save();
 
+		//SEキャッシュをクリア
 		SEManager::ClearCache();
 
+		//このUIを終了状態にする
 		m_isFinished = true;
 		m_inputTimer = m_inputInterval;
 	}
@@ -138,31 +160,35 @@ void SoundUI::Input()
 
 void SoundUI::FillBars()
 {
+	//値(0～1)をX座標に変換
 	auto calcX = [&](float v)
 		{
 			return m_minX + (m_maxX - m_minX) * v;
 		};
+	//各バーの位置更新
 	m_mastarFillRender.SetPosition({ calcX(m_masterValue),100.0f,0.0f });
-	m_SEFillRender.SetPosition({ calcX(m_SEValue),-100.0f,0.0f });
-	m_BGMFillRender.SetPosition({ calcX(m_BGMValue),-300.0f,0.0f });
+	m_BGMFillRender.SetPosition({ calcX(m_SEValue),-100.0f,0.0f });
+	m_SEFillRender.SetPosition({ calcX(m_BGMValue),-300.0f,0.0f });
 }
 
 void SoundUI::SelectScale()
 {
+	//通常サイズに戻す
 	m_mastarFillRender.SetScale({ 1.0f,1.0f,1.0f });
 	m_SEFillRender.SetScale({ 1.0f,1.0f,1.0f });
 	m_BGMFillRender.SetScale({ 1.0f,1.0f,1.0f });
 
+	//選択中だけ拡大
 	switch (m_selectedIndex)
 	{
 	case 0:
 		m_mastarFillRender.SetScale({ 1.2f,1.2f,1.2f });
 		break;
 	case 1:
-		m_BGMFillRender.SetScale({ 1.2f,1.2f,1.2f });
+		m_SEFillRender.SetScale({ 1.2f,1.2f,1.2f });
 		break;
 	case 2:
-		m_SEFillRender.SetScale({ 1.2f,1.2f,1.2f });
+		m_BGMFillRender.SetScale({ 1.2f,1.2f,1.2f });
 		break;
 	}
 }
@@ -174,6 +200,10 @@ bool SoundUI::IsFinished()const
 
 void SoundUI::Render(RenderContext& rc)
 {
+	m_masterRender.Draw(rc);
+	m_SERender.Draw(rc);
+	m_BGMRender.Draw(rc);
+
 	m_masterBarRender.Draw(rc);
 	m_SEBarRender.Draw(rc);
 	m_BGMBarRender.Draw(rc);

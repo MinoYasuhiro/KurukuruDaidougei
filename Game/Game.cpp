@@ -66,8 +66,14 @@ bool Game::Start()
     m_successTimer = 0.0f;
     m_showSuccess = false;
 
-    m_BGM = NewGO<BGMManager>(0, "bgmManager");
-    m_BGM->Init();
+    m_BGM = FindGO<BGMManager>("bgmManager");
+
+    if (m_BGM == nullptr)
+    {
+        m_BGM = NewGO<BGMManager>(0, "bgmManager");
+        m_BGM->Init();
+    }
+
     m_BGM->Play(BGM_NormalUmbrella);
 
     //m_coinBox = NewGO<CoinBox>(0, "coinBox");
@@ -161,6 +167,13 @@ void Game::ResetGame()
 
     if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
         cam->Reset();
+
+    m_BGM = FindGO<BGMManager>("bgmManager");
+
+    if (m_BGM != nullptr)
+    {
+        m_BGM->Play(BGM_NormalUmbrella);
+    }
 
     m_phase = GamePhase::Start;
 
@@ -383,6 +396,13 @@ void Game::RequestTitle()
     // ★ GameOver判定用リセット
     m_idleTimer = 0.0f;
     m_prevPos = Vector3::Zero;
+
+    m_BGM = FindGO<BGMManager>("bgmManager");
+
+    if (m_BGM != nullptr)
+    {
+        m_BGM->Stop();
+    }
 
     // Title状態
     m_gameState = GameState::Title;
