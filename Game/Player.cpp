@@ -71,7 +71,29 @@ bool Player::Start()
 
 void Player::Reset()
 {
+    m_playerState = 0;
+    m_spinCount = 0;
+    m_itemOnUmbrella = false;
+
     m_position = m_startPos;
+	m_rotation = Quaternion::Identity;
+
+    m_NewModelRender.SetPosition(m_position);
+	m_NewModelRender.SetRotation(m_rotation);
+    m_NewModelRender.Update();
+
+    m_umbrella->Reset();
+
+    m_gameStartTimer = 0.0f;
+    m_canPlayerMove = false;
+
+    m_spinSpeed = 0.0f;
+
+    m_prevStick = Vector2::Zero;
+    m_prevStick2 = Vector2::Zero;
+
+    m_inputCooldown = 0.0f;
+
     m_isRunSEPlaying = false;
 }
 
@@ -81,20 +103,6 @@ void Player::Update()
     {
         m_isRunSEPlaying = false;
         return;
-    }
-    if (m_resetGame)
-    {
-		m_playerState = 0;
-		m_spinCount = 0;
-		m_itemOnUmbrella = false;
-        m_position = m_startPos;
-        m_NewModelRender.SetPosition(m_position);
-        m_NewModelRender.Update();
-        m_umbrella->Reset();
-        m_gameStartTimer = 0.0f;
-        m_canPlayerMove = false;
-
-        m_resetGame = false;
     }
 
     // ゲーム開始タイマー   例えばこれで3秒後に操作可能になります。
@@ -274,6 +282,18 @@ void Player::ManageState()
             m_playerState = 0;
         }
         break;
+
+    case 1: // 傘回し失敗中
+
+        // アニメ終了待ち
+        if (!m_NewModelRender.IsPlayingAnimation())
+        {
+            m_itemOnUmbrella = false;
+            m_playerState = 0;
+        }
+
+        break;
+
 
     case 7: // クリア中
         if (!m_NewModelRender.IsPlayingAnimation())
