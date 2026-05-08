@@ -33,6 +33,8 @@ public:
 		return m_position;
 	}
 	void Reset();   // ★ 追加
+	void EndUmbrellaSpin();
+
 	//ココからメンバ変数
 	//描画
 	ModelRender m_modelRender;
