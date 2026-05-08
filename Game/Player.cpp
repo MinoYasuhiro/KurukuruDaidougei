@@ -288,8 +288,10 @@ void Player::ManageState()
         // アニメ終了待ち
         if (!m_NewModelRender.IsPlayingAnimation())
         {
-            m_itemOnUmbrella = false;
+			EndUmbrellaSpin();
+
             m_playerState = 0;
+
         }
 
         break;
@@ -560,6 +562,20 @@ float Player::CalcStickRotationSpeed()
     m_prevStick = current;
 
     return angle * 20.0f;
+}
+
+void Player::EndUmbrellaSpin()
+{
+    m_itemOnUmbrella = false;
+
+    m_spinSpeed = 0.0f;
+
+    m_prevStick = Vector2::Zero;
+    m_prevStick2 = Vector2::Zero;
+
+    m_spinCount = 0;
+
+    m_umbrella->Reset();
 }
 
 
