@@ -7,6 +7,7 @@ class GameCamera;
 class Pause;
 class Umbrella;
 class QTE;
+class QTEButton;
 class BGMManager;
 class CoinBox;
 class Item;
@@ -100,7 +101,10 @@ private:
 	// ■ QTEフェーズ用
 	// ======================================
 	QTE* m_qte = nullptr;
+	QTEButton* m_button;
 	float m_qteTimer = 0.0f;
 	const float m_qteLimitTime = 3.0f;
 	bool  m_qteStarted = false;
+	bool m_waitQTEResult = false;
+	bool m_qteResultSuccess = false;
 };

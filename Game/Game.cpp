@@ -9,6 +9,7 @@
 #include "BGM.h"
 #include "BGMManager.h"
 #include "QTE.h"
+#include "QTEButton.h"
 #include <random>
 #include "Umbrella.h"
 #include "CoinBox.h"
@@ -144,13 +145,16 @@ void Game::ResetGame()
     m_gameState = GameState::Pause;
     
     m_phase = GamePhase::Start;
-    m_phaseStep;
+    m_phaseStep = 0;
     m_startTimer = 0.0f;
     m_showStart = true;
     m_movePhaseTimer = 0.0f;
     m_clearTimer = 0.0f;
     m_isGameClearShown = false;
     m_itemMove = false;
+
+    m_qteStarted = false;
+    m_button = nullptr;
 
     // ★ 残っているオブジェクトを消す
     if (m_item)
@@ -191,7 +195,7 @@ void Game::UpdatePlaying()
 {
 
     // ===== ポーズ呼び出し =====
-    if (g_pad[0]->IsPress(enButtonY) && m_gameState == GameState::Playing)
+    if (m_phase != GamePhase::QTEMove&& g_pad[0]->IsPress(enButtonY) && m_gameState == GameState::Playing)
     {
         SEManager::StopLoop(SE_run);
 
@@ -285,26 +289,40 @@ void Game::UpdatePlaying()
     case GamePhase::QTEMove:
         if (!m_qteStarted)
         {
-            m_qte = NewGO<QTE>(0, "qte");
-            m_qte->Start();                      // ★ 先に初期化
-            m_qte->StartQTE(ButtonType::Y, 3.0f);
+            m_button = NewGO<QTEButton>(0, "qteButton");
+            m_button->StartQTE(ButtonType::Y, 3.0f);
             m_qteStarted = true;
+            break;
         }
 
-        if (m_qte->IsFinished())
-        {
-            if (m_qte->IsSuccess())
-                // 成功処理
-                // QTE成功 → ゲームクリア
-                m_gameState = GameState::GameClear;
-            else
-                // 失敗処理
-                // QTE失敗 → ゲームオーバー
-                m_gameState = GameState::GameOver;
+        
+        m_button->Update();
 
-            DeleteGO(m_qte);
-            m_qte = nullptr;
+        if (m_button->IsFinished())
+        {
+            m_qteResultSuccess = m_button->IsSuccess();
+            m_waitQTEResult = true;
+
+            if (m_button->IsSuccess())
+            {
+                // 成功処理
+                m_gameState = GameState::GameClear;
+                NewGO<GameClear>(10, "gameClear");
+            }
+            else
+            {
+                // 失敗処理
+                m_gameState = GameState::GameOver;
+                NewGO<GameOver>(10, "gameOver");
+            }
+                
+            m_phase = GamePhase::Start;
+
+            DeleteGO(m_button);
+            m_button = nullptr;
             m_qteStarted = false;
+
+            return;
         }
         break;
     }
@@ -373,15 +391,15 @@ void Game::UpdatePlaying()
     }
 }
 
-void Game::RequestGameClear()
-{
-    if (m_gameState != GameState::Playing)
-        return;
-
-    m_gameState = GameState::GameClear;
-    m_isGameClearShown = true;
-    NewGO<GameClear>(10, "gameClear");
-}
+//void Game::RequestGameClear()
+//{
+//    if (m_gameState != GameState::Playing)
+//        return;
+//
+//    m_gameState = GameState::GameClear;
+//    m_isGameClearShown = true;
+//    NewGO<GameClear>(10, "gameClear");
+//}
 
 void Game::RequestTitle()
 {
