@@ -34,9 +34,9 @@ bool SoundUI::Start()
 	m_BGMRender.SetPosition({ -750.0f,-300.0f,0.0f });
 
 	//バーの初期化
-	m_masterBarRender.Init("Assets/sprite/Whitebar.dds",1000.0f,400.0f);
-	m_SEBarRender.Init("Assets/sprite/Whitebar.dds",1000.0f,400.0f);
-	m_BGMBarRender.Init("Assets/sprite/Whitebar.dds", 1000.0f, 400.0f);
+	m_masterBarRender.Init("Assets/sprite/Bar.dds",1500.0f,400.0f);
+	m_SEBarRender.Init("Assets/sprite/Bar.dds",1500.0f,400.0f);
+	m_BGMBarRender.Init("Assets/sprite/Bar.dds", 1500.0f, 400.0f);
 
 	//各バーの位置設定
 	m_masterBarRender.SetPosition({ 0.0f,100.0f,0.0f });
@@ -44,9 +44,9 @@ bool SoundUI::Start()
 	m_BGMBarRender.SetPosition({ 0.0f,-100.0f,0.0f });
 
 	//つまみ部分の初期化
-	m_mastarFillRender.Init("Assets/sprite/memory.dds", 1000.0f, 400.0f);
-	m_SEFillRender.Init("Assets/sprite/memory.dds", 1000.0f, 400.0f);
-	m_BGMFillRender.Init("Assets/sprite/memory.dds", 1000.0f, 400.0f);
+	m_mastarFillRender.Init("Assets/sprite/memory.dds", 150.0f, 150.0f);
+	m_SEFillRender.Init("Assets/sprite/memory.dds", 150.0f, 150.0f);
+	m_BGMFillRender.Init("Assets/sprite/memory.dds", 150.0f, 150.0f);
 
 	return true;
 }
