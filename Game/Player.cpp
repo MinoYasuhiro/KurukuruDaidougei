@@ -284,6 +284,7 @@ void Player::ManageState()
         break;
 
     case 1: // 傘回し失敗中
+    case 4: // 傘回し成功中
 
         // アニメ終了待ち
         if (!m_NewModelRender.IsPlayingAnimation())
@@ -362,6 +363,11 @@ void Player::PlayerAction()
         m_umbrella->SetSpinSpeed(m_spinSpeed);
 
         SpinCount();
+
+        if(m_spinCount >= 20)
+        {
+            m_playerState = 4;
+		}
 		
     }
     break;

@@ -113,5 +113,7 @@ private:
 	
 	float m_gameStartTimer = 0.0f;
 	bool m_canPlayerMove = false;
+
+	float m_timer = 0.0f;
 	
 };

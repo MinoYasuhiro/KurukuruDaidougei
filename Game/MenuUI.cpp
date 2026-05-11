@@ -15,10 +15,10 @@ MenuUI::~MenuUI()
 bool MenuUI::Start()
 {
 	//スプライトの読み込み
-	m_backTitleRender.Init("Assets/sprite/Backritle.dds", 800.0f, 800.0f);
-	m_retryRender.Init("Assets/sprite/Endgame.dds", 800.0f, 800.0f);
-	m_restartRender.Init("Assets/sprite/Restart.dds", 800.0f, 800.0f);
-	m_soundTestRender.Init("Assets/sprite/Soundtest.dds", 800.0f, 800.0f);
+	m_backTitleRender.Init("Assets/sprite/BackTitle.dds", 700.0f, 500.0f);
+	m_retryRender.Init("Assets/sprite/Retry.dds", 700.0f, 500.0f);
+	m_restartRender.Init("Assets/sprite/Restart.dds", 700.0f, 500.0f);
+	m_soundTestRender.Init("Assets/sprite/Soundtest.dds", 700.0f, 500.0f);
 
 
 	//各UIの配置
