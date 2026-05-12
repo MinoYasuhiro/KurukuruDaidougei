@@ -45,6 +45,13 @@ private:
 	SpriteRender m_SEFillRender;
 	SpriteRender m_BGMFillRender;
 
+	SpriteRender m_masterFillSelection;
+	SpriteRender m_SEFillSelection;
+	SpriteRender m_BGMFillSelection;
+
+	static const int kSeparatorNum = 11;
+	SpriteRender m_separator[3][kSeparatorNum];
+
 	//音源(外部から注入される)
 	SoundSource* m_BGMSource = nullptr;
 	SoundSource* m_SESource = nullptr;
