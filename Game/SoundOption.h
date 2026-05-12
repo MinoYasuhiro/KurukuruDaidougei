@@ -15,6 +15,9 @@ private:
 	//サウンドオプション画面の背景スプライト
 	SpriteRender m_spriteRender;
 
+	//サウンドオプション画面の文字スプライト
+	SpriteRender m_textRender;
+
 	//表示位置
 	Vector3 m_position;
 

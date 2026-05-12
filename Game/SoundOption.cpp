@@ -9,7 +9,10 @@
 bool SoundOption::Start()
 {
 	//サウンドオプション画面の背景表示
-	m_spriteRender.Init("Assets/sprite/soundOption.dds", 1920, 1080);
+	m_spriteRender.Init("Assets/Sprite/SoundBackGround.DDS", 1920, 1080);
+	//サウンド文字
+	m_textRender.Init("Assets/Sprite/Soundtext.DDS", 400, 100);
+	m_textRender.SetPosition(Vector3(0.0f, 330.0f, 0.0f));
 
 	//サウンド設定UIを生成
 	m_soundUI = new SoundUI();
@@ -22,6 +25,9 @@ void SoundOption::Update()
 {
 	//背景スプライトの更新
 	m_spriteRender.Update();
+
+	//文字スプライトの更新
+	m_textRender.Update();
 
 	//サウンドUIの更新
 	m_soundUI->Update();
@@ -48,6 +54,9 @@ void SoundOption::Render(RenderContext& rc)
 {
 	//背景を描画
 	m_spriteRender.Draw(rc);
+
+	//文字を描画
+	m_textRender.Draw(rc);
 
 	//サウンド設定UIを描画
 	m_soundUI->Render(rc);
