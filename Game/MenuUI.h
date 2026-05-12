@@ -33,5 +33,5 @@ private:
 
 	MenuResult m_result = MenuResult::None;//現在の選択結果
 
-	int m_selectIndex = 0;//現在選択中のインデックス(0～3)
+	int m_selectIndex = 2;//現在選択中のインデックス(0～3)
 };
