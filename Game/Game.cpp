@@ -292,7 +292,7 @@ void Game::UpdatePlaying()
             m_button = NewGO<QTEButton>(0, "qteButton");
             m_button->StartQTE(ButtonType::Y, 8.0f);
             m_qteStarted = true;
-            break;
+            
         }
 
         
