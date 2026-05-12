@@ -290,7 +290,7 @@ void Game::UpdatePlaying()
         if (!m_qteStarted)
         {
             m_button = NewGO<QTEButton>(0, "qteButton");
-            m_button->StartQTE(ButtonType::Y, 3.0f);
+            m_button->StartQTE(ButtonType::Y, 8.0f);
             m_qteStarted = true;
             break;
         }
