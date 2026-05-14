@@ -261,6 +261,19 @@ void Player::Rotation()
 //状態管理。
 void Player::ManageState()
 {
+    // ★ゲームクリア判定
+    if (m_playerClear >= 5)
+    {
+        m_playerState = 7;
+        return;
+    }
+
+    if (m_playerError >= 3)
+    {
+        m_playerState = 9;
+		return;
+    }
+
     Vector2 stick;
     stick.x = g_pad[0]->GetLStickXF();
     stick.y = g_pad[0]->GetLStickYF();
@@ -367,6 +380,7 @@ void Player::PlayerAction()
         if(m_spinCount >= 20)
         {
             m_playerState = 4;
+            m_playerClear++;
 		}
 		
     }

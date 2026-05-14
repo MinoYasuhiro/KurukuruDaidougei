@@ -287,6 +287,7 @@ void Item::SpinningFailed()
 	m_state = BallState::FailFall;*/
 	m_state = BallState::DropPrepare;
 	m_player->m_playerState = 1;
+	m_player->m_playerError++;
 }
 
 void Item::DropPrepare()
