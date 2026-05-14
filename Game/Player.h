@@ -83,6 +83,8 @@ public:
 	bool m_itemOnUmbrella = false;	//アイテムが傘の上にあるかどうか
 
 	bool m_resetGame = false;	//ゲームリセットフラグ
+
+	int m_playerError = 0;
 private:
 	Umbrella* m_umbrella = nullptr;
 
@@ -115,5 +117,8 @@ private:
 	bool m_canPlayerMove = false;
 
 	float m_timer = 0.0f;
+
+	int m_playerClear = 0;
+	
 	
 };
