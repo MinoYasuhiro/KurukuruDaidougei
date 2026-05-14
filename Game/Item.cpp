@@ -334,7 +334,7 @@ void Item::DropPrepare()
 Vector3 Item::GetLandingPosition()const
 {
 	//初期の高さ
-	float y0 = m_position.y;
+	float y0 = m_position.y;  
 	//初速
 	float vy = m_moveSpeed.y;
 	//重力加速度
