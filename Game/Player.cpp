@@ -72,6 +72,10 @@ bool Player::Start()
 void Player::Reset()
 {
     m_playerState = 0;
+
+    m_playerClear = 0;   // ←追加
+    m_playerError = 0;   // ←追加
+
     m_spinCount = 0;
     m_itemOnUmbrella = false;
 
@@ -95,6 +99,8 @@ void Player::Reset()
     m_inputCooldown = 0.0f;
 
     m_isRunSEPlaying = false;
+
+    m_gameOverRunTimer = 0.0f;
 }
 
 void Player::Update()
@@ -261,17 +267,16 @@ void Player::Rotation()
 //状態管理。
 void Player::ManageState()
 {
-    // ★ゲームクリア判定
-    if (m_playerClear >= 5)
+    if (m_playerClear >= 5 && m_playerState < 7)
     {
         m_playerState = 7;
         return;
     }
 
-    if (m_playerError >= 3)
+    if (m_playerError >= 3 && m_playerState < 9)
     {
         m_playerState = 9;
-		return;
+        return;
     }
 
     Vector2 stick;
@@ -323,6 +328,10 @@ void Player::ManageState()
         {
             m_playerState = 10;
         }
+        break;
+
+    case 30:
+        // 何もしない（停止）
         break;
     }
 }
@@ -404,13 +413,38 @@ void Player::PlayerAction()
         //ゲームオーバーのアクション
         break;
     case 10:
-        //ゲームオーバーの走るアクション
-        m_moveSpeed = Vector3(-400.0f, 0.0f, 0.0f); // 左方向
+    {
+        // ゲームオーバー後の走り
+        m_moveSpeed = Vector3(-400.0f, 0.0f, 0.0f);
+
         m_position += m_moveSpeed * (1.0f / 60.0f);
+
         m_NewModelRender.SetRotation(m_finishRot);
         m_NewModelRender.SetPosition(m_position);
 
-        break;
+        // タイマー加算
+        m_gameOverRunTimer += 1.0f / 60.0f;
+
+        // 3秒後に待機へ
+        if (m_gameOverRunTimer >= 3.0f)
+        {
+            m_playerError = 0;     // ←追加
+			m_itemOnUmbrella = false; // ←追加
+            m_playerState = 30;
+            m_gameOverRunTimer = 0.0f;
+            m_moveSpeed = Vector3::Zero; // ←追加
+        }
+    }
+    break;
+
+    case 30:
+    {
+        // 完全停止
+        m_moveSpeed = Vector3::Zero;
+
+        m_NewModelRender.SetPosition(m_position);
+    }
+    break;
     }
 }
 
@@ -500,6 +534,11 @@ void Player::PlayAnimation2()
     case 10:
         //ゲームオーバーの走るアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameOverRun);
+        break;
+
+    case 30:
+        // 完全停止のアニメーション
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_Idle);
         break;
     }
 }
