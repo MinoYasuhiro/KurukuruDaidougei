@@ -15,6 +15,7 @@
 #include "CoinBox.h"
 #include "SEManager.h"
 #include "Item.h"
+#include "ItemSpawner.h"
 #include "Title.h"
 #include "Circle.h"
 #include "SoundSettings.h"
@@ -39,6 +40,8 @@ bool Game::Start()
     //ゲームの初期化
     m_phase = GamePhase::Start;
 
+    m_spawner = NewGO<ItemSpawner>(0, "itemSpawner");
+
     m_circle = NewGO<Circle>(0, "circle");
 
     m_backGround = NewGO<BackGround>(0, "background");
@@ -46,17 +49,14 @@ bool Game::Start()
     m_player = NewGO<Player>(0, "player");
     m_gameCamera = NewGO<GameCamera>(0, "gameCamera");
 
-    m_startLetter.Init("Assets/sprite/Start.dds", 800.0f, 200.0f);
+    m_startLetter.Init("Assets/sprite/Start.dds", 500.0f, 300.0f);
     m_startLetter.SetPosition({ 640.0f,360.0f,0.0f });
-    m_startLetter.SetScale({ 2.0f,2.0f,2.0f });
 
-    m_failureLetter.Init("Assets/sprite/Failure.dds", 800.0f, 200.0f);
+    m_failureLetter.Init("Assets/sprite/Failure.dds", 500.0f, 300.0f);
     m_failureLetter.SetPosition({ 640.0f,360.0f,0.0f });
-    m_failureLetter.SetScale({ 2.0f,2.0f,2.0f });
 
-    m_successLetter.Init("Assets/sprite/Success.dds", 800.0f, 200.0f);
+    m_successLetter.Init("Assets/sprite/Success.dds", 500.0f, 300.0f);
     m_successLetter.SetPosition({ 640.0f,360.0f,0.0f });
-    m_successLetter.SetScale({ 2.0f,2.0f,2.0f });
 
     m_startTimer = 0.0f;
     m_showStart = true;
@@ -156,6 +156,17 @@ void Game::ResetGame()
     m_qteStarted = false;
     m_button = nullptr;
 
+    m_showSuccess = false;
+    m_showFailure = false;
+
+    m_successTimer = 0.0f;
+    m_failureTimer = 0.0f;
+
+    if (m_spawner)
+    {
+        m_spawner->Reset();
+    }
+
     // ★ 残っているオブジェクトを消す
     if (m_item)
     {
@@ -230,47 +241,55 @@ void Game::UpdatePlaying()
         //アイテム未生成時のみ生成
         if (!m_itemMove)
         {
-            if (m_item)
-            {
-                DeleteGO(m_item);
-                m_item = nullptr;
-            }
-
-            m_item = NewGO<Item>(0, "item");
-
-            //放物運動準備
-            m_item->PrepareParabola();
+            m_spawner->SpawnNext();
 
             m_itemMove = true;
             m_hasThrownItem = false;
         }
+
+        m_item = m_spawner->GetCurrentItem();
+
+        if (m_item && m_phase == GamePhase::MovePhase && !m_hasThrownItem && !m_item->IsFlying())
+        {
+            Vector3 landingPosition = m_item->GetPlannedLandingPosition();
+            m_circle->SetPosition(landingPosition);
+            m_circle->SetVisible(true);
+        }
+        else
+        {
+            m_circle->SetVisible(false);
+        }
+
+        if (!m_hasThrownItem && m_movePhaseTimer >= 2.0f)
+        {
+            m_spawner->StartThrow();
+            m_hasThrownItem = true;
+        }
+
         if (m_movePhaseTimer >= 15.0f)
         {
             m_movePhaseTimer = 0.0f;
 
-            if (m_phaseStep == 0)
-            {
-                m_phase = GamePhase::AfterMove;      // 通常傘回し
-            }
-            else if (m_phaseStep == 1)
-            {
-                m_phase = GamePhase::SpecialMove;    // 特殊傘回し
-            }
-            else
-            {
-                m_phase = GamePhase::QTEMove;        // QTE
-            }
+            m_phase = GamePhase::AfterMove;
         }
         break;
 
     case GamePhase::AfterMove:
         ////////通常傘回し用の処理////////
         m_clearTimer += deltaTime;
-        if (m_clearTimer >= 30.0f)
+        if (m_clearTimer >= 1.0f)
         {
             m_clearTimer = 0.0f;
-            m_phaseStep = 1;          // 次は特殊
-            m_phase = GamePhase::MovePhase;
+
+            if (m_item && m_item->IsQTEItem())
+            {
+                m_phase = GamePhase::QTEMove;
+                m_qteTimer = 0.0f;
+            }
+            else
+            {
+                RequestMovePhase();
+            }
         }
         break;
 
@@ -278,51 +297,61 @@ void Game::UpdatePlaying()
         //特殊傘回し用の処理
         m_clearTimer += deltaTime;
 
-        if (m_clearTimer >= 30.0f)    // 秒数
+        if (m_clearTimer >= 1.0f)    // 秒数
         {
             m_clearTimer = 0.0f;
             m_phaseStep = 2;          // 次はQTE
-            m_phase = GamePhase::MovePhase;
+         
+            RequestMovePhase();
         }
         break;
 
     case GamePhase::QTEMove:
-        if (!m_qteStarted)
+        //if (!m_qteStarted)
+        //{
+        //    m_button = NewGO<QTEButton>(0, "qteButton");
+        //    m_button->StartQTE(ButtonType::Y, 8.0f);
+        //    m_qteStarted = true;
+        //    
+        //}
+
+        //
+        //m_button->Update();
+
+        //if (m_button->IsFinished())
+        //{
+        //    m_qteResultSuccess = m_button->IsSuccess();
+        //    m_waitQTEResult = true;
+
+        //    if (m_button->IsSuccess())
+        //    {
+        //        // 成功処理
+        //        m_gameState = GameState::GameClear;
+        //        NewGO<GameClear>(10, "gameClear");
+        //    }
+        //    else
+        //    {
+        //        // 失敗処理
+        //        m_gameState = GameState::GameOver;
+        //        NewGO<GameOver>(10, "gameOver");
+        //    }
+        //        
+        //    m_phase = GamePhase::Start;
+
+        //    DeleteGO(m_button);
+        //    m_button = nullptr;
+        //    m_qteStarted = false;
+
+        //    return;
+        m_qteTimer += deltaTime;
+
+        if (m_qteTimer >= m_qteLimitTime)
         {
-            m_button = NewGO<QTEButton>(0, "qteButton");
-            m_button->StartQTE(ButtonType::Y, 8.0f);
-            m_qteStarted = true;
-            
-        }
+            m_qteTimer = 0.0f;
 
-        
-        m_button->Update();
+            RequestSuccessLetter();
 
-        if (m_button->IsFinished())
-        {
-            m_qteResultSuccess = m_button->IsSuccess();
-            m_waitQTEResult = true;
-
-            if (m_button->IsSuccess())
-            {
-                // 成功処理
-                m_gameState = GameState::GameClear;
-                NewGO<GameClear>(10, "gameClear");
-            }
-            else
-            {
-                // 失敗処理
-                m_gameState = GameState::GameOver;
-                NewGO<GameOver>(10, "gameOver");
-            }
-                
-            m_phase = GamePhase::Start;
-
-            DeleteGO(m_button);
-            m_button = nullptr;
-            m_qteStarted = false;
-
-            return;
+            RequestMovePhase();
         }
         break;
     }
@@ -354,21 +383,27 @@ void Game::UpdatePlaying()
    // }
 
     //アイテムが飛んでいない間は着地点予測を表示
-    if (m_item && m_phase == GamePhase::MovePhase && !m_hasThrownItem && !m_item->IsFlying())
-    {
-        Vector3 landingPosition = m_item->GetPlannedLandingPosition();
-        m_circle->SetPosition(landingPosition);
-        m_circle->SetVisible(true);
-    }
-    else
-    {
-        m_circle->SetVisible(false);
-    }
+    //if (m_item && m_phase == GamePhase::MovePhase && !m_hasThrownItem && !m_item->IsFlying())
+    //{
+    //    Vector3 landingPosition = m_item->GetPlannedLandingPosition();
+    //    m_circle->SetPosition(landingPosition);
+    //    m_circle->SetVisible(true);
+    //}
+    //else
+    //{
+    //    m_circle->SetVisible(false);
+    //}
 
-    //一定時間後にアイテムを投げる
-    if (m_item && !m_item->IsFlying() && !m_hasThrownItem && m_movePhaseTimer >= 2.0f)
+    ////一定時間後にアイテムを投げる
+    //if (m_item && !m_item->IsFlying() && !m_hasThrownItem && m_movePhaseTimer >= 2.0f)
+    //{
+    //    m_item->Move();
+    //    m_hasThrownItem = true;
+    //}
+
+    if (!m_hasThrownItem && m_movePhaseTimer >= 2.0f)
     {
-        m_item->Move();
+        m_spawner->StartThrow();
         m_hasThrownItem = true;
     }
 
@@ -387,6 +422,16 @@ void Game::UpdatePlaying()
         if (m_successTimer >= 2.0f)
         {
             m_showSuccess = false;
+        }
+    }
+
+    if (m_showSuccess || m_showFailure)
+    {
+        if ((m_showSuccess && m_successTimer >= 2.0f) || (m_showFailure && m_failureTimer >= 2.0f))
+        {
+            m_showSuccess = false;
+            m_showFailure = false;
+            RequestMovePhase();
         }
     }
 }
@@ -414,6 +459,16 @@ void Game::RequestTitle()
     // ★ GameOver判定用リセット
     m_idleTimer = 0.0f;
     m_prevPos = Vector3::Zero;
+
+    m_phase = GamePhase::Start;
+    m_phaseStep = 0;
+    m_itemMove = false;
+    m_hasThrownItem = false;
+
+    if (m_spawner)
+    {
+        m_spawner->Reset();
+    }
 
     m_BGM = FindGO<BGMManager>("bgmManager");
 
