@@ -12,6 +12,7 @@ class BGMManager;
 class CoinBox;
 class Item;
 class Circle;
+class ItemSpawner;
 enum class GamePhase
 {
 	Start,
@@ -60,6 +61,7 @@ private:
 	BackGround* m_backGround;
 	Player* m_player;
 	Umbrella* m_umbrella;
+	ItemSpawner* m_spawner = nullptr;
 	SpriteRender* m_SpriteRender;
 	SpriteRender m_startLetter;
 	SpriteRender m_failureLetter;
@@ -100,7 +102,7 @@ private:
 	// ======================================
 	// ■ QTEフェーズ用
 	// ======================================
-	QTE* m_qte = nullptr;
+	//QTE* m_qte = nullptr;
 	QTEButton* m_button;
 	float m_qteTimer = 0.0f;
 	const float m_qteLimitTime = 3.0f;

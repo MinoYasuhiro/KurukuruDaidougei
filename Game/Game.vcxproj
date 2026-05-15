@@ -241,6 +241,7 @@
     <ClCompile Include="GameClear.cpp" />
     <ClCompile Include="GameOver.cpp" />
     <ClCompile Include="Item.cpp" />
+    <ClCompile Include="ItemSpawner.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuUI.cpp" />
     <ClCompile Include="Pause.cpp" />
@@ -279,6 +280,7 @@
     <ClInclude Include="GameClear.h" />
     <ClInclude Include="GameOver.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="ItemSpawner.h" />
     <ClInclude Include="MenuUI.h" />
     <ClInclude Include="Pause.h" />
     <ClInclude Include="Player.h" />

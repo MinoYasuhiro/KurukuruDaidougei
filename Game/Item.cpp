@@ -29,58 +29,72 @@ namespace
 	}
 }
 
-//落下処理のテスト
-void Item::StartFallTest()
-{
-	m_isCracked = false;
-	m_moveSpeed = Vector3::Zero;
-	RandomSpawn();
-	m_position.y = 100.0f;
-	m_isFlying = true;
-	m_state = BallState::FailFall;
-	m_moveSpeed = { 0.0f,-2.0f,0.0f };
-}
-
-//放物運動のテスト
-void Item::StartParabolaTest()
-{
-	RandomSpawn();
-	m_isFlying = true;
-	Move();
-}
-
 //初期化
 bool Item::Start()
 {
-	//モデルを読み込む
-	m_modelRender.Init("Assets/modelData/ball.tkm");
-	m_modelRender.SetScale({ 2.0f,2.0f,2.0f });
-	//m_eggRender.Init("Assets/modelData/egg.tkm");
-	//m_eggRender.SetScale({ 5.0f,5.0f,5.0f });
-
-	//m_eggCrackedRender.Init("Assets/modelData/eggCracked.tkm");
-	//m_eggCrackedRender.SetScale({ 5.0f,5.0f,5.0f });
-
-
 	RandomSpawn();	//初期位置をランダムにする
 
+	m_game = FindGO<Game>("game");
 	m_player = FindGO<Player>("player");
 
-	//StartFallTest();		//落下処理のテスト
-	//StartParabolaTest();	//放物運動のテスト
+	if (m_game)
+	{
+		m_circle = m_game->GetCircle();
+	}
+	else
+	{
+		m_circle = nullptr;
+	}
+
 	return true;
+}
+
+void Item::Init(ItemType type)
+{
+	m_type = type;
+
+	m_isProcessed = false;
+	m_wasOnUmbrella = false;
+	m_isCracked = false;
+	m_hasPlayedLandSE = false;
+
+	switch (m_type)
+	{
+	case ItemType::ball:
+		m_category = ItemCategory::Normal;
+		m_hasFailureModel = false;
+		m_modelRender.Init("Assets/modelData/ball.tkm");
+		m_modelRender.SetScale({ 2.0f,2.0f,2.0f });
+		break;
+	case ItemType::egg:
+		m_category = ItemCategory::QTE;
+		m_hasFailureModel = true;
+		m_modelRender.Init("Assets/modelData/egg.tkm");
+		m_modelRender.SetScale({ 5.0f,5.0f,5.0f });
+
+		m_failureModelRender.Init("Assets/modelData/eggCracked.tkm");
+		m_failureModelRender.SetScale({ 5.0f,5.0f,5.0f });
+		break;
+	default:
+		m_category = ItemCategory::Normal;
+		m_hasFailureModel = false;
+		break;
+	}
 }
 
 //更新処理
 void Item::Update()
 {
+	if (!m_game)
+	{
+		m_game = FindGO<Game>("game");
+		if (!m_game)return;
+	}
 	if (m_game->GetState() != GameState::Playing)return;
 	switch (m_state)
 	{
 		//待機中は何もしない
 	case BallState::Idle:
-		//StartFallTest();		//落下処理のテスト
-		//StartParabolaTest();	//放物運動のテスト
 		break;
 	case BallState::Flying:
 		ParabolicMotion();
@@ -101,24 +115,17 @@ void Item::Update()
 		ParabolicMotion();
 		break;
 	}
-	/*if (!m_isCracked)
+
+	if (m_isCracked && m_hasFailureModel)
 	{
-		FailFallMotion();
-	}*/
-	if (m_isCracked)
-	{
-		//m_eggCrackedRender.SetPosition(m_position);
-		//m_eggCrackedRender.Update();
+		m_failureModelRender.SetPosition(m_position);
+		m_failureModelRender.Update();
 	}
 	else
 	{
-		//m_eggRender.SetPosition(m_position);
-		//m_eggRender.Update();
+		m_modelRender.SetPosition(m_position);
+		m_modelRender.Update();
 	}
-	m_modelRender.SetPosition(m_position);
-	m_modelRender.Update();
-	//m_eggRender.SetPosition(m_position);
-	//m_eggRender.Update();
 }
 
 //球の放物運動（重力による落下を含む）を処理する関数
@@ -137,7 +144,7 @@ void Item::ParabolicMotion()
 			m_moveSpeed = { 0.0f,0.0f,0.0f };
 			m_isFlying = false;
 
-			if (m_game = FindGO<Game>("game"))
+			if (m_game)
 			{
 				m_player = FindGO<Player>("player");
 				m_circle = m_game->GetCircle();
@@ -149,7 +156,7 @@ void Item::ParabolicMotion()
 						m_circle->GetPosition(),
 						m_circle->GetRadius());
 
-					if (success)
+					if (success && !m_isProcessed)
 					{
 						m_wasOnUmbrella = true;
 						m_player->m_itemOnUmbrella = true;
@@ -158,9 +165,7 @@ void Item::ParabolicMotion()
 					}
 				}
 			}
-			m_state = BallState::Idle;
-			//OnBallLanded();	//後でUI・ゲーム側とつなげる用
-			//RandomSpawn();	//着地したら位置をランダムに変える
+			m_state = BallState::FailFall;
 		}
 	}
 }
@@ -174,10 +179,6 @@ void Item::SetState(BallState newState)
 //落下処理
 void Item::FailFallMotion()
 {
-	/*if (!m_isFlying)
-	{
-		SpinningFailed();
-	}*/
 	//落下処理
 	m_moveSpeed.y -= 0.3f;
 	m_position += m_moveSpeed;
@@ -192,14 +193,26 @@ void Item::FailFallMotion()
 
 		if (!m_hasPlayedLandSE)
 		{
-			SEManager::Play(SE_ball, false);
+			switch (m_type)
+			{
+			case ItemType::ball:
+				SEManager::Play(SE_ball, false);
+				break;
+
+			case ItemType::egg:
+				SEManager::Play(SE_crackedEgg, false);
+				break;
+
+			default:
+				break;
+			}
 			//SEManager::Play(SE_crackedEgg);
 			m_hasPlayedLandSE = true;
 		}
 
-		if (m_wasOnUmbrella)
+		if (!m_isProcessed)
 		{
-			if (m_game = FindGO<Game>("game"))
+			if (m_game)
 			{
 				m_game->RequestFailureLetter();
 			}
@@ -257,19 +270,35 @@ void Item::RandomSpawn()
 //傘の上に乗ったときの処理
 void Item::OnUmbrella()
 {
-	if (m_player = FindGO<Player>("player"))
+	if (!m_player)
 	{
-		Vector3 position = m_player->GetPosition();
-		position.y += 130.0f;
-		m_position = position;
+		m_player = FindGO<Player>("player");
+	}
 
-		m_onUmbrellaTimer += 1.0f / 60.0f;
+	if (!m_player)return;
 
-		if (m_onUmbrellaTimer >= m_onUmbrellaLimitTimer)
+	Vector3 position = m_player->GetPosition();
+	position.y += 130.0f;
+	m_position = position;
+
+	if (m_player->m_playerState == 4 && m_state != BallState::SuccessThrow)
+	{
+		m_state = BallState::SuccessThrow;
+		m_isFlying = true;
+		m_isProcessed = true;
+		m_moveSpeed = { 0.0f,10.0f,15.0f };
+
+		if (m_game)
 		{
-			m_onUmbrellaTimer = 0.0f;
-			SpinningFailed();
+			m_game->RequestSuccessLetter();
 		}
+		return;
+	}
+
+	if (m_player->m_playerState == 1 && m_state != BallState::DropPrepare)
+	{
+		SpinningFailed();
+		return;
 	}
 }
 
@@ -282,12 +311,8 @@ void Item::StartQTE()
 //傘回し失敗時の処理
 void Item::SpinningFailed()
 {
-	/*m_isFlying = true;
-	m_moveSpeed = { 0.0f,-2.0f,0.0f };
-	m_state = BallState::FailFall;*/
 	m_state = BallState::DropPrepare;
 	m_player->m_playerState = 1;
-	m_player->m_playerError++;
 }
 
 void Item::DropPrepare()
@@ -334,7 +359,7 @@ void Item::DropPrepare()
 Vector3 Item::GetLandingPosition()const
 {
 	//初期の高さ
-	float y0 = m_position.y;  
+	float y0 = m_position.y;
 	//初速
 	float vy = m_moveSpeed.y;
 	//重力加速度
@@ -389,6 +414,10 @@ Vector3 Item::GetPlannedLandingPosition()const
 void Item::PrepareParabola()
 {
 	RandomSpawn();
+
+	m_isProcessed = false;
+	m_wasOnUmbrella = false;
+
 	m_plannedVelocity = Vector3(0.0f, 15.0f, 10.0f);
 	m_isFlying = false;
 	m_state = BallState::Idle;
@@ -396,13 +425,12 @@ void Item::PrepareParabola()
 
 void Item::Render(RenderContext& rc)
 {
-	m_modelRender.Draw(rc);
-	if (m_isCracked)
+	if (m_isCracked && m_hasFailureModel)
 	{
-		//m_eggCrackedRender.Draw(rc);
+		m_failureModelRender.Draw(rc);
 	}
 	else
 	{
-		//m_eggRender.Draw(rc);
+		m_modelRender.Draw(rc);
 	}
 }
