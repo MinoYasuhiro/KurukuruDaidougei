@@ -105,6 +105,12 @@ void Player::Reset()
 
 void Player::Update()
 {
+    if (!m_game)
+    {
+        m_game = FindGO <Game>("game");
+        if (!m_game)return;
+    }
+
     if (m_game->GetState() != GameState::Playing)
     {
         m_isRunSEPlaying = false;
