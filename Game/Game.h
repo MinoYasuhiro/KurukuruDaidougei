@@ -66,6 +66,9 @@ private:
 	SpriteRender m_startLetter;
 	SpriteRender m_failureLetter;
 	SpriteRender m_successLetter;
+	SpriteRender m_count1;
+	SpriteRender m_count2;
+	SpriteRender m_count3;
 	GameCamera* m_gameCamera;
 	CoinBox* m_coinBox = nullptr;
 	Item* m_item = nullptr;
@@ -109,4 +112,9 @@ private:
 	bool  m_qteStarted = false;
 	bool m_waitQTEResult = false;
 	bool m_qteResultSuccess = false;
+
+	//3カウント用
+	float m_countTimer = 0.0f;
+	bool m_isCounting = false;
+	int m_countNumber;
 };
