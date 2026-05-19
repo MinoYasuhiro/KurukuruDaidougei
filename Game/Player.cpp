@@ -76,6 +76,7 @@ void Player::Reset()
     m_playerClear = 0;   // ←追加
     m_playerError = 0;   // ←追加
 
+    m_spinTimer = 0.0f;
     m_spinCount = 0;
     m_itemOnUmbrella = false;
 
@@ -360,44 +361,45 @@ void Player::PlayerAction()
         break;
     case 3:
     {
-        // 目標回転（正面）
+        // 正面向き処理
         Quaternion targetRot;
         targetRot.SetRotationY(0.0f);
 
-        // 現在回転 → 正面へ補間
         Quaternion rot;
         rot.Slerp(0.08f, m_rotation, targetRot);
 
-        // 保存
         m_rotation = rot;
-
-        // モデルへ反映
         m_NewModelRender.SetRotation(m_rotation);
 
-
-
-        //傘を回すアクション
+        // 傘回し
         float inputSpin = CalcStickRotationSpeed();
 
-        // 入力で加速
         m_spinSpeed += inputSpin * 0.11f;
+        m_spinSpeed *= 0.96f;
 
-        // 減衰（勝手に止まる）
-       m_spinSpeed *= 0.96f;
-
-       if (m_spinSpeed > 20.0f) m_spinSpeed = 30.0f;
-       if (m_spinSpeed < -20.0f) m_spinSpeed = -30.0f;
+        if (m_spinSpeed > 20.0f) m_spinSpeed = 30.0f;
+        if (m_spinSpeed < -20.0f) m_spinSpeed = -30.0f;
 
         m_umbrella->SetSpinSpeed(m_spinSpeed);
 
         SpinCount();
 
-        if(m_spinCount >= 20)
+        // ★タイマー加算
+        m_spinTimer += 1.0f / 60.0f;
+
+        // ★成功判定（25回）
+        if (m_spinCount >= 25)
         {
             m_playerState = 4;
             m_playerClear++;
-		}
-		
+        }
+
+        // ★失敗判定（3秒）
+        else if (m_spinTimer >= 3.0f)
+        {
+            m_playerState = 1;
+            m_playerError++;
+        }
     }
     break;
     case 4:
@@ -639,6 +641,7 @@ void Player::EndUmbrellaSpin()
     m_prevStick2 = Vector2::Zero;
 
     m_spinCount = 0;
+    m_spinTimer = 0.0f;
 
     m_umbrella->Reset();
 }
