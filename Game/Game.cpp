@@ -50,13 +50,18 @@ bool Game::Start()
     m_gameCamera = NewGO<GameCamera>(0, "gameCamera");
 
     m_startLetter.Init("Assets/sprite/Start.dds", 500.0f, 300.0f);
-    m_startLetter.SetPosition({ 640.0f,360.0f,0.0f });
 
     m_failureLetter.Init("Assets/sprite/Failure.dds", 500.0f, 300.0f);
-    m_failureLetter.SetPosition({ 640.0f,360.0f,0.0f });
 
     m_successLetter.Init("Assets/sprite/Success.dds", 500.0f, 300.0f);
-    m_successLetter.SetPosition({ 640.0f,360.0f,0.0f });
+
+    m_count1.Init("Assets/sprite/count1.dds",125.0f,125.0f);
+    m_count2.Init("Assets/sprite/count2.dds",125.0f,125.0f);
+    m_count3.Init("Assets/sprite/count3.dds",125.0f,125.0f);
+
+    m_count1.SetPosition({ 0.0f,400.0f,0.0f });
+    m_count2.SetPosition({ 0.0f,400.0f,0.0f });
+    m_count3.SetPosition({ 0.0f,400.0f,0.0f });
 
     m_startTimer = 0.0f;
     m_showStart = true;
@@ -122,6 +127,10 @@ void Game::Update()
     {
         m_circle->Update();
     }
+
+    m_count1.Update();
+    m_count2.Update();
+    m_count3.Update();
 }
 
 GamePhase Game::GetPhase()
@@ -245,6 +254,10 @@ void Game::UpdatePlaying()
 
             m_itemMove = true;
             m_hasThrownItem = false;
+
+            m_countTimer = 0.0f;
+            m_isCounting = true;
+            m_countNumber = 3;
         }
 
         m_item = m_spawner->GetCurrentItem();
@@ -258,12 +271,6 @@ void Game::UpdatePlaying()
         else
         {
             m_circle->SetVisible(false);
-        }
-
-        if (!m_hasThrownItem && m_movePhaseTimer >= 2.0f)
-        {
-            m_spawner->StartThrow();
-            m_hasThrownItem = true;
         }
 
         if (m_movePhaseTimer >= 15.0f)
@@ -401,10 +408,47 @@ void Game::UpdatePlaying()
     //    m_hasThrownItem = true;
     //}
 
-    if (!m_hasThrownItem && m_movePhaseTimer >= 2.0f)
+    if (m_isCounting)
     {
-        m_spawner->StartThrow();
-        m_hasThrownItem = true;
+        m_countTimer += deltaTime;
+
+        float alpha = 0.3 + (1.0f - m_countTimer) * 0.7f;
+
+        if (alpha < 0.0f)
+        {
+            alpha = 0.0f;
+        }
+
+        if (m_countNumber == 3)
+        {
+            m_count3.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, alpha));
+        }
+        else if (m_countNumber == 2)
+        {
+            m_count2.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, alpha));
+        }
+        else if (m_countNumber == 1)
+        {
+            m_count1.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, alpha));
+        }
+
+        if (m_countTimer >= 1.0f)
+        {
+            m_countTimer = 0.0f;
+            m_countNumber--;
+
+            m_count1.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+            m_count2.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+            m_count3.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+
+            if (m_countNumber <= 0)
+            {
+                m_isCounting = false;
+
+                m_spawner->StartThrow();
+                m_hasThrownItem = true;
+            }
+        }
     }
 
     if (m_showFailure)
@@ -539,5 +583,21 @@ void Game::Render(RenderContext& rc)
     if (m_circle)
     {
         m_circle->Render(rc);
+    }
+
+    if (m_isCounting)
+    {
+        if (m_countNumber == 3)
+        {
+            m_count3.Draw(rc);
+        }
+        else if (m_countNumber == 2)
+        {
+            m_count2.Draw(rc);
+        }
+        else if (m_countNumber == 1)
+        {
+            m_count1.Draw(rc);
+        }
     }
 }
