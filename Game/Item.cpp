@@ -164,8 +164,23 @@ void Item::ParabolicMotion()
 						return;
 					}
 				}
+				// ★ここを置き換え
+				if (!m_isProcessed)
+				{
+					// 傘に乗せ失敗
+					if (m_player)
+					{
+						m_player->m_playerState = 1;
+					}
+
+					m_state = BallState::FailFall;
+				}
+				else
+				{
+					// 成功後の弾は終了
+					m_state = BallState::Idle;
+				}
 			}
-			m_state = BallState::FailFall;
 		}
 	}
 }

@@ -121,5 +121,7 @@ private:
 	int m_playerClear = 0;
 	
 	float m_gameOverRunTimer = 0.0f;
+
+	float m_spinTimer = 0.0f;
 	
 };
