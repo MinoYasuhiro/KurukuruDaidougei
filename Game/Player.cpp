@@ -274,39 +274,58 @@ void Player::Rotation()
 //状態管理。
 void Player::ManageState()
 {
-    if (m_playerClear >= 5 && m_playerState < 7)
-    {
-        m_playerState = 7;
-        return;
-    }
-
-    if (m_playerError >= 3 && m_playerState < 9)
-    {
-        m_playerState = 9;
-        return;
-    }
-
     Vector2 stick;
     stick.x = g_pad[0]->GetLStickXF();
     stick.y = g_pad[0]->GetLStickYF();
-    
+
     switch (m_playerState)
     {
     case 0: // 待機
-    case 2: // 移動
+    {
+        // ★クリア判定
+        if (m_playerClear >= 5)
+        {
+            m_playerState = 7;
+            return;
+        }
+
+        // ★ゲームオーバー判定
+        if (m_playerError >= 3)
+        {
+            m_playerState = 9;
+            return;
+        }
+
+        // 傘回し開始
         if (m_itemOnUmbrella)
         {
             m_playerState = 3;
         }
+        // 移動開始
         else if (fabsf(stick.x) >= 0.1f || fabsf(stick.y) >= 0.1f)
         {
             m_playerState = 2;
         }
-        else
+
+        break;
+    }
+
+    case 2: // 移動
+    {
+        // 傘回し開始
+        if (m_itemOnUmbrella)
+        {
+            m_playerState = 3;
+        }
+        // 入力がないなら待機
+        else if (fabsf(stick.x) < 0.1f &&
+            fabsf(stick.y) < 0.1f)
         {
             m_playerState = 0;
         }
+
         break;
+    }
 
     case 1: // 傘回し失敗中
     case 4: // 傘回し成功中
