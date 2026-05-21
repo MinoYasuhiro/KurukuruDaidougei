@@ -22,10 +22,10 @@ bool MenuUI::Start()
 
 
 	//各UIの配置
-	m_backTitleRender.SetPosition({ -300.0f, -100.0f, 0.0f });
-	m_retryRender.SetPosition({ 300.0f, -100.0f, 0.0f });
-	m_restartRender.SetPosition({ -300.0f, 200.0f, 0.0f });
-	m_soundTestRender.SetPosition({ 300.0f, 200.0f, 0.0f });
+	m_backTitleRender.SetPosition({ -300.0f, -250.0f, 0.0f });
+	m_retryRender.SetPosition({ 300.0f, -250.0f, 0.0f });
+	m_restartRender.SetPosition({ -300.0f, 50.0f, 0.0f });
+	m_soundTestRender.SetPosition({ 300.0f, 50.0f, 0.0f });
 
 
 	return true;

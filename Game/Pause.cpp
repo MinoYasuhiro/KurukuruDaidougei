@@ -10,17 +10,17 @@ bool Pause::Start()
 {
     
     // Menu 表示
-    m_Sprite.Init("Assets/Sprite/Menu.DDS", 100, 100);
-    m_Sprite.SetPosition(Vector3(0, 200, 0)); // ★ 手前
-    m_Sprite.SetScale(Vector3(1.5f, 1.5f, 1.5f));
+    //m_Sprite.Init("Assets/Sprite/Menu.DDS", 100, 100);
+    //m_Sprite.SetPosition(Vector3(0, 200, 0)); // ★ 手前
+    //m_Sprite.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 
     // Pause 表示
-    m_SpriteRender.Init("Assets/Sprite/Pause.DDS", 100, 100);
-    m_SpriteRender.SetPosition(Vector3(0, -200, 0)); // ★ 手前
+    m_SpriteRender.Init("Assets/Sprite/Pause.DDS", 300, 80);
+    m_SpriteRender.SetPosition(Vector3(0, 300, 0)); // ★ 手前
     m_SpriteRender.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 
     //Menu背景　表示
-    m_PauseRender.Init("Assets/Sprite/PauseBackground.DDS", 1920, 1080);
+    m_PauseRender.Init("Assets/Sprite/SoundBackground.DDS", 1920, 1080);
     m_PauseRender.SetPosition(Vector3(0, 0, 0));
     
     m_menuUI = new MenuUI();    //メニューUIの生成
@@ -34,7 +34,7 @@ void Pause::Update()
 {
 
     //m_SpriteRender.Update();
-    m_Sprite.Update();
+    //m_Sprite.Update();
     m_PauseRender.Update();
     m_SpriteRender.Update();
 
@@ -89,7 +89,7 @@ void Pause::Render(RenderContext& rc)
 {
     m_PauseRender.Draw(rc);
     m_SpriteRender.Draw(rc);
-    m_Sprite.Draw(rc);
+    //m_Sprite.Draw(rc);
 
     if (m_menuUI)
     {
