@@ -171,6 +171,7 @@ void Item::ParabolicMotion()
 					if (m_player)
 					{
 						m_player->m_playerState = 1;
+						m_player->m_playerError++;
 					}
 
 					m_state = BallState::FailFall;
