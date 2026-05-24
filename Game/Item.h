@@ -29,6 +29,7 @@ public:
 	void Render(RenderContext& renderContext)override;
 
 	bool IsQTEItem()const { return m_category == ItemCategory::QTE; }
+	bool IsActive()const { return m_isActive; }
 
 	void Init(ItemType type);
 	void SetState(BallState newState);	//状態切り替え
@@ -43,6 +44,7 @@ public:
 	void FailFallMotion();	//失敗時の落下モーション
 	void DropPrepare();		//傘から落とす準備
 	void PrepareParabola();
+	void SetActive(bool isActive);
 
 	//現在の速度から予測される着地点を取得
 	Vector3 GetPlannedLandingPosition()const;
@@ -76,6 +78,10 @@ private:
 	bool m_hasPlayedLandSE = false;			//SE再生済みフラグ
 	bool m_isProcessed = false;
 	bool m_hasFailureModel = false;
+	bool m_isModelInited = false;
+	bool m_isFailureModelInited = false;
+	bool m_isDead = false;
+	bool m_isActive = true;
 	float m_onUmbrellaTimer = 0.0f;			//傘の上にいる時間
 	float m_onUmbrellaLimitTimer = 2.0f;	//制限時間
 };

@@ -8,7 +8,7 @@ enum class CoinLevel
 	ExtraLarge,
 	Max
 };
-class CoinBox:public IGameObject
+class CoinBox :public IGameObject
 {
 public:
 	CoinBox();
@@ -26,7 +26,6 @@ private:
 	ModelRender m_maxCoinRender;
 	Vector3 m_position = Vector3::Zero;
 	CoinLevel m_coinLevel = CoinLevel::Empty;
-
 	float m_testTime = 0.0f;
 };
 

@@ -4,6 +4,10 @@
 bool ItemSpawner::Start()
 {
 	m_index = 0;
+
+	m_currentItem = nullptr;
+	m_pendingDeleteItem = nullptr;
+
 	return true;
 }
 
@@ -12,6 +16,9 @@ void ItemSpawner::SpawnNext()
 	if (m_currentItem)
 	{
 		DeleteGO(m_currentItem);
+		//m_currentItem->SetActive(false);
+
+		m_pendingDeleteItem = m_currentItem;
 		m_currentItem = nullptr;
 	}
 
@@ -43,13 +50,24 @@ void ItemSpawner::StartThrow()
 	}
 }
 
+void ItemSpawner::LateUpdate()
+{
+	/*if (m_pendingDeleteItem)
+	{
+		DeleteGO(m_pendingDeleteItem);
+		m_pendingDeleteItem = nullptr;
+	}*/
+}
+
 void ItemSpawner::Reset()
 {
 	m_index = 0;
-	
+
 	if (m_currentItem)
 	{
 		DeleteGO(m_currentItem);
 		m_currentItem = nullptr;
 	}
+
+	m_pendingDeleteItem = nullptr;
 }
