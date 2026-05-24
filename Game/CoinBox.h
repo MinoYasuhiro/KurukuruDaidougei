@@ -8,7 +8,7 @@ enum class CoinLevel
 	ExtraLarge,
 	Max
 };
-class CoinBox:public IGameObject
+class CoinBox :public IGameObject
 {
 public:
 	CoinBox();
@@ -16,6 +16,9 @@ public:
 	bool Start()override;
 	void Update()override;
 	void Render(RenderContext& renderContext)override;
+
+	void AddCoin();
+	void Reset();
 
 private:
 	ModelRender m_coinBoxRender;
@@ -26,7 +29,6 @@ private:
 	ModelRender m_maxCoinRender;
 	Vector3 m_position = Vector3::Zero;
 	CoinLevel m_coinLevel = CoinLevel::Empty;
-
 	float m_testTime = 0.0f;
 };
 

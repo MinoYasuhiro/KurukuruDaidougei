@@ -49,6 +49,11 @@ bool Item::Start()
 	return true;
 }
 
+void Item::SetActive(bool isActive)
+{
+	m_isActive = isActive;
+}
+
 void Item::Init(ItemType type)
 {
 	m_type = type;
@@ -65,15 +70,18 @@ void Item::Init(ItemType type)
 		m_hasFailureModel = false;
 		m_modelRender.Init("Assets/modelData/ball.tkm");
 		m_modelRender.SetScale({ 2.0f,2.0f,2.0f });
+		m_isModelInited = true;
 		break;
 	case ItemType::egg:
 		m_category = ItemCategory::QTE;
 		m_hasFailureModel = true;
 		m_modelRender.Init("Assets/modelData/egg.tkm");
 		m_modelRender.SetScale({ 5.0f,5.0f,5.0f });
+		m_isModelInited = true;
 
 		m_failureModelRender.Init("Assets/modelData/eggCracked.tkm");
 		m_failureModelRender.SetScale({ 5.0f,5.0f,5.0f });
+		m_isFailureModelInited = true;
 		break;
 	default:
 		m_category = ItemCategory::Normal;
@@ -85,6 +93,8 @@ void Item::Init(ItemType type)
 //更新処理
 void Item::Update()
 {
+	if (!m_isActive)return;
+
 	if (!m_game)
 	{
 		m_game = FindGO<Game>("game");
@@ -116,12 +126,12 @@ void Item::Update()
 		break;
 	}
 
-	if (m_isCracked && m_hasFailureModel)
+	if (m_isCracked && m_hasFailureModel && m_isFailureModelInited)
 	{
 		m_failureModelRender.SetPosition(m_position);
 		m_failureModelRender.Update();
 	}
-	else
+	else if (m_isModelInited)
 	{
 		m_modelRender.SetPosition(m_position);
 		m_modelRender.Update();
@@ -164,24 +174,8 @@ void Item::ParabolicMotion()
 						return;
 					}
 				}
-				// ★ここを置き換え
-				if (!m_isProcessed)
-				{
-					// 傘に乗せ失敗
-					if (m_player)
-					{
-						m_player->m_playerState = 1;
-						m_player->m_playerError++;
-					}
-
-					m_state = BallState::FailFall;
-				}
-				else
-				{
-					// 成功後の弾は終了
-					m_state = BallState::Idle;
-				}
 			}
+			m_state = BallState::FailFall;
 		}
 	}
 }
@@ -292,6 +286,8 @@ void Item::OnUmbrella()
 	}
 
 	if (!m_player)return;
+
+	if (!m_circle)return;
 
 	Vector3 position = m_player->GetPosition();
 	position.y += 130.0f;
@@ -441,11 +437,13 @@ void Item::PrepareParabola()
 
 void Item::Render(RenderContext& rc)
 {
-	if (m_isCracked && m_hasFailureModel)
+	if (!m_isActive)return;
+
+	if (m_isCracked && m_hasFailureModel && m_isFailureModelInited)
 	{
 		m_failureModelRender.Draw(rc);
 	}
-	else
+	else if (m_isModelInited)
 	{
 		m_modelRender.Draw(rc);
 	}

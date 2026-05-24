@@ -56,7 +56,7 @@ public:
 	Circle* GetCircle()const { return m_circle; }
 
 private:
-	ModelRender m_modelRender;
+	//ModelRender m_modelRender;
 	Vector3 m_pos;
 	BackGround* m_backGround;
 	Player* m_player;
@@ -69,6 +69,7 @@ private:
 	SpriteRender m_count1;
 	SpriteRender m_count2;
 	SpriteRender m_count3;
+	SpriteRender m_countDown;
 	GameCamera* m_gameCamera;
 	CoinBox* m_coinBox = nullptr;
 	Item* m_item = nullptr;

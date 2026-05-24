@@ -15,47 +15,75 @@ CoinBox::~CoinBox()
 bool CoinBox::Start()
 {
 	m_coinBoxRender.Init("Assets/modelData/coinHolder.tkm");
+	m_coinBoxRender.SetScale({ 1.5f,1.5f,1.5f });
 	m_smallCoinRender.Init("Assets/modelData/smallCoin.tkm");
+	m_smallCoinRender.SetScale({ 1.5f,1.5f,1.5f });
 	m_mediumCoinRender.Init("Assets/modelData/mediumCoin.tkm");
+	m_mediumCoinRender.SetScale({ 1.5f,1.5f,1.5f });
 	m_largeCoinRender.Init("Assets/modelData/largeCoin.tkm");
+	m_largeCoinRender.SetScale({ 1.5f,1.5f,1.5f });
 	m_extraLargeCoinRender.Init("Assets/modelData/extraLargeCoin.tkm");
+	m_extraLargeCoinRender.SetScale({ 1.5f,1.5f,1.5f });
 	m_maxCoinRender.Init("Assets/modelData/maxCoin.tkm");
+	m_maxCoinRender.SetScale({ 1.5f,1.5f,1.5f });
+
 	return true;
 }
 
 void CoinBox::Update()
 {
-	if (Game::GetState() != GameState::Playing)
-		return;
-	float deltaTime =g_gameTime->GetFrameDeltaTime();
-	m_testTime += deltaTime;
-	if (m_testTime > 2.0f)
-	{
-		m_testTime = 0.0f;
+	if (g_gameTime == nullptr)return;
 
-		switch (m_coinLevel)
-		{
-		case CoinLevel::Empty:
-			m_coinLevel = CoinLevel::Small;
-			break;
-		case CoinLevel::Small:
-			m_coinLevel = CoinLevel::Medium;
-			break;
-		case CoinLevel::Medium:
-			m_coinLevel = CoinLevel::Large;
-			break;
-		case CoinLevel::Large:
-			m_coinLevel = CoinLevel::ExtraLarge;
-			break;
-		case CoinLevel::ExtraLarge:
-			m_coinLevel = CoinLevel::Max;
-			break;
-		default:
-			break;
-		}
-	}
 	m_coinBoxRender.SetPosition(m_position);
 	m_coinBoxRender.Update();
+
+	m_smallCoinRender.SetPosition(m_position);
+	m_smallCoinRender.Update();
+
+	m_mediumCoinRender.SetPosition(m_position);
+	m_mediumCoinRender.Update();
+
+	m_largeCoinRender.SetPosition(m_position);
+	m_largeCoinRender.Update();
+
+	m_extraLargeCoinRender.SetPosition(m_position);
+	m_extraLargeCoinRender.Update();
+
+	m_maxCoinRender.SetPosition(m_position);
+	m_maxCoinRender.Update();
+
+	if (Game::GetState() != GameState::Playing)return;
+}
+
+void CoinBox::AddCoin()
+{
+	switch (m_coinLevel)
+	{
+	case CoinLevel::Empty:
+		m_coinLevel = CoinLevel::Small;
+		break;
+	case CoinLevel::Small:
+		m_coinLevel = CoinLevel::Medium;
+		break;
+	case CoinLevel::Medium:
+		m_coinLevel = CoinLevel::Large;
+		break;
+	case CoinLevel::Large:
+		m_coinLevel = CoinLevel::ExtraLarge;
+		break;
+	case CoinLevel::ExtraLarge:
+		m_coinLevel = CoinLevel::Max;
+		break;
+	case CoinLevel::Max:
+		break;
+	default:
+		break;
+	}
+}
+
+void CoinBox::Reset()
+{
+	m_coinLevel = CoinLevel::Empty;
 }
 
 void CoinBox::Render(RenderContext& rc)
