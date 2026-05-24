@@ -123,11 +123,6 @@ void Game::Update()
         break;
     }
 
-    //m_modelRender.Update();
-    if (m_coinBox)
-    {
-        m_coinBox->Update();
-    }
     if (m_circle!=nullptr)
     {
         m_circle->Update();
@@ -180,6 +175,11 @@ void Game::ResetGame()
     if (m_spawner)
     {
         m_spawner->Reset();
+    }
+
+    if (m_coinBox)
+    {
+        m_coinBox->Reset();
     }
 
     // ★ 残っているオブジェクトを消す
@@ -611,10 +611,6 @@ void Game::Render(RenderContext& rc)
         m_successLetter.Draw(rc);
     }
 
-    if (m_coinBox)
-    {
-        m_coinBox->Render(rc);
-    }
     if (m_circle)
     {
         m_circle->Render(rc);

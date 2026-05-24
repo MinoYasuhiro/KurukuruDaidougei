@@ -53,38 +53,37 @@ void CoinBox::Update()
 	m_maxCoinRender.Update();
 
 	if (Game::GetState() != GameState::Playing)return;
+}
 
-	float deltaTime = g_gameTime->GetFrameDeltaTime();
-
-	m_testTime += deltaTime;
-
-	if (m_testTime > 10.0f)
+void CoinBox::AddCoin()
+{
+	switch (m_coinLevel)
 	{
-		m_testTime = 0.0f;
-
-		switch (m_coinLevel)
-		{
-		case CoinLevel::Empty:
-			m_coinLevel = CoinLevel::Small;
-			break;
-		case CoinLevel::Small:
-			m_coinLevel = CoinLevel::Medium;
-			break;
-		case CoinLevel::Medium:
-			m_coinLevel = CoinLevel::Large;
-			break;
-		case CoinLevel::Large:
-			m_coinLevel = CoinLevel::ExtraLarge;
-			break;
-		case CoinLevel::ExtraLarge:
-			m_coinLevel = CoinLevel::Max;
-			break;
-		case CoinLevel::Max:
-			break;
-		default:
-			break;
-		}
+	case CoinLevel::Empty:
+		m_coinLevel = CoinLevel::Small;
+		break;
+	case CoinLevel::Small:
+		m_coinLevel = CoinLevel::Medium;
+		break;
+	case CoinLevel::Medium:
+		m_coinLevel = CoinLevel::Large;
+		break;
+	case CoinLevel::Large:
+		m_coinLevel = CoinLevel::ExtraLarge;
+		break;
+	case CoinLevel::ExtraLarge:
+		m_coinLevel = CoinLevel::Max;
+		break;
+	case CoinLevel::Max:
+		break;
+	default:
+		break;
 	}
+}
+
+void CoinBox::Reset()
+{
+	m_coinLevel = CoinLevel::Empty;
 }
 
 void CoinBox::Render(RenderContext& rc)

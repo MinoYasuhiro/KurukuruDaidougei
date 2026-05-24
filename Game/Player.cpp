@@ -6,6 +6,7 @@
 #include "SEManager.h"
 #include "Game.h"
 #include "Item.h"
+#include "CoinBox.h"
 
 Player::Player()
 {
@@ -17,7 +18,7 @@ Player::~Player()
 
 bool Player::Start()
 {
-    
+
     m_playerAnimationState[enPlayerAnimationState_Idle].Load("Assets/animData/PlayerIdle.tka");
     m_playerAnimationState[enPlayerAnimationState_Idle].SetLoopFlag(true);
     m_playerAnimationState[enPlayerAnimationState_Run].Load("Assets/animData/PlayerRun.tka");
@@ -62,7 +63,7 @@ bool Player::Start()
     m_font.SetColor({ 1.0f,1.0f,1.0f,1.0f });
     m_font.SetScale(1.0f);
 
-	m_itemOnUmbrella = false;
+    m_itemOnUmbrella = false;
     m_isRunSEPlaying = false;
 
     return true;
@@ -81,10 +82,10 @@ void Player::Reset()
     m_itemOnUmbrella = false;
 
     m_position = m_startPos;
-	m_rotation = Quaternion::Identity;
+    m_rotation = Quaternion::Identity;
 
     m_NewModelRender.SetPosition(m_position);
-	m_NewModelRender.SetRotation(m_rotation);
+    m_NewModelRender.SetRotation(m_rotation);
     m_NewModelRender.Update();
 
     m_umbrella->Reset();
@@ -112,6 +113,11 @@ void Player::Update()
         if (!m_game)return;
     }
 
+    if (!m_umbrella)
+    {
+        m_umbrella = FindGO<Umbrella>("umbrella");
+    }
+
     if (m_game->GetState() != GameState::Playing)
     {
         m_isRunSEPlaying = false;
@@ -126,14 +132,14 @@ void Player::Update()
         m_canPlayerMove = true;
     }
 
-	// ★スティック回転の計算
+    // ★スティック回転の計算
     wchar_t text[256];
     swprintf_s(text, 256, L"Spin Count : %d", m_spinCount);
 
     m_font.SetText(text);
 
     m_prevNumber = number;
-   
+
 
     if (m_prevNumber != 1 && number == 1)
     {
@@ -161,7 +167,10 @@ void Player::Update()
     {
         if (m_playerState == 3)
         {
-            m_umbrella->OnStartSpin();
+            if (m_umbrella)
+            {
+                m_umbrella->OnStartSpin();
+            }
         }
 
         PlayAnimation2();
@@ -171,7 +180,7 @@ void Player::Update()
 
     m_prevPlayerState = m_playerState;
 
-	// ★傘の位置を更新
+    // ★傘の位置を更新
     int boneNo = m_NewModelRender.FindBoneID(L"Middle_r");
 
     if (boneNo != -1)
@@ -185,7 +194,10 @@ void Player::Update()
         bone->CalcWorldTRS(pos, rot, scale);
 
         // 手首位置だけ追従
-        m_umbrella->SetPosition(pos);
+        if (m_umbrella)
+        {
+            m_umbrella->SetPosition(pos);
+        }
     }
 }
 
@@ -215,7 +227,7 @@ void Player::SoundPlay()
 
     if (isMoveInput && !m_isRunSEPlaying)
     {
-        SEManager::Play(SE_run,true);
+        SEManager::Play(SE_run, true);
         m_isRunSEPlaying = true;
     }
     else if (!isMoveInput && m_isRunSEPlaying)
@@ -333,7 +345,7 @@ void Player::ManageState()
         // アニメ終了待ち
         if (!m_NewModelRender.IsPlayingAnimation())
         {
-			EndUmbrellaSpin();
+            EndUmbrellaSpin();
 
             m_playerState = 0;
 
@@ -399,7 +411,10 @@ void Player::PlayerAction()
         if (m_spinSpeed > 20.0f) m_spinSpeed = 30.0f;
         if (m_spinSpeed < -20.0f) m_spinSpeed = -30.0f;
 
-        m_umbrella->SetSpinSpeed(m_spinSpeed);
+        if (m_umbrella)
+        {
+            m_umbrella->SetSpinSpeed(m_spinSpeed);
+        }
 
         SpinCount();
 
@@ -411,6 +426,11 @@ void Player::PlayerAction()
         {
             m_playerState = 4;
             m_playerClear++;
+
+            if (CoinBox* coin = FindGO<CoinBox>("coinBox"))
+            {
+                coin->AddCoin();
+            }
         }
 
         // ★失敗判定（3秒）
@@ -456,7 +476,7 @@ void Player::PlayerAction()
         if (m_gameOverRunTimer >= 3.0f)
         {
             m_playerError = 0;     // ←追加
-			m_itemOnUmbrella = false; // ←追加
+            m_itemOnUmbrella = false; // ←追加
             m_playerState = 30;
             m_gameOverRunTimer = 0.0f;
             m_moveSpeed = Vector3::Zero; // ←追加
