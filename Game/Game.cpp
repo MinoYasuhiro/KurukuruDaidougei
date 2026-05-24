@@ -58,10 +58,12 @@ bool Game::Start()
     m_count1.Init("Assets/sprite/count1.dds",125.0f,125.0f);
     m_count2.Init("Assets/sprite/count2.dds",125.0f,125.0f);
     m_count3.Init("Assets/sprite/count3.dds",125.0f,125.0f);
+    m_countDown.Init("Assets/sprite/countDown.dds", 400.0f, 400.0f);
 
-    m_count1.SetPosition({ 0.0f,400.0f,0.0f });
-    m_count2.SetPosition({ 0.0f,400.0f,0.0f });
-    m_count3.SetPosition({ 0.0f,400.0f,0.0f });
+    m_count1.SetPosition({ 0.0f,375.0f,0.0f });
+    m_count2.SetPosition({ 0.0f,375.0f,0.0f });
+    m_count3.SetPosition({ 0.0f,375.0f,0.0f });
+    m_countDown.SetPosition({ 0.0f,475.0f,0.0f });
 
     m_startTimer = 0.0f;
     m_showStart = true;
@@ -82,7 +84,7 @@ bool Game::Start()
 
     m_BGM->Play(BGM_NormalUmbrella);
 
-    //m_coinBox = NewGO<CoinBox>(0, "coinBox");
+    m_coinBox = NewGO<CoinBox>(0, "coinBox");
 
     return true;
 }
@@ -121,9 +123,12 @@ void Game::Update()
         break;
     }
 
-    m_modelRender.Update();
-    //m_coinBox->Update();
-    if (m_circle)
+    //m_modelRender.Update();
+    if (m_coinBox)
+    {
+        m_coinBox->Update();
+    }
+    if (m_circle!=nullptr)
     {
         m_circle->Update();
     }
@@ -131,6 +136,7 @@ void Game::Update()
     m_count1.Update();
     m_count2.Update();
     m_count3.Update();
+    m_countDown.Update();
 }
 
 GamePhase Game::GetPhase()
@@ -177,11 +183,11 @@ void Game::ResetGame()
     }
 
     // ★ 残っているオブジェクトを消す
-    if (m_item)
+    /*if (m_item)
     {
         DeleteGO(m_item);
         m_item = nullptr;
-    }
+    }*/
 
     // ★ プレイヤー初期化
     if (Player* player = FindGO<Player>("player"))
@@ -238,7 +244,7 @@ void Game::UpdatePlaying()
     {
     case GamePhase::Start:
         m_startTimer += deltaTime;
-        if (m_startTimer >= 2.0f)
+        if (m_startTimer >= 3.0f)
         {
             m_showStart = false;
             RequestMovePhase();
@@ -246,7 +252,11 @@ void Game::UpdatePlaying()
         break;
 
     case GamePhase::MovePhase:
+    {
         m_movePhaseTimer += deltaTime;
+
+        m_circle->SetVisible(false);
+
         //アイテム未生成時のみ生成
         if (!m_itemMove)
         {
@@ -258,19 +268,32 @@ void Game::UpdatePlaying()
             m_countTimer = 0.0f;
             m_isCounting = true;
             m_countNumber = 3;
+
+            return;
         }
 
-        m_item = m_spawner->GetCurrentItem();
+        Item* current = m_spawner->GetCurrentItem();
 
-        if (m_item && m_phase == GamePhase::MovePhase && !m_hasThrownItem && !m_item->IsFlying())
+        if (current == nullptr)
         {
-            Vector3 landingPosition = m_item->GetPlannedLandingPosition();
-            m_circle->SetPosition(landingPosition);
-            m_circle->SetVisible(true);
+            m_circle->SetVisible(false);
+            break;
         }
         else
         {
-            m_circle->SetVisible(false);
+            if (m_phase == GamePhase::MovePhase && !m_hasThrownItem)
+            {
+                if (!current->IsFlying())
+                {
+                    Vector3 landingPosition = current->GetPlannedLandingPosition();
+                    m_circle->SetPosition(landingPosition);
+                    m_circle->SetVisible(true);
+                }
+                else
+                {
+                    m_circle->SetVisible(false);
+                }
+            }
         }
 
         if (m_movePhaseTimer >= 15.0f)
@@ -280,7 +303,7 @@ void Game::UpdatePlaying()
             m_phase = GamePhase::AfterMove;
         }
         break;
-
+    }
     case GamePhase::AfterMove:
         ////////通常傘回し用の処理////////
         m_clearTimer += deltaTime;
@@ -288,14 +311,23 @@ void Game::UpdatePlaying()
         {
             m_clearTimer = 0.0f;
 
-            if (m_item && m_item->IsQTEItem())
+            Item* item = m_spawner->GetCurrentItem();
+
+            if (item == nullptr)
             {
-                m_phase = GamePhase::QTEMove;
-                m_qteTimer = 0.0f;
+                RequestMovePhase();
             }
             else
             {
-                RequestMovePhase();
+                if (item->IsQTEItem())
+                {
+                    m_phase = GamePhase::QTEMove;
+                    m_qteTimer = 0.0f;
+                }
+                else
+                {
+                    RequestMovePhase();
+                }
             }
         }
         break;
@@ -579,7 +611,10 @@ void Game::Render(RenderContext& rc)
         m_successLetter.Draw(rc);
     }
 
-    //m_coinBox->Render(rc);
+    if (m_coinBox)
+    {
+        m_coinBox->Render(rc);
+    }
     if (m_circle)
     {
         m_circle->Render(rc);
@@ -587,6 +622,7 @@ void Game::Render(RenderContext& rc)
 
     if (m_isCounting)
     {
+        m_countDown.Draw(rc);
         if (m_countNumber == 3)
         {
             m_count3.Draw(rc);

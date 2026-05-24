@@ -2,11 +2,12 @@
 #include <vector>
 #include "Item.h"
 
-class ItemSpawner:public IGameObject
+class ItemSpawner :public IGameObject
 {
 public:
 	bool Start()override;
 
+	void LateUpdate();
 	void SpawnNext();
 	void StartThrow();
 	void Reset();
@@ -22,5 +23,6 @@ private:
 	int m_index = 0;
 
 	Item* m_currentItem = nullptr;
+	Item* m_pendingDeleteItem = nullptr;
 };
 
