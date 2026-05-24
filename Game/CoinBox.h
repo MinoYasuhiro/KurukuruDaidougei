@@ -17,6 +17,9 @@ public:
 	void Update()override;
 	void Render(RenderContext& renderContext)override;
 
+	void AddCoin();
+	void Reset();
+
 private:
 	ModelRender m_coinBoxRender;
 	ModelRender m_smallCoinRender;
