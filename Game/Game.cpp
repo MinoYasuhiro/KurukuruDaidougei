@@ -172,6 +172,14 @@ void Game::ResetGame()
     m_successTimer = 0.0f;
     m_failureTimer = 0.0f;
 
+    m_countTimer = 0.0f;
+    m_isCounting = false;
+    m_countNumber = 0.0f;
+
+    m_count1.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    m_count2.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+    m_count3.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
+
     if (m_spawner)
     {
         m_spawner->Reset();
