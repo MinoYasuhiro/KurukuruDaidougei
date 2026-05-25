@@ -13,6 +13,7 @@ class CoinBox;
 class Item;
 class Circle;
 class ItemSpawner;
+class CoinEffect;
 enum class GamePhase
 {
 	Start,
@@ -71,6 +72,7 @@ private:
 	SpriteRender m_count3;
 	SpriteRender m_countDown;
 	GameCamera* m_gameCamera;
+	CoinEffect* m_coin = nullptr;
 	CoinBox* m_coinBox = nullptr;
 	Item* m_item = nullptr;
 	Circle* m_circle = nullptr;
@@ -118,4 +120,6 @@ private:
 	float m_countTimer = 0.0f;
 	bool m_isCounting = false;
 	int m_countNumber;
+
+	bool m_coinPlayed = false;
 };

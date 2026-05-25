@@ -19,6 +19,7 @@
 #include "Title.h"
 #include "Circle.h"
 #include "SoundSettings.h"
+#include "CoinEffect.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -43,6 +44,8 @@ bool Game::Start()
     m_spawner = NewGO<ItemSpawner>(0, "itemSpawner");
 
     m_circle = NewGO<Circle>(0, "circle");
+
+    m_coin = NewGO<CoinEffect>(0, "coinEffect");
 
     m_backGround = NewGO<BackGround>(0, "background");
     //m_umbrella = NewGO<Umbrella>(0, "umbrella");
@@ -126,6 +129,11 @@ void Game::Update()
     if (m_circle!=nullptr)
     {
         m_circle->Update();
+    }
+
+    if (m_coin)
+    {
+        m_coin->Update();
     }
 
     m_count1.Update();
@@ -216,6 +224,8 @@ void Game::ResetGame()
     m_phase = GamePhase::Start;
 
     m_requestStart = true;
+
+    m_coinPlayed = false;
 }
 
 void Game::RequestMovePhase()
@@ -515,6 +525,7 @@ void Game::UpdatePlaying()
         {
             m_showSuccess = false;
             m_showFailure = false;
+            m_coinPlayed = false;
             RequestMovePhase();
         }
     }
@@ -600,6 +611,8 @@ void Game::RequestSuccessLetter()
     m_showSuccess = true;
     m_successTimer = 0.0f;
     SEManager::Play(SE_cheers,false);
+
+    m_coin->Play();
 }
 
 void Game::Render(RenderContext& rc)
@@ -622,6 +635,11 @@ void Game::Render(RenderContext& rc)
     if (m_circle)
     {
         m_circle->Render(rc);
+    }
+
+    if (m_coin)
+    {
+        m_coin->Render(rc);
     }
 
     if (m_isCounting)
