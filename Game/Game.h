@@ -71,6 +71,7 @@ private:
 	SpriteRender m_count2;
 	SpriteRender m_count3;
 	SpriteRender m_countDown;
+	SkyCube* m_skyCube;
 	GameCamera* m_gameCamera;
 	CoinEffect* m_coin = nullptr;
 	CoinBox* m_coinBox = nullptr;
