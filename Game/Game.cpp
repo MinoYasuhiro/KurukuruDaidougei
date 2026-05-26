@@ -50,7 +50,11 @@ bool Game::Start()
     m_backGround = NewGO<BackGround>(0, "background");
     //m_umbrella = NewGO<Umbrella>(0, "umbrella");
     m_player = NewGO<Player>(0, "player");
+
     m_gameCamera = NewGO<GameCamera>(0, "gameCamera");
+
+    m_skyCube = NewGO<SkyCube>(0, "skyCube");
+    m_skyCube->SetType(enSkyCubeType_SunriseToon);
 
     m_startLetter.Init("Assets/sprite/Start.dds", 500.0f, 300.0f);
 
