@@ -127,7 +127,7 @@ void Player::Update()
     // ゲーム開始タイマー   例えばこれで3秒後に操作可能になります。
     m_gameStartTimer += 1.0f / 60.0f;
 
-    if (m_gameStartTimer >= 2.0f)
+    if (m_gameStartTimer >= 3.0f)
     {
         m_canPlayerMove = true;
     }
