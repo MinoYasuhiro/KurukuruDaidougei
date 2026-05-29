@@ -10,6 +10,7 @@ https://github.com/MinoYasuhiro/KurukuruDaidougei
 
 YoutubeのURL
 
+https://youtu.be/vFspM1WKWlU?si=FeEYZufL00zf0ORD
 
 ## 目次
 
