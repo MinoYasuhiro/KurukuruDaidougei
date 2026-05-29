@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>傘廻師</title>
+</head>
+
+<body>
+
+<h2>傘廻師</h2>
+<img src="TitleData-1.png" alt="alt text">
+
+<p>河原電子ビジネス専門学校　ゲームクリエイター科 2年（28卒）</p>
+
+<p>GitHubのURL</p>
+<p><a href="https://github.com/MinoYasuhiro/KurukuruDaidougei">
+https://github.com/MinoYasuhiro/KurukuruDaidougei
+</a></p>
+
+<p>YoutubeのURL</p>
+<p><a href="https://youtu.be/vFspM1WKWlU?si=FeEYZufL00zf0ORD">
+https://youtu.be/vFspM1WKWlU?si=FeEYZufL00zf0ORD
+</a></p>
+
+<h2>目次</h2>
+<ul>
+<li>作品概要</li>
+<li>傘廻師</li>
+<li>ゲーム説明</li>
+<li>技術紹介</li>
+<li>このゲームの醍醐味</li>
+<li>技術紹介</li>
+</ul>
+
+<h2>作品概要</h2>
+
+<p>タイトル<br>傘廻師</p>
+
+<p>制作人数：<br>3人</p>
+
+<p>製作期間：<br>2026年2月~2026年5月</p>
+
+<p>ゲームジャンル：<br>3Dアクションゲーム</p>
+
+<p>プレイ人数：<br>1人</p>
+
+<p>使用言語：<br>C++<br>HLSL</p>
+
+<p>使用ツール</p>
+<ul>
+<li>Visual studio 2026</li>
+<li>Adobe Photoshop 2026</li>
+<li>3dsMax 2026</li>
+<li>GitHub</li>
+<li>fork</li>
+<li>MIXAMO</li>
+</ul>
+
+<p>開発環境<br>K2Engine（学校内製のエンジン）</p>
+
+<p>担当しているもの：</p>
+
+<p>青木<br>・ゲームシーン、カメラ、ステージ</p>
+
+<p>三野<br>・Playerの挙動</p>
+
+<p>岡﨑<br>・UI,BGMとSE,サウンド</p>
+
+<h2>ゲーム説明</h2>
+
+<p>
+傘回しで、観客を盛り上げて、投げ銭を集めるゲームです。<br>
+時間内に指定の回数回せたら傘回しを成功することが目的です。
+</p>
+
+<img src="傘回しの回転-1.gif" alt="ゲーム画像">
+
+<p>アイテムの種類は鞠、卵の二種類です</p>
+<img src="シーケンス 01_5-1.gif" alt="アイテム">
+
+<p>プレイヤーについて</p>
+<ul>
+<li>スティックの回転：Lスティックを回す</li>
+<li>傾き：Rスティックでバランス調整</li>
+</ul>
+
+<p>サウンド設定画面</p>
+<p>
+カーソルに合わせてアイコンを拡大し、
+選択時に傘が開く演出を追加しました。
+</p>
+
+<img src="シーケンス 01 (1)-1.gif" alt="UI">
+
+<h2>このゲームの醍醐味</h2>
+
+<p>
+観客を盛り上げながら投げ銭を集める達成感と、
+直感的な操作が魅力です。<br>
+
+スティック操作で傘が直接回転し、
+操作とゲームの動きが一致します。<br>
+
+回転とバランスの同時操作により、
+シンプルながら奥深いゲーム性を実現しています。
+</p>
+
+<img src="シーケンス 01_2-1.gif" alt="プレイ">
+
+<h2>技術紹介</h2>
+
+<h3>音量設定の保存</h3>
+
+<pre><code>
+void SoundSettings::Save()
+{
+    std::ofstream ofs("SoundSettings.dat", std::ios::binary);
+
+    ofs.write((char*)&Master, sizeof(float));
+    ofs.write((char*)&BGM, sizeof(float));
+    ofs.write((char*)&SE, sizeof(float));
+}
+</code></pre>
+
+<pre><code>
+void SoundSettings::Load()
+{
+    std::ifstream ifs("SoundSettings.dat", std::ios::binary);
+
+    if (!ifs)return;
+
+    ifs.read((char*)&Master, sizeof(float));
+    ifs.read((char*)&BGM, sizeof(float));
+    ifs.read((char*)&SE, sizeof(float));
+}
+</code></pre>
+
+<p>
+ゲームを閉じても音量設定が保持されるようにしました。
+</p>
+
+<h3>カメラの補間イージング</h3>
+
+<p>
+EaseInOutCubicを使用し、自然なカメラ移動を実現しました
+</p>
+
+<img src="Camera-1.gif" alt="カメラ">
+
+<pre><code>
+float GameCamera::EaseInOutCubic(float t)
+{
+    return (t < 0.5f)
+        ? 4.0f * t * t * t
+        : 1.0f - powf(-2.0f * t + 2.0f, 3.0f) * 0.5f;
+}
+</code></pre>
+
+<h3>回転入力の解析</h3>
+
+<pre><code>
+float dot = current.x * prev.x + current.y * prev.y;
+dot = Clamp(dot, -1.0f, 1.0f);
+
+float angle = acosf(dot);
+
+float cross = prev.x * current.y - prev.y * current.x;
+
+if (cross < 0)
+{
+    angle = -angle;
+}
+</code></pre>
+
+<p>
+内積で角度、外積で方向を求め、
+直感的な回転操作を実現しました。
+</p>
+
+</body>
+</html>
+s
