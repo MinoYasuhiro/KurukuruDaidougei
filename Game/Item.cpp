@@ -175,6 +175,12 @@ void Item::ParabolicMotion()
 					}
 				}
 			}
+
+			if (!m_isProcessed)
+			{
+				m_player->m_playerState = 1;
+			}
+
 			m_state = BallState::FailFall;
 		}
 	}
