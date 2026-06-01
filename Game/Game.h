@@ -14,6 +14,7 @@ class Item;
 class Circle;
 class ItemSpawner;
 class CoinEffect;
+class AudienceManager;
 enum class GamePhase
 {
 	Start,
@@ -64,6 +65,7 @@ private:
 	Umbrella* m_umbrella;
 	ItemSpawner* m_spawner = nullptr;
 	SpriteRender* m_SpriteRender;
+	AudienceManager* m_audienceManager;
 	SpriteRender m_startLetter;
 	SpriteRender m_failureLetter;
 	SpriteRender m_successLetter;

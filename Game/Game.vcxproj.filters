@@ -36,6 +36,8 @@
     <ClCompile Include="SoundSettings.cpp" />
     <ClCompile Include="ItemSpawner.cpp" />
     <ClCompile Include="CoinEffect.cpp" />
+    <ClCompile Include="Audience.cpp" />
+    <ClCompile Include="AudienceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -67,5 +69,7 @@
     <ClInclude Include="SoundSettings.h" />
     <ClInclude Include="ItemSpawner.h" />
     <ClInclude Include="CoinEffect.h" />
+    <ClInclude Include="Audience.h" />
+    <ClInclude Include="AudienceManager.h" />
   </ItemGroup>
 </Project>

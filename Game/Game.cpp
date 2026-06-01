@@ -20,6 +20,7 @@
 #include "Circle.h"
 #include "SoundSettings.h"
 #include "CoinEffect.h"
+#include "AudienceManager.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -46,6 +47,8 @@ bool Game::Start()
     m_circle = NewGO<Circle>(0, "circle");
 
     m_coin = NewGO<CoinEffect>(0, "coinEffect");
+
+	m_audienceManager = NewGO<AudienceManager>(0, "audienceManager");
 
     m_backGround = NewGO<BackGround>(0, "background");
     //m_umbrella = NewGO<Umbrella>(0, "umbrella");
