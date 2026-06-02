@@ -14,6 +14,9 @@ class Item;
 class Circle;
 class ItemSpawner;
 class CoinEffect;
+class AudienceManager;
+class Confetti;
+class MissEffect;
 enum class GamePhase
 {
 	Start,
@@ -52,7 +55,8 @@ public:
 	void RequestTitle();
 	void UpdatePlaying();
 	void RequestFailureLetter();
-	void RequestSuccessLetter();
+	void RequestNormalSuccess();
+	void RequestQTESuccess();
 
 	Circle* GetCircle()const { return m_circle; }
 
@@ -64,6 +68,7 @@ private:
 	Umbrella* m_umbrella;
 	ItemSpawner* m_spawner = nullptr;
 	SpriteRender* m_SpriteRender;
+	AudienceManager* m_audienceManager;
 	SpriteRender m_startLetter;
 	SpriteRender m_failureLetter;
 	SpriteRender m_successLetter;
@@ -78,6 +83,8 @@ private:
 	Item* m_item = nullptr;
 	Circle* m_circle = nullptr;
 	BGMManager* m_BGM = nullptr;
+	Confetti* m_confetti = nullptr;
+	MissEffect* m_missEffect = nullptr;
 	float m_movePhaseTimer = 0.0f;   // ★ 移動フェーズ経過時間
 	float m_clearTimer = 0.0f;      // 経過時間
 	float m_startTimer = 0.0f;
@@ -123,4 +130,6 @@ private:
 	int m_countNumber;
 
 	bool m_coinPlayed = false;
+
+	int m_failCount = 0;
 };

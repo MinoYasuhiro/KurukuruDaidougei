@@ -223,6 +223,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Audience.cpp" />
+    <ClCompile Include="AudienceManager.cpp" />
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="BallState.cpp" />
     <ClCompile Include="BGM.cpp">
@@ -235,6 +237,7 @@
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="CoinBox.cpp" />
     <ClCompile Include="CoinEffect.cpp" />
+    <ClCompile Include="Confetti.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -245,6 +248,7 @@
     <ClCompile Include="ItemSpawner.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuUI.cpp" />
+    <ClCompile Include="MissEffect.cpp" />
     <ClCompile Include="Pause.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="QTEButton.cpp" />
@@ -263,6 +267,8 @@
     <ClCompile Include="Umbrella.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Audience.h" />
+    <ClInclude Include="AudienceManager.h" />
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="BallState.h" />
     <ClInclude Include="BGM.h">
@@ -275,6 +281,7 @@
     <ClInclude Include="Circle.h" />
     <ClInclude Include="CoinBox.h" />
     <ClInclude Include="CoinEffect.h" />
+    <ClInclude Include="Confetti.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -284,6 +291,7 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemSpawner.h" />
     <ClInclude Include="MenuUI.h" />
+    <ClInclude Include="MissEffect.h" />
     <ClInclude Include="Pause.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="QTEButton.h" />

@@ -20,6 +20,9 @@
 #include "Circle.h"
 #include "SoundSettings.h"
 #include "CoinEffect.h"
+#include "AudienceManager.h"
+#include "Confetti.h"
+#include "MissEffect.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -46,6 +49,12 @@ bool Game::Start()
     m_circle = NewGO<Circle>(0, "circle");
 
     m_coin = NewGO<CoinEffect>(0, "coinEffect");
+
+    m_confetti = NewGO<Confetti>(0, "confetti");
+
+    m_missEffect = NewGO<MissEffect>(0, "missEffect");
+
+	m_audienceManager = NewGO<AudienceManager>(0, "audienceManager");
 
     m_backGround = NewGO<BackGround>(0, "background");
     //m_umbrella = NewGO<Umbrella>(0, "umbrella");
@@ -202,6 +211,16 @@ void Game::ResetGame()
         m_coinBox->Reset();
     }
 
+    if (m_confetti)
+    {
+        m_confetti->Update();
+    }
+
+    if (m_missEffect)
+    {
+        m_missEffect->Update();
+    }
+
     // ★ 残っているオブジェクトを消す
     /*if (m_item)
     {
@@ -294,25 +313,40 @@ void Game::UpdatePlaying()
             return;
         }
 
+        //現在のアイテムを取得
         Item* current = m_spawner->GetCurrentItem();
 
+        //アイテムが存在しない場合
         if (current == nullptr)
         {
+            //表示委する必要がないので円を非表示にする
             m_circle->SetVisible(false);
             break;
         }
         else
         {
+#ifdef _DEBUG
+            //デバッグ用:ポインタの安全チェック
+            assert(current != nullptr);
+            assert(_CrtIsValidPointer(current, sizeof(Item), TRUE));
+#endif // DEBUG
+
+            //「移動フェーズ中かつまだ投げていない」場合のみ予測表示する
             if (m_phase == GamePhase::MovePhase && !m_hasThrownItem)
             {
+                //アイテムがまだ飛んでいない
                 if (!current->IsFlying())
                 {
+                    //着地点(これから飛ばしたときに落ちる位置)を計算取得
                     Vector3 landingPosition = current->GetPlannedLandingPosition();
+                    //予測円の位置を着地点に合わせる
                     m_circle->SetPosition(landingPosition);
+                    //円を表示
                     m_circle->SetVisible(true);
                 }
                 else
                 {
+                    //すでに飛んでいるときは予測は不要なので非表示
                     m_circle->SetVisible(false);
                 }
             }
@@ -341,6 +375,8 @@ void Game::UpdatePlaying()
             }
             else
             {
+                assert(item != nullptr);
+                assert(_CrtIsValidPointer(item, sizeof(Item), TRUE));
                 if (item->IsQTEItem())
                 {
                     m_phase = GamePhase::QTEMove;
@@ -410,7 +446,7 @@ void Game::UpdatePlaying()
         {
             m_qteTimer = 0.0f;
 
-            RequestSuccessLetter();
+            RequestQTESuccess();
 
             RequestMovePhase();
         }
@@ -608,15 +644,31 @@ void Game::RequestFailureLetter()
     m_showFailure = true;
     m_failureTimer = 0.0f;
     SEManager::Play(SE_booing,false);
+
+    m_failCount++;
+    if (m_missEffect)
+    {
+        m_missEffect->Play(m_failCount);
+    }
 }
 
-void Game::RequestSuccessLetter()
+void Game::RequestNormalSuccess()
 {
     m_showSuccess = true;
     m_successTimer = 0.0f;
-    SEManager::Play(SE_cheers,false);
+    SEManager::Play(SE_cheers, false);
 
     m_coin->Play();
+}
+
+void Game::RequestQTESuccess()
+{
+    m_showSuccess = true;
+    m_successTimer = 0.0f;
+    SEManager::Play(SE_cheers, false);
+
+    m_coin->Play();
+    m_confetti->Play();
 }
 
 void Game::Render(RenderContext& rc)
@@ -644,6 +696,16 @@ void Game::Render(RenderContext& rc)
     if (m_coin)
     {
         m_coin->Render(rc);
+    }
+
+    if (m_confetti)
+    {
+        m_confetti->Render(rc);
+    }
+
+    if (m_missEffect)
+    {
+        m_missEffect->Render(rc);
     }
 
     if (m_isCounting)
