@@ -56,6 +56,11 @@ void Item::SetActive(bool isActive)
 
 void Item::Init(ItemType type)
 {
+	//if (m_isModelInited)return;
+
+	m_isModelInited = false;
+	m_isFailureModelInited = false;
+
 	m_type = type;
 
 	m_isProcessed = false;
@@ -63,29 +68,39 @@ void Item::Init(ItemType type)
 	m_isCracked = false;
 	m_hasPlayedLandSE = false;
 
+	m_modelRender = new ModelRender();
+	m_failureModelRender = nullptr;
+
 	switch (m_type)
 	{
 	case ItemType::ball:
 		m_category = ItemCategory::Normal;
 		m_hasFailureModel = false;
-		m_modelRender.Init("Assets/modelData/ball.tkm");
-		m_modelRender.SetScale({ 2.0f,2.0f,2.0f });
+		m_modelRender->Init("Assets/modelData/ball.tkm");
+		m_modelRender->SetScale({ 2.0f,2.0f,2.0f });
 		m_isModelInited = true;
 		break;
 	case ItemType::egg:
 		m_category = ItemCategory::QTE;
 		m_hasFailureModel = true;
-		m_modelRender.Init("Assets/modelData/egg.tkm");
-		m_modelRender.SetScale({ 5.0f,5.0f,5.0f });
+		m_modelRender->Init("Assets/modelData/egg.tkm");
+		m_modelRender->SetScale({ 5.0f,5.0f,5.0f });
 		m_isModelInited = true;
 
-		m_failureModelRender.Init("Assets/modelData/eggCracked.tkm");
-		m_failureModelRender.SetScale({ 5.0f,5.0f,5.0f });
+		m_failureModelRender = new ModelRender();
+
+		m_failureModelRender->Init("Assets/modelData/eggCracked.tkm");
+		m_failureModelRender->SetScale({ 5.0f,5.0f,5.0f });
 		m_isFailureModelInited = true;
 		break;
 	default:
 		m_category = ItemCategory::Normal;
 		m_hasFailureModel = false;
+
+		m_modelRender->Init("Assets/modelData/ball.tkm");
+		m_modelRender->SetScale({ 2.0f,2.0f,2.0f });
+
+		m_isModelInited = true;
 		break;
 	}
 }
@@ -93,48 +108,63 @@ void Item::Init(ItemType type)
 //更新処理
 void Item::Update()
 {
+	//無効状態なら何もしない
 	if (!m_isActive)return;
 
+	//モデルが準備できていなければ処理しない
+	if (!m_isModelInited)return;
+
+	//Gameオブジェクトを取得(未取得なら探す)
 	if (!m_game)
 	{
 		m_game = FindGO<Game>("game");
 		if (!m_game)return;
 	}
+	//ゲームがプレイ中じゃなければ停止
 	if (m_game->GetState() != GameState::Playing)return;
+
 	switch (m_state)
 	{
 		//待機中は何もしない
 	case BallState::Idle:
 		break;
 	case BallState::Flying:
+		//空中を飛んでいる→放物運動
 		ParabolicMotion();
 		break;
 	case BallState::OnUmbrella:
+		//プレイヤーの傘の上に載っている状態
 		OnUmbrella();
 		break;
 	case BallState::Spinning:
+		//QTE中
 		StartQTE();
 		break;
 	case BallState::DropPrepare:
+		//傘の端へ移動して落とされる準備
 		DropPrepare();
 		break;
 	case BallState::FailFall:
+		//ミスして落下中
 		FailFallMotion();
 		break;
 	case BallState::SuccessThrow:
+		//成功
 		ParabolicMotion();
 		break;
 	}
 
 	if (m_isCracked && m_hasFailureModel && m_isFailureModelInited)
 	{
-		m_failureModelRender.SetPosition(m_position);
-		m_failureModelRender.Update();
+		//卵が割れたモデル表示
+		m_failureModelRender->SetPosition(m_position);
+		m_failureModelRender->Update();
 	}
 	else if (m_isModelInited)
 	{
-		m_modelRender.SetPosition(m_position);
-		m_modelRender.Update();
+		//通常モデル表示
+		m_modelRender->SetPosition(m_position);
+		m_modelRender->Update();
 	}
 }
 
@@ -159,6 +189,7 @@ void Item::ParabolicMotion()
 				m_player = FindGO<Player>("player");
 				m_circle = m_game->GetCircle();
 
+				//傘に乗ったか判定
 				if (m_player && m_circle)
 				{
 					bool success = IsInsideCircle(
@@ -166,6 +197,7 @@ void Item::ParabolicMotion()
 						m_circle->GetPosition(),
 						m_circle->GetRadius());
 
+					//成功
 					if (success && !m_isProcessed)
 					{
 						m_wasOnUmbrella = true;
@@ -175,12 +207,7 @@ void Item::ParabolicMotion()
 					}
 				}
 			}
-
-			if (!m_isProcessed)
-			{
-				m_player->m_playerState = 1;
-			}
-
+			//失敗
 			m_state = BallState::FailFall;
 		}
 	}
@@ -207,6 +234,7 @@ void Item::FailFallMotion()
 		m_isFlying = false;
 		m_isCracked = true;
 
+		//SE再生(一回だけ)
 		if (!m_hasPlayedLandSE)
 		{
 			switch (m_type)
@@ -226,6 +254,7 @@ void Item::FailFallMotion()
 			m_hasPlayedLandSE = true;
 		}
 
+		//ゲームに失敗通知
 		if (!m_isProcessed)
 		{
 			if (m_game)
@@ -233,6 +262,7 @@ void Item::FailFallMotion()
 				m_game->RequestFailureLetter();
 			}
 		}
+		//状態リセット
 		m_state = BallState::Idle;
 	}
 }
@@ -295,24 +325,29 @@ void Item::OnUmbrella()
 
 	if (!m_circle)return;
 
+	//プレイヤーの頭の上に固定
 	Vector3 position = m_player->GetPosition();
-	position.y += 130.0f;
+	position.y += 130.0f;	//傘の高さ
 	m_position = position;
 
+	//成功
 	if (m_player->m_playerState == 4 && m_state != BallState::SuccessThrow)
 	{
 		m_state = BallState::SuccessThrow;
 		m_isFlying = true;
 		m_isProcessed = true;
+
+		//前方斜め上に発射
 		m_moveSpeed = { 0.0f,10.0f,15.0f };
 
 		if (m_game)
 		{
-			m_game->RequestSuccessLetter();
+			m_game->RequestNormalSuccess();
 		}
 		return;
 	}
 
+	//失敗
 	if (m_player->m_playerState == 1 && m_state != BallState::DropPrepare)
 	{
 		SpinningFailed();
@@ -447,10 +482,10 @@ void Item::Render(RenderContext& rc)
 
 	if (m_isCracked && m_hasFailureModel && m_isFailureModelInited)
 	{
-		m_failureModelRender.Draw(rc);
+		m_failureModelRender->Draw(rc);
 	}
 	else if (m_isModelInited)
 	{
-		m_modelRender.Draw(rc);
+		m_modelRender->Draw(rc);
 	}
 }

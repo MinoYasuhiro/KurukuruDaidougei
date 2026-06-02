@@ -32,8 +32,11 @@ bool CoinBox::Start()
 
 void CoinBox::Update()
 {
+	//ゲーム時間が取得できない場合処理しない
 	if (g_gameTime == nullptr)return;
 
+	//位置を設定し更新
+	//実際に描画されるのはRenderで１つだけ
 	m_coinBoxRender.SetPosition(m_position);
 	m_coinBoxRender.Update();
 
@@ -52,11 +55,13 @@ void CoinBox::Update()
 	m_maxCoinRender.SetPosition(m_position);
 	m_maxCoinRender.Update();
 
+	//ゲームがプレイ中でなければここで終了
 	if (Game::GetState() != GameState::Playing)return;
 }
 
 void CoinBox::AddCoin()
 {
+	//現在の状態に応じて次のレベルへ進める
 	switch (m_coinLevel)
 	{
 	case CoinLevel::Empty:
@@ -83,11 +88,13 @@ void CoinBox::AddCoin()
 
 void CoinBox::Reset()
 {
+	//状態を初期(空)に戻す
 	m_coinLevel = CoinLevel::Empty;
 }
 
 void CoinBox::Render(RenderContext& rc)
 {
+	//現在のコイン状態に応じて表示するモデルを切り替える
 	switch (m_coinLevel)
 	{
 	case CoinLevel::Empty:
