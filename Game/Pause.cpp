@@ -22,6 +22,8 @@ bool Pause::Start()
     //Menu背景　表示
     m_PauseRender.Init("Assets/Sprite/SoundBackground.DDS", 1920, 1080);
     m_PauseRender.SetPosition(Vector3(0, 0, 0));
+
+    m_pauseOperation.Init("Assets/Sprite/PauseOperation.dds", 1920, 1080);
     
     m_menuUI = new MenuUI();    //メニューUIの生成
     m_menuUI->Start();          //メニューUIの初期化
@@ -37,6 +39,7 @@ void Pause::Update()
     //m_Sprite.Update();
     m_PauseRender.Update();
     m_SpriteRender.Update();
+    m_pauseOperation.Update();
 
     if (!m_menuUI)return;
     m_menuUI->Update();
@@ -89,6 +92,7 @@ void Pause::Render(RenderContext& rc)
 {
     m_PauseRender.Draw(rc);
     m_SpriteRender.Draw(rc);
+    m_pauseOperation.Draw(rc);
     //m_Sprite.Draw(rc);
 
     if (m_menuUI)

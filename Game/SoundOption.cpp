@@ -14,6 +14,9 @@ bool SoundOption::Start()
 	m_textRender.Init("Assets/Sprite/Soundtext.DDS", 400, 100);
 	m_textRender.SetPosition(Vector3(0.0f, 330.0f, 0.0f));
 
+	//操作説明
+	m_operationInstructions.Init("Assets/Sprite/operationInstructions.dds", 1920, 1080);
+
 	//サウンド設定UIを生成
 	m_soundUI = new SoundUI();
 	m_soundUI->Start();
@@ -28,6 +31,9 @@ void SoundOption::Update()
 
 	//文字スプライトの更新
 	m_textRender.Update();
+
+	//操作説明スプライトの更新
+	m_operationInstructions.Update();
 
 	//サウンドUIの更新
 	m_soundUI->Update();
@@ -57,6 +63,9 @@ void SoundOption::Render(RenderContext& rc)
 
 	//文字を描画
 	m_textRender.Draw(rc);
+
+	//操作説明描画
+	m_operationInstructions.Draw(rc);
 
 	//サウンド設定UIを描画
 	m_soundUI->Render(rc);

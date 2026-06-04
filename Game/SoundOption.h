@@ -18,6 +18,9 @@ private:
 	//サウンドオプション画面の文字スプライト
 	SpriteRender m_textRender;
 
+	//オプション画面上での操作説明
+	SpriteRender m_operationInstructions;
+
 	//表示位置
 	Vector3 m_position;
 
