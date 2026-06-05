@@ -223,6 +223,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="Audience.cpp" />
     <ClCompile Include="AudienceManager.cpp" />
     <ClCompile Include="BackGround.cpp" />
@@ -267,6 +268,7 @@
     <ClCompile Include="Umbrella.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Arrow.h" />
     <ClInclude Include="Audience.h" />
     <ClInclude Include="AudienceManager.h" />
     <ClInclude Include="BackGround.h" />

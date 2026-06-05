@@ -21,6 +21,9 @@ public:
 	//const参照で返すことでコピーコスト削減
 	const Vector3& GetPosition()const { return m_position; }
 
+	//円が表示状態かどうか取得
+	bool IsVisible()const { return m_isVisible; }
+
 private:
 	ModelRender m_modelRender;					//円のモデル
 	Vector3 m_position = { 0.0f,-10.0f,0.0f };	//円の現在位置
