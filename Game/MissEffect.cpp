@@ -6,6 +6,7 @@ bool MissEffect::Start()
 	//乱数初期化
 	srand((unsigned int)time(nullptr));
 
+	//アクティブリストの容量をあらかじめ確保
 	m_activeList.reserve(MISS_MAX);
 
 	m_nextIndex = 0;
@@ -56,15 +57,13 @@ void MissEffect::Update()
 	{
 		int j = m_activeList[i];
 
-		if (j < 0 || j >= MISS_MAX)
+		//非アクティブor不正なら高速削除
+		if (j < 0 || j >= MISS_MAX || !m_objects[j].active)
 		{
-			m_activeList.erase(m_activeList.begin() + i);
-			i--;
-			continue;
-		}
-		if (!m_objects[j].active)
-		{
-			m_activeList.erase(m_activeList.begin() + i);
+			//最後と入れ替え
+			m_activeList[i] = m_activeList.back();
+			//削除
+			m_activeList.pop_back();
 			i--;
 			continue;
 		}
@@ -89,6 +88,15 @@ void MissEffect::Update()
 
 void MissEffect::Play(int failCount)
 {
+	//前回のエフェクトをリセット
+	m_activeList.clear();
+
+	//全オブジェクトを非アクティブにする
+	for (int i = 0;i < MISS_MAX;i++)
+	{
+		m_objects[i].active = false;
+	}
+
 	//投げる数
 	int spawnNum = failCount * 10;
 
@@ -101,6 +109,7 @@ void MissEffect::Play(int failCount)
 	{
 		int j = m_nextIndex;
 
+		//新しく使う場合のみリストに追加
 		if (!m_objects[j].active)
 		{
 			m_activeList.push_back(j);
@@ -114,12 +123,14 @@ void MissEffect::Play(int failCount)
 
 		m_objects[j].position = { startX,startY,0.0f };
 
+		//ランダムな目標地点
 		Vector3 target = {
 		(float)(rand() % 600 - 300),
 		(float)(rand() % 200 - 100),
 		0.0f
 		};
 
+		//進行方向
 		Vector3 dir = target - m_objects[j].position;
 
 		if (dir.Length() > 0.001f)
@@ -132,6 +143,7 @@ void MissEffect::Play(int failCount)
 		float speedScale = 1.8f;
 		m_objects[j].speed = dir * speed;
 
+		//横方向のばらつき
 		m_objects[j].speed.x += (rand() % 200 - 100);
 
 		//上に持ち上げる
@@ -153,7 +165,7 @@ void MissEffect::Play(int failCount)
 
 void MissEffect::Render(RenderContext& rc)
 {
-	for (int i = 0;i <m_activeList.size();i++)
+	for (int i = 0;i < m_activeList.size();i++)
 	{
 		int j = m_activeList[i];
 

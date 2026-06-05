@@ -3,6 +3,8 @@
 #include "Umbrella.h"
 #include "Item.h"
 
+class Arrow;
+class Circle;
 class Player : public IGameObject
 {
 public:
@@ -124,4 +126,6 @@ private:
 
 	float m_spinTimer = 0.0f;
 	
+	Arrow* m_arrow = nullptr;
+	Circle* m_circle = nullptr;
 };

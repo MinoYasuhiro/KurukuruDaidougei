@@ -7,6 +7,8 @@
 #include "Game.h"
 #include "Item.h"
 #include "CoinBox.h"
+#include "Arrow.h"
+#include "Circle.h"
 
 Player::Player()
 {
@@ -62,6 +64,8 @@ bool Player::Start()
     m_font.SetPosition(0.0f, 0.0f, 0.0f);
     m_font.SetColor({ 1.0f,1.0f,1.0f,1.0f });
     m_font.SetScale(1.0f);
+
+    m_arrow = NewGO<Arrow>(0);
 
     m_itemOnUmbrella = false;
     m_isRunSEPlaying = false;
@@ -197,6 +201,42 @@ void Player::Update()
         if (m_umbrella)
         {
             m_umbrella->SetPosition(pos);
+        }
+    }
+
+    //円が未取得、または削除されている場合は再取得
+    if (!m_circle || m_circle->IsDead())
+    {
+        m_circle = FindGO<Circle>("circle");
+    }
+
+    //矢印が存在する場合のみ処理
+    if (m_arrow)
+    {
+        //円が存在し、削除されておらず、表示状態の場合
+        if (m_circle && !m_circle->IsDead() && m_circle->IsVisible())
+        {
+            //現在位置と円の中心との距離を計算
+            float dist = (m_circle->GetPosition() - m_position).Length();
+
+            //プレイヤーが円の中にいる場合
+            if (dist <= m_circle->GetRadius())
+            {
+                //矢印を非表示
+                m_arrow->SetActive(false);
+            }
+            else
+            {
+                //円の外にいる場合は矢印を表示
+                m_arrow->SetActive(true);
+                //円の方向を指すように矢印の向きを設定
+                m_arrow->SetDirection(m_position, m_circle->GetPosition());
+            }
+        }
+        else
+        {
+            //円が存在しない・非表示などの場合は矢印も非表示
+            m_arrow->SetActive(false);
         }
     }
 }
@@ -592,14 +632,14 @@ void Player::PlayAnimation2()
 
 
 // ベクトルの長さを計算
-float Length(Vector2 v)
+static float Length(Vector2 v)
 {
     return sqrtf(v.x * v.x + v.y * v.y);
 }
 
 
 // ベクトルを正規化
-Vector2 Normalize(Vector2 v)
+static Vector2 Normalize(Vector2 v)
 {
     float len = sqrtf(v.x * v.x + v.y * v.y);
 
@@ -612,12 +652,12 @@ Vector2 Normalize(Vector2 v)
 }
 
 // ベクトルの内積を計算
-float Dot(Vector2 a, Vector2 b)
+static float Dot(Vector2 a, Vector2 b)
 {
     return a.x * b.x + a.y * b.y;
 }
 
-float Clamp(float v, float min, float max)
+static float Clamp(float v, float min, float max)
 {
     if (v < min) return min;
     if (v > max) return max;

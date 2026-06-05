@@ -262,7 +262,7 @@ void Game::UpdatePlaying()
 {
 
     // ===== ポーズ呼び出し =====
-    if (m_phase != GamePhase::QTEMove&& g_pad[0]->IsPress(enButtonY) && m_gameState == GameState::Playing)
+    if (m_phase != GamePhase::QTEMove&& g_pad[0]->IsPress(enButtonStart) && m_gameState == GameState::Playing)
     {
         SEManager::StopLoop(SE_run);
 

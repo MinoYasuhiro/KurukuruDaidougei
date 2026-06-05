@@ -16,6 +16,12 @@ bool CoinEffect::Start()
 		m_coins[i].active = false;
 	}
 
+	//アクティブなコインリストをリセット
+	m_activeList.clear();
+
+	//最大数分の容量を確保
+	m_activeList.reserve(COIN_MAX);
+
 	return true;
 }
 
@@ -25,21 +31,31 @@ void CoinEffect::Update()
 	//1フレームの時間(60FPS想定)
 	float dt = 1.0f / 60.0f;
 
-	for (int i = 0;i < COIN_MAX;i++)
+	for (int i = 0;i < m_activeList.size();i++)
 	{
-		//非アクティブなら処理しない
-		if (!m_coins[i].active)continue;
+		//実際のコイン番号
+		int j = m_activeList[i];
 
-		//重力処理(下に引っ張る)
-		m_coins[i].speed.y -= 120.0f * dt;
-
-		//位置更新(速度を使って移動)
-		m_coins[i].position += m_coins[i].speed * dt;
-
-		//一定以下に落ちたら消す(画面外)
-		if (m_coins[i].position.y < -600.0f)
+		//非アクティブならリストから削除
+		if (!m_coins[j].active)
 		{
-			m_coins[i].active = false;
+			//最後と交換
+			m_activeList[i] = m_activeList.back();
+			//削除
+			m_activeList.pop_back();
+			i--;
+			continue;
+		}
+
+		//重力
+		m_coins[j].speed.y -= 120.0f * dt;
+		//移動
+		m_coins[j].position += m_coins[j].speed * dt;
+
+		//画面外で無効化
+		if (m_coins[j].position.y < -600.0f)
+		{
+			m_coins[j].active = false;
 		}
 	}
 }
@@ -51,6 +67,11 @@ void CoinEffect::Play()
 		//使用するコインのインデックス
 		int j = m_nextIndex;
 
+		//新しくアクティブになる場合のみリストに追加
+		if (!m_coins[j].active)
+		{
+			m_activeList.push_back(j);
+		}
 		//コインを有効化(表示)
 		m_coins[j].active = true;
 
@@ -95,18 +116,20 @@ void CoinEffect::Play()
 
 void CoinEffect::Render(RenderContext& rc)
 {
-	for (int i = 0;i < COIN_MAX;i++)
+	for (int i = 0;i < m_activeList.size();i++)
 	{
+		int j = m_activeList[i];
+
 		//アクティブなものだけ描画
-		if (!m_coins[i].active)continue;
+		if (!m_coins[j].active)continue;
 
 		//スプライトに位置を反映
-		m_coin[i].SetPosition(m_coins[i].position);
+		m_coin[j].SetPosition(m_coins[j].position);
 
 		//内部処理更新
-		m_coin[i].Update();
+		m_coin[j].Update();
 
 		//描画
-		m_coin[i].Draw(rc);
+		m_coin[j].Draw(rc);
 	}
 }

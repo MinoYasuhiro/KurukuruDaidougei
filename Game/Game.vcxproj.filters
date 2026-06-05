@@ -38,6 +38,9 @@
     <ClCompile Include="CoinEffect.cpp" />
     <ClCompile Include="Audience.cpp" />
     <ClCompile Include="AudienceManager.cpp" />
+    <ClCompile Include="Confetti.cpp" />
+    <ClCompile Include="MissEffect.cpp" />
+    <ClCompile Include="Arrow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -71,5 +74,8 @@
     <ClInclude Include="CoinEffect.h" />
     <ClInclude Include="Audience.h" />
     <ClInclude Include="AudienceManager.h" />
+    <ClInclude Include="Confetti.h" />
+    <ClInclude Include="MissEffect.h" />
+    <ClInclude Include="Arrow.h" />
   </ItemGroup>
 </Project>
