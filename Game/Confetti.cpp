@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Confetti.h"
+#include <algorithm>
 
 bool Confetti::Start()
 {
@@ -36,6 +37,12 @@ bool Confetti::Start()
 		m_confettis[i].active = false;
 	}
 
+	//アクティブな紙吹雪リストをリセット
+	m_activeList.clear();
+
+	//最大数分の容量を確保
+	m_activeList.reserve(CONFETTI_MAX);
+
 	return true;
 }
 
@@ -44,37 +51,18 @@ void Confetti::Update()
 	//1フレームの時間(60FPS想定)
 	float dt = 1.0f / 60.0f;
 
-	for (int i = 0;i < CONFETTI_MAX;i++)
+	int spawnNow = (std::min)(m_spawnCount, m_spawnPerFrame);
+
+	for (int i = 0;i < spawnNow;i++)
 	{
-		//非アクティブなら処理しない
-		if (!m_confettis[i].active)continue;
-
-		//重力処理
-		m_confettis[i].speed.y -= 60.0f * dt;
-
-		//位置更新
-		m_confettis[i].position += m_confettis[i].speed * dt;
-
-		//横揺れ(sin波でふわふわ感を出す)
-		m_confettis[i].position.x += sinf(m_confettis[i].position.y * 0.05f) * 2.0f;
-
-		//回転更新
-		m_confettis[i].rotation += m_confettis[i].rotSpeed * dt;
-
-		//画面外に出たら非アクティブ化(再利用)
-		if (m_confettis[i].position.y < -600.0f)
-		{
-			m_confettis[i].active = false;
-		}
-	}
-}
-
-void Confetti::Play()
-{
-	for (int i = 0;i < CONFETTI_MAX;i++)
-	{
-		//次に使う紙吹雪のインデックス
+		//使用する紙吹雪の次のインデックス
 		int j = m_nextIndex;
+
+		//新規アクティブならリスト追加
+		if (!m_confettis[j].active)
+		{
+			m_activeList.push_back(j);
+		}
 
 		//紙吹雪を有効化
 		m_confettis[j].active = true;
@@ -110,24 +98,70 @@ void Confetti::Play()
 			m_nextIndex = 0;
 		}
 	}
+
+	//残りの生成数を減らす
+	m_spawnCount -= spawnNow;
+
+	for (int i = 0;i < m_activeList.size();i++)
+	{
+		int j = m_activeList[i];
+
+		//非アクティブなら削除
+		if (!m_confettis[j].active)
+		{
+			m_activeList[i] = m_activeList.back();
+			m_activeList.pop_back();
+			i--;
+			continue;
+		}
+
+		//重力処理
+		m_confettis[j].speed.y -= 60.0f * dt;
+
+		//位置更新
+		m_confettis[j].position += m_confettis[j].speed * dt;
+
+		//横揺れ(sin波でふわふわ感を出す)
+		m_confettis[j].position.x += m_confettis[j].speed.x * 0.02f;
+
+		//回転更新
+		m_confettis[j].rotation += m_confettis[j].rotSpeed * dt;
+
+		//画面外に出たら非アクティブ化(再利用)
+		if (m_confettis[j].position.y < -600.0f)
+		{
+			m_confettis[j].active = false;
+		}
+	}
+}
+
+void Confetti::Play()
+{
+	m_spawnCount = CONFETTI_MAX;
 }
 
 void Confetti::Render(RenderContext& rc)
 {
-	for (int i = 0;i < CONFETTI_MAX;i++)
+	for (int i = 0;i < m_activeList.size();i++)
 	{
+		int j = m_activeList[i];
+
 		//非アクティブは描画しない
-		if (!m_confettis[i].active)continue;
+		if (!m_confettis[j].active)continue;
 
 		//位置をスプライトに反映
-		m_confetti[i].SetPosition(m_confettis[i].position);
+		m_confetti[j].SetPosition(m_confettis[j].position);
 
 		//回転設定(Z軸回転)
 		Quaternion rot;
-		rot.SetRotationDegZ(m_confettis[i].rotation);
-		m_confetti[i].SetRotation(rot);
+		rot.SetRotationDegZ(m_confettis[j].rotation);
+		m_confetti[j].SetRotation(rot);
 
-		m_confetti[i].Update();
-		m_confetti[i].Draw(rc);
+		m_confetti[j].Update();
+
+		if (m_confettis[j].position.y > -600.0f)
+		{
+			m_confetti[j].Draw(rc);
+		}
 	}
 }

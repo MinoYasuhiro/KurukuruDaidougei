@@ -32,5 +32,9 @@ private:
 
 	//次に使用するインデックス(使いまわし用)
 	int m_nextIndex = 0;
+
+	//現在表示中のコインのインデックス一覧
+	//Update/Render対象を減らして高速化するために使用
+	std::vector<int>m_activeList;
 };
 

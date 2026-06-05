@@ -1,5 +1,5 @@
 ﻿#pragma once
-class Confetti:public IGameObject
+class Confetti :public IGameObject
 {
 public:
 	Confetti() {};
@@ -37,5 +37,13 @@ private:
 
 	//次に使うインデックス(再利用用)
 	int m_nextIndex = 0;
+
+	//使用中の紙吹雪インデックス
+	std::vector<int>m_activeList;
+
+	//まだ生成していない残りの数
+	int m_spawnCount = 0;
+	//1フレーム当たりの生成数
+	int m_spawnPerFrame = 20;
 };
 

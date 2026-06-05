@@ -303,9 +303,9 @@ void Item::RandomSpawn()
 	static std::mt19937 mt(rd());
 
 	//座標をランダム生成
-	std::uniform_real_distribution<float>distX(-100.0f, 100.0f);
+	std::uniform_real_distribution<float>distX(-700.0f, 700.0f);
 	std::uniform_real_distribution<float>distY(0.0f, 10.0f);
-	std::uniform_real_distribution<float>distZ(-50.0f, 50.0f);
+	std::uniform_real_distribution<float>distZ(-400.0f, 200.0f);
 
 	//ランダムに生成した値をそれぞれの座標に代入
 	m_position.x = distX(mt);

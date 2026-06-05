@@ -1,5 +1,5 @@
 ﻿#pragma once
-class MissEffect:public IGameObject
+class MissEffect :public IGameObject
 {
 public:
 	MissEffect() {};
@@ -14,6 +14,8 @@ public:
 
 private:
 
+	//現在動いているオブジェクトのインデックス一覧
+	//Update/Renderの対象を限定して処理負荷を軽減する
 	std::vector<int>m_activeList;
 
 	//最大同時表示数
@@ -34,16 +36,17 @@ private:
 	//一つ分のデータ
 	struct ThrowData
 	{
-		Vector3 position;
-		Vector3 speed;
-		float rotation;
-		bool active;
-		int type;
+		Vector3 position;	//現在位置
+		Vector3 speed;		//速度(移動方向・速さ)
+		float rotation;		//回転角度
+		bool active;		//表示中かどうか
+		int type;			//表示する種類
 	};
 
-	//本体データ
+	//全オブジェクトの状態配列
 	ThrowData m_objects[MISS_MAX];
 
+	//描画用スプライト配列
 	SpriteRender m_sprite[MISS_MAX];
 
 	//次に使うインデックス
