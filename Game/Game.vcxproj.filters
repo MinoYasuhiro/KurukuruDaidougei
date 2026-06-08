@@ -41,6 +41,7 @@
     <ClCompile Include="Confetti.cpp" />
     <ClCompile Include="MissEffect.cpp" />
     <ClCompile Include="Arrow.cpp" />
+    <ClCompile Include="Operation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -77,5 +78,6 @@
     <ClInclude Include="Confetti.h" />
     <ClInclude Include="MissEffect.h" />
     <ClInclude Include="Arrow.h" />
+    <ClInclude Include="Operation.h" />
   </ItemGroup>
 </Project>
