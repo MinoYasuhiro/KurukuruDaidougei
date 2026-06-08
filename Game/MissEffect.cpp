@@ -163,6 +163,17 @@ void MissEffect::Play(int failCount)
 	}
 }
 
+void MissEffect::Reset()
+{
+	for (int i = 0;i < MISS_MAX;i++)
+	{
+		m_objects[i].active = false;
+	}
+
+	m_nextIndex = 0;
+	m_activeList.clear();
+}
+
 void MissEffect::Render(RenderContext& rc)
 {
 	for (int i = 0;i < m_activeList.size();i++)

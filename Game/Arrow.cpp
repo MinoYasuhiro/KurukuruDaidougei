@@ -48,6 +48,7 @@ void Arrow::SetDirection(const Vector3& playerPos, const Vector3& targetPos)
 	//円の中に入っていたら何もしない
 	if (dir.LengthSq() < 0.0001f)
 	{
+		m_isActive = false;
 		return;
 	}
 	//ベクトルの正規化
@@ -68,7 +69,7 @@ void Arrow::SetDirection(const Vector3& playerPos, const Vector3& targetPos)
 	float y = dir.Dot(camForward);
 
 	//画面基準の角度
-	float angle = atan2f(x,y);
+	float angle = atan2f(x, y);
 
 	//度に変換
 	float deg = Math::RadToDeg(angle);
@@ -78,12 +79,21 @@ void Arrow::SetDirection(const Vector3& playerPos, const Vector3& targetPos)
 
 	//8方向に変換
 	m_currentIndex = (int)((deg / 45.0f) + 0.5f) % 8;
+
+	//正しく方向が計算できたら表示をONにする
+	m_isActive = true;
+}
+
+void Arrow::Reset()
+{
+	m_isActive = false;
+	m_currentIndex = -1;
 }
 
 void Arrow::Render(RenderContext& rc)
 {
-	//非表示なら何もしない
-	if (!m_isActive)return;
+	//非表示、または方向が計算されていないなら何もしない
+	if (!m_isActive || m_currentIndex == -1)return;
 
 	//計算された方向に応じて該当する矢印を描画
 	switch (m_currentIndex)
