@@ -28,7 +28,9 @@ void Operation::Update()
 		Game::SetState(GameState::Title);
 		NewGO<Title>(0, "title");
 
-		DeleteGO(this); // ★これ追加
+
+		DeleteGO(this);  // ★最重要
+		return;          // ★安全
 	}
 }
 
