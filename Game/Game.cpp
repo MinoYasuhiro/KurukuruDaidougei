@@ -23,6 +23,7 @@
 #include "AudienceManager.h"
 #include "Confetti.h"
 #include "MissEffect.h"
+#include "Arrow.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -54,7 +55,7 @@ bool Game::Start()
 
     m_missEffect = NewGO<MissEffect>(0, "missEffect");
 
-	m_audienceManager = NewGO<AudienceManager>(0, "audienceManager");
+	//m_audienceManager = NewGO<AudienceManager>(0, "audienceManager");
 
     m_backGround = NewGO<BackGround>(0, "background");
     //m_umbrella = NewGO<Umbrella>(0, "umbrella");
@@ -162,6 +163,47 @@ GamePhase Game::GetPhase()
 
 void Game::ResetGame()
 {
+    // ★ プレイヤー初期化
+    if (Player* player = FindGO<Player>("player"))
+    {
+        player->Reset();
+    }
+
+    if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
+        cam->Reset();
+
+    m_BGM = FindGO<BGMManager>("bgmManager");
+
+    if (m_BGM != nullptr)
+    {
+        m_BGM->Play(BGM_NormalUmbrella);
+    }
+
+    if (Arrow* arrow = FindGO<Arrow>("arrow"))
+    {
+        arrow->Reset();
+    }
+
+    if (Circle* circle = FindGO<Circle>("circle"))
+    {
+        circle->Reset();
+    }
+
+    if (CoinEffect* coinEffect = FindGO<CoinEffect>("coinEffect"))
+    {
+        coinEffect->Reset();
+    }
+
+    if (Confetti* confetti = FindGO<Confetti>("confetti"))
+    {
+        confetti->Reset();
+    }
+
+    if (MissEffect* missEffect = FindGO<MissEffect>("missEffect"))
+    {
+        missEffect->Reset();
+    }
+
     // Title からのみ許可
     if (m_gameState != GameState::Title &&
         m_gameState != GameState::GameClear && 
@@ -227,22 +269,6 @@ void Game::ResetGame()
         DeleteGO(m_item);
         m_item = nullptr;
     }*/
-
-    // ★ プレイヤー初期化
-    if (Player* player = FindGO<Player>("player"))
-    {
-        player->Reset();
-    }
-
-    if (GameCamera* cam = FindGO<GameCamera>("gameCamera"))
-        cam->Reset();
-
-    m_BGM = FindGO<BGMManager>("bgmManager");
-
-    if (m_BGM != nullptr)
-    {
-        m_BGM->Play(BGM_NormalUmbrella);
-    }
 
     m_phase = GamePhase::Start;
 
@@ -343,11 +369,24 @@ void Game::UpdatePlaying()
                     m_circle->SetPosition(landingPosition);
                     //円を表示
                     m_circle->SetVisible(true);
+
+                    if (Arrow* arrow = FindGO<Arrow>("arrow"))
+                    {
+                        if (m_player != nullptr)
+                        {
+                            arrow->SetDirection(m_player->GetPosition(), landingPosition);
+                        }
+                    }
                 }
                 else
                 {
                     //すでに飛んでいるときは予測は不要なので非表示
                     m_circle->SetVisible(false);
+
+                    if (Arrow* arrow = FindGO<Arrow>("arrow"))
+                    {
+                        arrow->SetActive(false);
+                    }
                 }
             }
         }

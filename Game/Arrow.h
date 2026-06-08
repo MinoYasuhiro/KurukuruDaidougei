@@ -1,5 +1,5 @@
 ﻿#pragma once
-class Arrow:public IGameObject
+class Arrow :public IGameObject
 {
 public:
 	Arrow() {};
@@ -8,6 +8,8 @@ public:
 	bool Start()override;
 	void Update()override;
 	void Render(RenderContext& renderContext)override;
+
+	void Reset();
 
 	//方向を計算
 	void SetDirection(const Vector3& playerPos, const Vector3& targetPos);
@@ -30,9 +32,9 @@ private:
 	Vector3 m_position = { 0.0f,200.0f,0.0f };
 
 	//今表示する方向
-	int m_currentIndex = 0;
+	int m_currentIndex = -1;
 
 	//表示するかどうか
-	bool m_isActive = true;
+	bool m_isActive = false;
 };
 

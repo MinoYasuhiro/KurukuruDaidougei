@@ -114,6 +114,17 @@ void CoinEffect::Play()
 	}
 }
 
+void CoinEffect::Reset()
+{
+	for (int i = 0;i < COIN_MAX;i++)
+	{
+		m_coins[i].active = false;
+	}
+
+	m_nextIndex = 0;
+	m_activeList.clear();
+}
+
 void CoinEffect::Render(RenderContext& rc)
 {
 	for (int i = 0;i < m_activeList.size();i++)

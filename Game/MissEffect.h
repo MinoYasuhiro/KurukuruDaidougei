@@ -9,6 +9,8 @@ public:
 	void Update()override;
 	void Render(RenderContext& renderContext)override;
 
+	void Reset();
+
 	//エフェクトを発生させる
 	void Play(int failCount);
 

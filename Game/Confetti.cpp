@@ -140,6 +140,18 @@ void Confetti::Play()
 	m_spawnCount = CONFETTI_MAX;
 }
 
+void Confetti::Reset()
+{
+	for (int i = 0;i < CONFETTI_MAX;i++)
+	{
+		m_confettis[i].active = false;
+	}
+
+	m_spawnCount = 0;
+	m_nextIndex = 0;
+	m_activeList.clear();
+}
+
 void Confetti::Render(RenderContext& rc)
 {
 	for (int i = 0;i < m_activeList.size();i++)
