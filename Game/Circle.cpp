@@ -15,7 +15,7 @@ void Circle::SetPosition(const Vector3& position)
 {
 	//メンバ変数に位置を保存
 	m_position = position;
-	
+
 	//モデル描画クラスにも位置を反映
 	m_modelRender.SetPosition(m_position);
 }
@@ -23,6 +23,13 @@ void Circle::SetPosition(const Vector3& position)
 void Circle::Update()
 {
 	m_modelRender.Update();
+}
+
+void Circle::Reset()
+{
+	m_isVisible = false;
+	m_position = { 0.0f,-10.0f,0.0f };
+	m_modelRender.SetPosition(m_position);
 }
 
 void Circle::Render(RenderContext& rc)

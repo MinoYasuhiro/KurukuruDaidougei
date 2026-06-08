@@ -6,6 +6,8 @@ public:
 	void Update()override;
 	void Render(RenderContext& renderContext)override;
 
+	void Reset();
+
 	//円の位置設定
 	//外部から座標を渡して位置を変更
 	void SetPosition(const Vector3& pos);
