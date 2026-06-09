@@ -32,5 +32,15 @@ public:
 	Vector3 m_forward = Vector3::AxisZ; // 傘の向き
 	float m_angleY = 0.0f;
 	float m_angleX = 0.0f;
+
+	//追加
+	// 傘ズレ関連
+	float m_offsetAngleX = 0.0f;      // ランダムズレ角度X
+	float m_offsetAngleZ = 0.0f;      // ランダムズレ角度Z
+	float m_offsetVelX = 0.0f;        // ズレの速度X
+	float m_offsetVelZ = 0.0f;        // ズレの速度Z
+	float m_offsetForceX = 0.0f;      // ランダム力X
+	float m_offsetForceZ = 0.0f;      // ランダム力Z
+	float m_offsetNoiseTimer = 0.0f;  // ランダム力切り替えタイマー
 };
 
