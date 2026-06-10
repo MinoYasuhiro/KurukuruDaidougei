@@ -60,6 +60,23 @@ public:
 
 	Circle* GetCircle()const { return m_circle; }
 
+
+	/// <summary>
+	/// 直前のゲーム状態を保存する
+	/// （画面遷移後に戻るために使用）
+	/// </summary>
+	/// <param name="state">保存する前の状態</param>
+	static void SetPrevState(GameState state);
+
+
+	/// <summary>
+	/// 直前に保存されたゲーム状態を取得する
+	/// （戻り先の画面判定に使用）
+	/// </summary>
+	/// <returns>直前のゲーム状態</returns>
+	static GameState GetPrevState();
+	bool m_fromTitleStart = false;
+
 private:
 	//ModelRender m_modelRender;
 	Vector3 m_pos;
@@ -98,7 +115,7 @@ private:
 	bool m_hasThrownItem = false;
 	bool m_isResetting = false;
 	static GamePhase m_phase;
-
+	static GameState m_prevState;
 	static GameState m_gameState;
 	bool m_requestStart = false;
 	bool m_isStarting = false;
