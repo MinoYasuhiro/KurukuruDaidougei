@@ -93,6 +93,41 @@ void Item::Init(ItemType type)
 		m_failureModelRender->SetScale({ 5.0f,5.0f,5.0f });
 		m_isFailureModelInited = true;
 		break;
+	case ItemType::box:
+		m_category = ItemCategory::Normal;
+		m_hasFailureModel = false;
+		m_modelRender->Init("Assets/modelData/Lift.tkm");
+		m_modelRender->SetScale({ 0.75f,0.75f,0.75f });
+		m_isModelInited = true;
+		break;
+	case ItemType::skeleton:
+		m_category = ItemCategory::QTE;
+		m_hasFailureModel = false;
+		m_modelRender->Init("Assets/modelData/Skeleton.tkm");
+		m_modelRender->SetScale({ 2.0f,2.0f,2.0f });
+		m_isModelInited = true;
+		break;
+	case ItemType::teaBowl:
+		m_category = ItemCategory::Normal;
+		m_hasFailureModel = false;
+		m_modelRender->Init("Assets/modelData/TeaBowl.tkm");
+		m_modelRender->SetScale({ 2.5f,2.5f,2.5f });
+		m_isModelInited = true;
+		break;
+	case ItemType::penguin:
+		m_category = ItemCategory::QTE;
+		m_hasFailureModel = false;
+		m_modelRender->Init("Assets/modelData/Penguin.tkm");
+		m_modelRender->SetScale({ 0.75f,0.75f,0.75f });
+		m_isModelInited = true;
+		break;
+	case ItemType::phone:
+		m_category = ItemCategory::Normal;
+		m_hasFailureModel = false;
+		m_modelRender->Init("Assets/modelData/Phone.tkm");
+		m_modelRender->SetScale({ 2.5f,2.5f,2.5f });
+		m_isModelInited = true;
+		break;
 	default:
 		m_category = ItemCategory::Normal;
 		m_hasFailureModel = false;
@@ -325,10 +360,43 @@ void Item::OnUmbrella()
 
 	if (!m_circle)return;
 
+	m_rotY += 8.0f;
+	m_shakeTimer += 0.5f;
+
+	float shakeIntensity = 1.0f;
+	float shakeX = sinf(m_shakeTimer * 1.3f) * shakeIntensity;
+	float shakeY = cosf(m_shakeTimer * 1.7f) * shakeIntensity;
+
 	//プレイヤーの頭の上に固定
 	Vector3 position = m_player->GetPosition();
 	position.y += 130.0f;	//傘の高さ
+
+	position.x += shakeX;
+	position.y += shakeY;
+
 	m_position = position;
+
+	//アイテムの種類に応じた回転制御
+	if (m_type == ItemType::penguin)
+	{
+		//ペンギンの場合は回転させず、常に正面を向かせる
+		Quaternion defaultRotation = Quaternion::Identity;
+		if (m_modelRender)
+		{
+			m_modelRender->SetRotation(defaultRotation);
+		}
+	}
+	else
+	{
+		//ペンギン以外のアイテムは、回転させる
+		Quaternion rotation;
+		rotation.SetRotationDegX(m_rotY);
+
+		if (m_modelRender)
+		{
+			m_modelRender->SetRotation(rotation);
+		}
+	}
 
 	//成功
 	if (m_player->m_playerState == 4 && m_state != BallState::SuccessThrow)

@@ -21,6 +21,11 @@ private:
 	{
 		ItemType::ball,
 		ItemType::egg,
+		ItemType::box,
+		ItemType::skeleton,
+		ItemType::teaBowl,
+		ItemType::penguin,
+		ItemType::phone
 	};
 
 	//現在どのアイテムを出すか
