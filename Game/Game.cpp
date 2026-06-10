@@ -27,6 +27,7 @@
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
+GameState Game::m_prevState = GameState::Title;
 
 Game::Game()
 {
@@ -676,6 +677,16 @@ void Game::RequestGameOver()
     m_gameState = GameState::GameOver;
 
 
+}
+
+void Game::SetPrevState(GameState state)
+{
+    m_prevState = state;
+}
+
+GameState Game::GetPrevState()
+{
+    return m_prevState;
 }
 
 void Game::RequestFailureLetter()
