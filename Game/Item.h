@@ -97,5 +97,7 @@ private:
 	bool m_isActive = true;							//更新・描画を行うかどうか(非アクティブなら停止)
 	float m_onUmbrellaTimer = 0.0f;					//傘の上にいる時間
 	float m_onUmbrellaLimitTimer = 2.0f;			//制限時間
+	float m_rotY = 0.0f;							//アイテム自体の回転角度(Y軸)
+	float m_shakeTimer = 0.0f;						//揺れを計算するためのタイマー
 };
 
