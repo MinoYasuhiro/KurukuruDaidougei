@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 class BGMManager;
 class Operation;
 class TitleMenu;
@@ -10,10 +9,9 @@ public:
 	~Title() {}
 	bool Start();
 	void Update();
-	void CleanupMenu();
 	void Render(RenderContext& renderContext);
 
-
+	
 private:
 	SpriteRender m_spriteRender;
 	SpriteRender m_soundButtonRender;
@@ -25,7 +23,9 @@ private:
 
 	Operation* m_operation = nullptr;
 
+	TitleMenu* m_titleMenu = nullptr;
 
+	bool m_inputLock = false;
 
 };
 

@@ -3,73 +3,70 @@
 #include "Game.h"
 #include "SoundOption.h"
 #include "BGMManager.h"
+#include "TitleMenu.h"
 #include "Operation.h"
 
-namespace {
+namespace TITLE {
 
-	const Vector3 TITLE_POS = { 0.0f,0.0f,0.0f };
-	
+	const Vector3 POSITION = { 0.0f,0.0f,0.0f };
 }
 
 bool Title::Start()
 {
 	m_spriteRender.Init("Assets/Sprite/Title.DDS", 1920, 1080);
-	m_spriteRender.SetPosition({TITLE_POS});
-	m_canInput = false;
+	m_spriteRender.SetPosition({ TITLE::POSITION });
 
-	m_BGM = FindGO<BGMManager>("bgmManager");
-	if (m_BGM == nullptr)
-	{
-		m_BGM = NewGO<BGMManager>(0, "bgmManager");
-		m_BGM->Init();
-	}
-	
-
-	m_BGM->Play(BGM_GameClear);
+	m_titleMenu = NewGO<TitleMenu>(0, "titleMenu");
 
 	return true;
 }
 
-
 void Title::Update()
 {
-    m_spriteRender.Update();
+	m_spriteRender.Update();
 
-    if (!m_canInput)
-    {
-        m_canInput = true;
-        return;
-    }
+	if (!m_titleMenu) return;
 
-    //…のちに統合版に加える…//
-    if (g_pad[0]->IsPress(enButtonSelect))
-    {
-	    if (Game* game = FindGO<Game>("game"))
+	switch (m_titleMenu->GetResult())
+	{
+	    case MenuResult::GameStart:
 	    {
-		game->ResetGame();
+		   if (Game* game = FindGO<Game>("game"))
+		   {
+			    game->m_fromTitleStart = true; 
+		        game->ResetGame();
+		   }
+	       DeleteGO(m_titleMenu);
+	       m_titleMenu = nullptr;
+
+		   DeleteGO(this);
+		   return;
 	    }
-	    DeleteGO(this);
+
+	    case MenuResult::SoundOption:
+	    {
+		   Game::SetPrevState(GameState::Title);
+		   Game::SetState(GameState::SoundTest);
+
+		   NewGO<SoundOption>(0, "soundOption");
+
+		   DeleteGO(m_titleMenu);
+		   m_titleMenu = nullptr;
+	   	   DeleteGO(this);
+		   return;
+	    }
+
+	    case MenuResult::Operation:
+	    {
+	   	   Game::SetPrevState(GameState::Title);
+		   NewGO<Operation>(0, "operation");
+
+		   DeleteGO(m_titleMenu);
+		   m_titleMenu = nullptr;
+		   DeleteGO(this);
+		   return;
+	    }
     }
-
-
-    // ★ 操作説明へ（Yボタン）
-    if (g_pad[0]->IsPress(enButtonY))
-    {
-    	Game::SetState(GameState::Title);
-        m_operation = NewGO<Operation>(0, "operation");
-	    DeleteGO(this);
-    }
-
-    // ★ サウンドオプションへ（Xボタン）
-    if (g_pad[0]->IsPress(enButtonX))
-    {
-
-	   Game::SetState(GameState::Title);   // ← 超重要
-	   Game::SetState(GameState::SoundTest);   // ← 正しい状態
-
-	   NewGO<SoundOption>(0, "soundOption");
-	   DeleteGO(this);
-    }   
 }
 
 void Title::Render(RenderContext& rc)

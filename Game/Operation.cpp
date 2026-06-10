@@ -29,8 +29,8 @@ void Operation::Update()
 		NewGO<Title>(0, "title");
 
 
-		DeleteGO(this);  // ★最重要
-		return;          // ★安全
+		DeleteGO(this);  
+		return;          
 	}
 }
 
