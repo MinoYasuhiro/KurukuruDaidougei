@@ -109,10 +109,16 @@ void Item::Init(ItemType type)
 		break;
 	case ItemType::teaBowl:
 		m_category = ItemCategory::Normal;
-		m_hasFailureModel = false;
+		m_hasFailureModel = true;
 		m_modelRender->Init("Assets/modelData/TeaBowl.tkm");
 		m_modelRender->SetScale({ 2.5f,2.5f,2.5f });
 		m_isModelInited = true;
+
+		m_failureModelRender = new ModelRender();
+
+		m_failureModelRender->Init("Assets/modelData/TeaBowlBroken.tkm");
+		m_failureModelRender->SetScale({ 2.5f,2.5f,2.5f });
+		m_isFailureModelInited = true;
 		break;
 	case ItemType::penguin:
 		m_category = ItemCategory::QTE;
