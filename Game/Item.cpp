@@ -117,7 +117,13 @@ void Item::Init(ItemType type)
 	case ItemType::penguin:
 		m_category = ItemCategory::QTE;
 		m_hasFailureModel = false;
-		m_modelRender->Init("Assets/modelData/Penguin.tkm");
+
+		m_penguinAnimationState[enPenguinAnimation_Run].Load("Assets/animData/PenguinRun.tka");
+		m_penguinAnimationState[enPenguinAnimation_Run].SetLoopFlag(true);
+
+		m_modelRender->Init("Assets/modelData/Penguin.tkm", m_penguinAnimationState, enPenguinAnimation_Num);
+
+		m_modelRender->PlayAnimation(enPenguinAnimation_Run);
 		m_modelRender->SetScale({ 0.75f,0.75f,0.75f });
 		m_isModelInited = true;
 		break;
@@ -384,6 +390,7 @@ void Item::OnUmbrella()
 		if (m_modelRender)
 		{
 			m_modelRender->SetRotation(defaultRotation);
+			m_modelRender->PlayAnimation(enPenguinAnimation_Run);
 		}
 	}
 	else

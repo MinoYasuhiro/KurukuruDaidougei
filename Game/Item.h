@@ -72,6 +72,15 @@ public:
 
 private:
 
+	//ペンギンのアニメーション
+	enum EnItemAnimation
+	{
+		enPenguinAnimation_Run,
+		enPenguinAnimation_Num,
+	};
+
+	AnimationClip m_penguinAnimationState[enPenguinAnimation_Num];
+
 	Game* m_game = nullptr;
 	Player* m_player = nullptr;
 	Circle* m_circle = nullptr;
