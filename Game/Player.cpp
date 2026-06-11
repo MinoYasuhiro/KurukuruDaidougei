@@ -39,24 +39,34 @@ bool Player::Start()
     // --- アニメーションの読み込み ---
     m_playerAnimationState[enPlayerAnimationState_Idle].Load("Assets/animData/PlayerIdle.tka");
     m_playerAnimationState[enPlayerAnimationState_Idle].SetLoopFlag(true);
+
     m_playerAnimationState[enPlayerAnimationState_Run].Load("Assets/animData/PlayerRun.tka");
     m_playerAnimationState[enPlayerAnimationState_Run].SetLoopFlag(true);
+
     m_playerAnimationState[enPlayerAnimationState_Rotation].Load("Assets/animData/PlayerRotation.tka");
     m_playerAnimationState[enPlayerAnimationState_Rotation].SetLoopFlag(true);
+
     m_playerAnimationState[enPlayerAnimationState_Success].Load("Assets/animData/PlayerSuccess.tka");
     m_playerAnimationState[enPlayerAnimationState_Success].SetLoopFlag(false);
+
     m_playerAnimationState[enPlayerAnimationState_Normal].Load("Assets/animData/normal.tka");
     m_playerAnimationState[enPlayerAnimationState_Normal].SetLoopFlag(false);
+
     m_playerAnimationState[enPlayerAnimationState_QTEsippai].Load("Assets/animData/QTEsippai.tka");
     m_playerAnimationState[enPlayerAnimationState_QTEsippai].SetLoopFlag(false);
+
     m_playerAnimationState[enPlayerAnimationState_QTEseikou].Load("Assets/animData/QTEseikou.tka");
     m_playerAnimationState[enPlayerAnimationState_QTEseikou].SetLoopFlag(true);
+
     m_playerAnimationState[enPlayerAnimationState_GameClear1].Load("Assets/animData/gameClear.tka");
     m_playerAnimationState[enPlayerAnimationState_GameClear1].SetLoopFlag(false);
+
     m_playerAnimationState[enPlayerAnimationState_GameClear2].Load("Assets/animData/gameClear2.tka");
     m_playerAnimationState[enPlayerAnimationState_GameClear2].SetLoopFlag(false);
+
     m_playerAnimationState[enPlayerAnimationState_GameOver].Load("Assets/animData/gameover.tka");
     m_playerAnimationState[enPlayerAnimationState_GameOver].SetLoopFlag(false);
+
     m_playerAnimationState[enPlayerAnimationState_GameOverRun].Load("Assets/animData/PlayerRun.tka");
     m_playerAnimationState[enPlayerAnimationState_GameOverRun].SetLoopFlag(true);
 
