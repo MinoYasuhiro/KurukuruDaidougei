@@ -1,4 +1,13 @@
-﻿#include "stdafx.h"
+﻿//=============================================================
+// Player.cpp
+// プレイヤーの移動・傘回し・ステート管理を行うクラス
+//
+// 主な処理の流れ：
+//   Update() → ManageState()でステート決定
+//            → PlayerAction()で行動実行
+//            → SoundPlay()でSE再生
+//=============================================================
+#include "stdafx.h"
 #include "Player.h"
 #include "sound/SoundEngine.h"
 #include "sound/SoundSource.h"
@@ -9,6 +18,12 @@
 #include "CoinBox.h"
 #include "Arrow.h"
 #include "Circle.h"
+
+// 傘回しゲームのパラメータ定数（Player.hのk_系と対応）
+const float Player::k_spinTimeLimit = 3.0f;   // 傘回しの制限時間
+const float Player::k_gameStartDelay = 3.0f;   // ゲーム開始までの待機時間
+const float Player::k_gameOverRunTime = 3.0f;  // ゲームオーバー後の走り時間
+
 
 Player::Player()
 {
@@ -21,6 +36,7 @@ Player::~Player()
 bool Player::Start()
 {
 
+    // --- アニメーションの読み込み ---
     m_playerAnimationState[enPlayerAnimationState_Idle].Load("Assets/animData/PlayerIdle.tka");
     m_playerAnimationState[enPlayerAnimationState_Idle].SetLoopFlag(true);
     m_playerAnimationState[enPlayerAnimationState_Run].Load("Assets/animData/PlayerRun.tka");
@@ -44,26 +60,33 @@ bool Player::Start()
     m_playerAnimationState[enPlayerAnimationState_GameOverRun].Load("Assets/animData/PlayerRun.tka");
     m_playerAnimationState[enPlayerAnimationState_GameOverRun].SetLoopFlag(true);
 
+
+    // --- モデルの初期化 ---
     m_NewModelRender.Init("Assets/modelData/Player2.tkm", m_playerAnimationState, enPlayerAnimationState_Num, enModelUpAxisZ);
-    // 傘生成
+
+
+    // --- 傘の生成 ---
     m_umbrella = NewGO<Umbrella>(0);
 
-    // キャラコン
+
+    // --- キャラクターコントローラーの初期化 ---
     m_characterController.Init(10.0f, 50.0f, m_position);
 
-    // 初期モード
+
+    // --- 変数の初期化 ---
     number = 1;
-    m_state = 0;
     m_prevNumber = 1;
     m_prevPlayerState = -1;
     m_playerState = 0;
     m_finishRot.SetRotationY(Math::DegToRad(-90.0f));
 
-    //カウントの初期化
+
+    // --- UIの初期化 ---
     m_font.SetText(L"");
     m_font.SetPosition(0.0f, 0.0f, 0.0f);
     m_font.SetColor({ 1.0f,1.0f,1.0f,1.0f });
     m_font.SetScale(1.0f);
+
 
     m_arrow = NewGO<Arrow>(0);
 
@@ -76,10 +99,10 @@ bool Player::Start()
 
 void Player::Reset()
 {
-    m_playerState = 0;
+    m_playerState = enPlayerState_Idle;
 
-    m_playerClear = 0;   // ←追加
-    m_playerError = 0;   // ←追加
+    m_playerClear = 0;   
+    m_playerError = 0;   
 
     m_spinTimer = 0.0f;
     m_spinCount = 0;
@@ -111,32 +134,40 @@ void Player::Reset()
 
 void Player::Update()
 {
+
+    // --- 必要なオブジェクトの取得 ---
     if (!m_game)
     {
         m_game = FindGO <Game>("game");
         if (!m_game)return;
     }
 
+
+    // --- 必要なオブジェクトの取得 ---
     if (!m_umbrella)
     {
         m_umbrella = FindGO<Umbrella>("umbrella");
     }
 
+
+    // --- ゲーム中でなければ処理しない ---
     if (m_game->GetState() != GameState::Playing)
     {
         m_isRunSEPlaying = false;
         return;
     }
 
-    // ゲーム開始タイマー   例えばこれで3秒後に操作可能になります。
+
+    // --- ゲーム開始タイマー（一定時間後に操作可能になる）---
     m_gameStartTimer += 1.0f / 60.0f;
 
-    if (m_gameStartTimer >= 3.0f)
+    if (m_gameStartTimer >= k_gameStartDelay)
     {
         m_canPlayerMove = true;
     }
 
-    // ★スティック回転の計算
+
+    // --- デバッグ表示（スピン回数）---
     wchar_t text[256];
     swprintf_s(text, 256, L"Spin Count : %d", m_spinCount);
 
@@ -154,6 +185,7 @@ void Player::Update()
     }
 
 
+    // --- メインの更新処理 ---
     if (m_canPlayerMove)
     {
         ManageState();     // 状態決定
@@ -163,13 +195,14 @@ void Player::Update()
     else
     {
         // 開始前は待機状態
-        m_playerState = 0;
+        m_playerState = enPlayerState_Idle;
     }
 
-    // ★ここに追加
+
+    // --- ステートが変わったときにアニメーションを切り替える ---
     if (m_prevPlayerState != m_playerState)
     {
-        if (m_playerState == 3)
+        if (m_playerState == enPlayerState_Spinning)
         {
             if (m_umbrella)
             {
@@ -180,9 +213,12 @@ void Player::Update()
         PlayAnimation2();
     }
 
+
+    // --- モデル・傘の位置更新 ---
     m_NewModelRender.Update();
 
     m_prevPlayerState = m_playerState;
+
 
     // ★傘の位置を更新
     int boneNo = m_NewModelRender.FindBoneID(L"Middle_r");
@@ -204,13 +240,15 @@ void Player::Update()
         }
     }
 
+
     //円が未取得、または削除されている場合は再取得
     if (!m_circle || m_circle->IsDead())
     {
         m_circle = FindGO<Circle>("circle");
     }
 
-    //矢印が存在する場合のみ処理
+
+    // --- 矢印が存在する場合のみ処理 ---
     if (m_arrow)
     {
         //円が存在し、削除されておらず、表示状態の場合
@@ -241,6 +279,7 @@ void Player::Update()
     }
 }
 
+
 //サウンドの再生。
 void Player::SoundPlay()
 {
@@ -251,7 +290,8 @@ void Player::SoundPlay()
         return;
     }
 
-    if (m_playerState != 2)
+
+    if (m_playerState != enPlayerState_Run)
     {
         if (m_isRunSEPlaying)
         {
@@ -261,21 +301,26 @@ void Player::SoundPlay()
         return;
     }
 
+
     bool isMoveInput =
         fabsf(g_pad[0]->GetLStickXF()) >= 0.1f ||
         fabsf(g_pad[0]->GetLStickYF()) >= 0.1f;
+
 
     if (isMoveInput && !m_isRunSEPlaying)
     {
         SEManager::Play(SE_run, true);
         m_isRunSEPlaying = true;
     }
+
+
     else if (!isMoveInput && m_isRunSEPlaying)
     {
         SEManager::StopLoop(SE_run);
         m_isRunSEPlaying = false;
     }
 }
+
 
 //移動処理。
 void Player::Move()
@@ -308,9 +353,9 @@ void Player::Move()
     }
 
     m_position = m_characterController.Execute(m_moveSpeed, 1.0f / 60.0f);
-    m_modelRender.SetPosition(m_position);
     m_NewModelRender.SetPosition(m_position);
 }
+
 
 //回転処理。
 void Player::Rotation()
@@ -318,10 +363,10 @@ void Player::Rotation()
     if (fabsf(m_moveSpeed.x) >= 0.001f || fabsf(m_moveSpeed.z) >= 0.001f)
     {
         m_rotation.SetRotationYFromDirectionXZ(m_moveSpeed);
-        m_modelRender.SetRotation(m_rotation);
         m_NewModelRender.SetRotation(m_rotation);
     }
 }
+
 
 //状態管理。
 void Player::ManageState()
@@ -332,105 +377,113 @@ void Player::ManageState()
 
     switch (m_playerState)
     {
-    case 0: // 待機
+    case enPlayerState_Idle: // 待機
     {
         // ★クリア判定
-        if (m_playerClear >= 5)
+        if (m_playerClear >= k_clearCountToWin)
         {
-            m_playerState = 7;
+            m_playerState = enPlayerState_GameClear1;
             return;
         }
 
         // ★ゲームオーバー判定
-        if (m_playerError >= 3)
+        if (m_playerError >= k_errorCountToGameOver)
         {
-            m_playerState = 9;
+            m_playerState = enPlayerState_GameOver;
             return;
         }
 
         // 傘回し開始
         if (m_itemOnUmbrella)
         {
-            m_playerState = 3;
+            m_playerState = enPlayerState_Spinning;
         }
         // 移動開始
         else if (fabsf(stick.x) >= 0.1f || fabsf(stick.y) >= 0.1f)
         {
-            m_playerState = 2;
+            m_playerState = enPlayerState_Run;
         }
 
         break;
     }
 
-    case 2: // 移動
+
+    case enPlayerState_Run: // 移動
     {
         // 傘回し開始
         if (m_itemOnUmbrella)
         {
-            m_playerState = 3;
+            m_playerState = enPlayerState_Spinning;
         }
         // 入力がないなら待機
         else if (fabsf(stick.x) < 0.1f &&
             fabsf(stick.y) < 0.1f)
         {
-            m_playerState = 0;
+            m_playerState = enPlayerState_Idle;
         }
 
         break;
     }
 
-    case 1: // 傘回し失敗中
-    case 4: // 傘回し成功中
+
+    case enPlayerState_Fail: // 傘回し失敗中
+    case enPlayerState_Success: // 傘回し成功中
 
         // アニメ終了待ち
         if (!m_NewModelRender.IsPlayingAnimation())
         {
             EndUmbrellaSpin();
 
-            m_playerState = 0;
+            m_playerState = enPlayerState_Idle;
 
         }
 
         break;
 
 
-    case 7: // クリア中
+    case enPlayerState_GameClear1: // クリア中
         if (!m_NewModelRender.IsPlayingAnimation())
         {
-            m_playerState = 8;
+            m_playerState = enPlayerState_GameClear2;
         }
         break;
 
-    case 9: // ゲームオーバー中
+
+    case enPlayerState_GameOver: // ゲームオーバー中
         if (!m_NewModelRender.IsPlayingAnimation())
         {
-            m_playerState = 10;
+            m_playerState = enPlayerState_GameOverRun;
         }
         break;
 
-    case 30:
+
+    case enPlayerState_Stop:
         // 何もしない（停止）
         break;
     }
 }
+
 
 //プレイヤーのアクション。
 void Player::PlayerAction()
 {
     switch (m_playerState)
     {
-    case 0:
+    case enPlayerState_Idle:
         //通常時待機のアクション
         break;
-    case 1:
+
+    case enPlayerState_Fail:
         //通常時失敗のアクション
         break;
-    case 2:
+
+    case enPlayerState_Run:
         //走るアクション
         Move();
         Rotation();
         break;
-    case 3:
+
+    case enPlayerState_Spinning:
     {
         // 正面向き処理
         Quaternion targetRot;
@@ -462,9 +515,9 @@ void Player::PlayerAction()
         m_spinTimer += 1.0f / 60.0f;
 
         // ★成功判定（25回）
-        if (m_spinCount >= 25)
+        if (m_spinCount >= k_spinCountToSuccess)
         {
-            m_playerState = 4;
+            m_playerState = enPlayerState_Success;
             m_playerClear++;
 
             if (CoinBox* coin = FindGO<CoinBox>("coinBox"))
@@ -474,32 +527,39 @@ void Player::PlayerAction()
         }
 
         // ★失敗判定（3秒）
-        else if (m_spinTimer >= 3.0f)
+        else if (m_spinTimer >= k_spinTimeLimit)
         {
-            m_playerState = 1;
+            m_playerState = enPlayerState_Fail;
             m_playerError++;
         }
     }
     break;
-    case 4:
+
+    case enPlayerState_Success:
         //通常時成功のアクション
         break;
-    case 5:
+
+    case enPlayerState_QTEFail:
         //QTE失敗のアクション
         break;
-    case 6:
+
+    case enPlayerState_QTESuccess:
         //QTE成功のアクション
         break;
-    case 7:
+
+    case enPlayerState_GameClear1:
         //ゲームクリアのアクション1
         break;
-    case 8:
+
+    case enPlayerState_GameClear2:
         //ゲームクリアのアクション2
         break;
-    case 9:
+
+    case enPlayerState_GameOver:
         //ゲームオーバーのアクション
         break;
-    case 10:
+
+    case enPlayerState_GameOverRun:
     {
         // ゲームオーバー後の走り
         m_moveSpeed = Vector3(-400.0f, 0.0f, 0.0f);
@@ -513,18 +573,19 @@ void Player::PlayerAction()
         m_gameOverRunTimer += 1.0f / 60.0f;
 
         // 3秒後に待機へ
-        if (m_gameOverRunTimer >= 3.0f)
+        if (m_gameOverRunTimer >= k_gameOverRunTime)
         {
             m_playerError = 0;     // ←追加
             m_itemOnUmbrella = false; // ←追加
-            m_playerState = 30;
+            m_playerState = enPlayerState_Stop;
             m_gameOverRunTimer = 0.0f;
             m_moveSpeed = Vector3::Zero; // ←追加
         }
     }
     break;
 
-    case 30:
+
+    case enPlayerState_Stop:
     {
         // 完全停止
         m_moveSpeed = Vector3::Zero;
@@ -535,95 +596,105 @@ void Player::PlayerAction()
     }
 }
 
+
 //傘回しの回転数保持
 void Player::SpinCount()
 {
+    // 現フレームのスティック入力を取得
     Vector2 current;
     current.x = g_pad[0]->GetLStickXF();
     current.y = g_pad[0]->GetLStickYF();
 
     float len = sqrtf(current.x * current.x + current.y * current.y);
 
-    // デッドゾーン
+    // デッドゾーン：入力が小さすぎる場合はゼロ扱い
     if (len < 0.2f)
     {
         current = Vector2(0, 0);
     }
 
-    // 前フレとの差
+    // 前フレームとの差分（スティックの移動量）を計算
     Vector2 delta;
     delta.x = current.x - m_prevStick2.x;
     delta.y = current.y - m_prevStick2.y;
-
     float change = sqrtf(delta.x * delta.x + delta.y * delta.y);
 
-    // クールタイム
+    // クールタイムを減らす（連続カウント防止）
     m_inputCooldown -= 1.0f / 60.0f;
 
-    // ★ここがポイント
     bool isInput = (current.x != 0.0f || current.y != 0.0f);
-    bool wasInput = (m_prevStick2.x != 0.0f || m_prevStick2.y != 0.0f);
 
-    // 「入力がある状態で変化したときだけカウント」
+    // スティックが動いていて、クールタイムが切れていて、入力がある場合のみカウント
     if (change > 0.2f && m_inputCooldown <= 0.0f && isInput)
     {
         m_spinCount++;
-        m_inputCooldown = 0.05f;
+        m_inputCooldown = 0.05f;  // 次のカウントまでのインターバル
     }
 
     m_prevStick2 = current;
 }
 
+
 //アニメーションの再生。
 void Player::PlayAnimation2()
 {
     switch (m_playerState) {
-    case 0:
+    case enPlayerState_Idle:
         //通常時待機のアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Idle);
         break;
-    case 1:
+
+    case enPlayerState_Fail:
         //通常時失敗のアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Normal);
         break;
-    case 2:
+
+    case enPlayerState_Run:
         //走るアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Run);
         break;
-    case 3:
+
+    case enPlayerState_Spinning:
         //傘を回すアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Rotation);
         break;
-    case 4:
+
+    case enPlayerState_Success:
         //通常時成功のアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Success);
         break;
-    case 5:
+
+    case enPlayerState_QTEFail:
         //QTE失敗のアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_QTEsippai);
         break;
-    case 6:
+
+    case enPlayerState_QTESuccess:
         //QTE成功のアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_QTEseikou);
         break;
-    case 7:
+
+    case enPlayerState_GameClear1:
         //ゲームクリアのアニメーション1
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameClear1);
         break;
-    case 8:
+
+    case enPlayerState_GameClear2:
         //ゲームクリアのアニメーション2
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameClear2);
         break;
-    case 9:
+
+    case enPlayerState_GameOver:
         //ゲームオーバーのアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameOver);
         break;
-    case 10:
+
+    case enPlayerState_GameOverRun:
         //ゲームオーバーの走るアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameOverRun);
         break;
 
-    case 30:
+    case enPlayerState_Stop:
         // 完全停止のアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Idle);
         break;
@@ -651,11 +722,13 @@ static Vector2 Normalize(Vector2 v)
     return v;
 }
 
+
 // ベクトルの内積を計算
 static float Dot(Vector2 a, Vector2 b)
 {
     return a.x * b.x + a.y * b.y;
 }
+
 
 static float Clamp(float v, float min, float max)
 {
@@ -664,51 +737,58 @@ static float Clamp(float v, float min, float max)
     return v;
 }
 
+
 // スティックの回転速度を計算
+// 前フレームからスティックがどれだけ「回転したか」を角度で返す
 float Player::CalcStickRotationSpeed()
 {
+    // 現フレームのスティック入力を取得
     Vector2 current;
     current.x = g_pad[0]->GetLStickXF();
     current.y = g_pad[0]->GetLStickYF();
 
     float len = sqrtf(current.x * current.x + current.y * current.y);
 
+    // デッドゾーン：スティックがほぼ中央なら回転なしとして終了
     if (len < 0.2f)
     {
         m_prevStick = current;
         return 0.0f;
     }
 
-    // 正規化
+    // 現フレームのスティックを正規化（向きだけ取り出す）
     current.x /= len;
     current.y /= len;
 
+    // 前フレームのスティックも正規化
     float prevLen = sqrtf(m_prevStick.x * m_prevStick.x + m_prevStick.y * m_prevStick.y);
-
     if (prevLen > 0.0001f)
     {
         m_prevStick.x /= prevLen;
         m_prevStick.y /= prevLen;
     }
-    // 内積
+
+    // 内積で前フレームと現フレームの「なす角」を求める
+    // dot = cos(θ) なので、acosを取ると2ベクトル間の角度になる
     float dot = current.x * m_prevStick.x + current.y * m_prevStick.y;
-
-    dot = Clamp(dot, -1.0f, 1.0f);
-
+    dot = Clamp(dot, -1.0f, 1.0f);  // 浮動小数点誤差でacosが壊れないようにクランプ
     float angle = acosf(dot);
 
-    // 外積（2D） 
+    // 外積（2D）で回転方向（時計回り／反時計回り）を判定
+    // 外積が負なら時計回り → angleを負にする
     float cross = m_prevStick.x * current.y - m_prevStick.y * current.x;
-
     if (cross < 0)
     {
         angle = -angle;
     }
 
+    // 今フレームの向きを次フレームの「前フレーム」として保存
     m_prevStick = current;
 
+    // 角度に倍率をかけて回転速度として返す
     return angle * 20.0f;
 }
+
 
 void Player::EndUmbrellaSpin()
 {
