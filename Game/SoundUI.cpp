@@ -66,6 +66,8 @@ bool SoundUI::Start()
 		}
 	}
 
+	m_inputTimer = m_inputInterval;
+
 	return true;
 }
 
