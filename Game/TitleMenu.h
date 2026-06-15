@@ -6,7 +6,8 @@ enum class MenuResult
     None,
     GameStart,
     SoundOption,
-    Operation
+    Operation,
+    Rule
 };
 
 class TitleMenu : public IGameObject
@@ -29,6 +30,7 @@ private:
     SpriteRender m_startRender;
     SpriteRender m_soundRender;
     SpriteRender m_operationRender;
+    SpriteRender m_ruleRender;
     MenuResult m_result = MenuResult::None;
 private:
     bool m_skipInputFrame = true;
