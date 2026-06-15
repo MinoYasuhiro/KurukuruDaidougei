@@ -43,6 +43,7 @@
     <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="Operation.cpp" />
     <ClCompile Include="TitleMenu.cpp" />
+    <ClCompile Include="Rule.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -81,5 +82,6 @@
     <ClInclude Include="Arrow.h" />
     <ClInclude Include="Operation.h" />
     <ClInclude Include="TitleMenu.h" />
+    <ClInclude Include="Rule.h" />
   </ItemGroup>
 </Project>

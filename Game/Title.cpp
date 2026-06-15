@@ -5,6 +5,7 @@
 #include "BGMManager.h"
 #include "TitleMenu.h"
 #include "Operation.h"
+#include "Rule.h"
 
 namespace TITLE {
 
@@ -66,6 +67,17 @@ void Title::Update()
 		   DeleteGO(this);
 		   return;
 	    }
+
+		case MenuResult::Rule:
+		{
+			Game::SetPrevState(GameState::Title);
+			NewGO<Rule>(0, "rule");
+
+			DeleteGO(m_titleMenu);
+			m_titleMenu = nullptr;
+			m_isDead = true;
+			return;
+		}
     }
 }
 

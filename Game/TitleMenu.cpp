@@ -103,11 +103,13 @@ void TitleMenu::SelectScale()
     m_startRender.SetScale({ 1,1,1 });
     m_soundRender.SetScale({ 1,1,1 });
     m_operationRender.SetScale({ 1,1,1 });
+    m_ruleRender.SetScale({ 1,1,1 });
 
     // 選択中だけ拡大
     if (m_selectIndex == 0) m_operationRender.SetScale({ 1.2f,1.2f,1.2f });
     if (m_selectIndex == 1) m_startRender.SetScale({ 1.2f,1.2f,1.2f });
     if (m_selectIndex == 2) m_soundRender.SetScale({ 1.2f,1.2f,1.2f });
+    if (m_selectIndex == 3) m_ruleRender.SetScale({ 1.2f,1.2f,1.2f });
 }
 
 void TitleMenu::Render(RenderContext& rc)
