@@ -102,10 +102,16 @@ void Item::Init(ItemType type)
 		break;
 	case ItemType::skeleton:
 		m_category = ItemCategory::QTE;
-		m_hasFailureModel = false;
+		m_hasFailureModel = true;
 		m_modelRender->Init("Assets/modelData/Skeleton.tkm");
 		m_modelRender->SetScale({ 2.0f,2.0f,2.0f });
 		m_isModelInited = true;
+
+		m_failureModelRender = new ModelRender();
+
+		m_failureModelRender->Init("Assets/modelData/SkeletonBroken.tkm");
+		m_failureModelRender->SetScale({ 2.0f,2.0f,2.0f });
+		m_isFailureModelInited = true;
 		break;
 	case ItemType::teaBowl:
 		m_category = ItemCategory::Normal;
