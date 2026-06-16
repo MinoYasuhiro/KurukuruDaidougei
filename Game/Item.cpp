@@ -7,12 +7,24 @@
 #include "SEManager.h"
 Item::Item()
 {
-
+	//起動時にポインタをnullptrで安全に初期化
+	m_modelRender = nullptr;
+	m_failureModelRender = nullptr;
 }
 
 Item::~Item()
 {
+	if (m_modelRender != nullptr)
+	{
+		delete m_modelRender;
+		m_modelRender = nullptr;
+	}
 
+	if (m_failureModelRender != nullptr)
+	{
+		delete m_failureModelRender;
+		m_failureModelRender = nullptr;
+	}
 }
 
 namespace
@@ -56,6 +68,19 @@ void Item::SetActive(bool isActive)
 
 void Item::Init(ItemType type)
 {
+	//次のアイテムへの切り替えに伴う古いリソースの解放
+	//Initが何度も呼び出されるため、newする前に古いモデルのメモリを確実に解放しDirectXのメモリ領域のリークや二重確保によるクラッシュを防ぐ
+	if (m_modelRender != nullptr)
+	{
+		delete m_modelRender;
+		m_modelRender = nullptr;
+	}
+
+	if (m_failureModelRender != nullptr)
+	{
+		delete m_failureModelRender;
+		m_failureModelRender = nullptr;
+	}
 	//if (m_isModelInited)return;
 
 	m_isModelInited = false;
@@ -243,34 +268,49 @@ void Item::ParabolicMotion()
 		//地面に付いたらリセット
 		if (m_position.y <= 0.0f)
 		{
-			m_moveSpeed = { 0.0f,0.0f,0.0f };
-			m_isFlying = false;
-
-			if (m_game)
+			//成功して飛んだあとの着地処理
+			if (m_state == BallState::SuccessThrow)
 			{
-				m_player = FindGO<Player>("player");
-				m_circle = m_game->GetCircle();
+				m_position.y = 0.0f;			//地面に位置を固定
 
-				//傘に乗ったか判定
-				if (m_player && m_circle)
+				m_moveSpeed = Vector3::Zero;	//移動速度を完全に停止
+
+				m_isFlying = false;				//飛行状態を終了
+
+				m_state = BallState::Idle;		//状態を待機中に戻す
+			}
+			//通常の落下(最初の登場時と傘から落ちたとき)の処理
+			else
+			{
+				m_moveSpeed = { 0.0f,0.0f,0.0f };
+				m_isFlying = false;
+
+				if (m_game)
 				{
-					bool success = IsInsideCircle(
-						m_player->GetPosition(),
-						m_circle->GetPosition(),
-						m_circle->GetRadius());
+					m_player = FindGO<Player>("player");
+					m_circle = m_game->GetCircle();
 
-					//成功
-					if (success && !m_isProcessed)
+					//傘に乗ったか判定
+					if (m_player && m_circle)
 					{
-						m_wasOnUmbrella = true;
-						m_player->m_itemOnUmbrella = true;
-						m_state = BallState::OnUmbrella;
-						return;
+						bool success = IsInsideCircle(
+							m_player->GetPosition(),
+							m_circle->GetPosition(),
+							m_circle->GetRadius());
+
+						//成功
+						if (success && !m_isProcessed)
+						{
+							m_wasOnUmbrella = true;
+							m_player->m_itemOnUmbrella = true;
+							m_state = BallState::OnUmbrella;
+							return;
+						}
 					}
 				}
+				//失敗
+				m_state = BallState::FailFall;
 			}
-			//失敗
-			m_state = BallState::FailFall;
 		}
 	}
 }
