@@ -1,17 +1,39 @@
 #pragma once
+class Fade;
 class Rule : public IGameObject
 {
 public:
 	Rule() {}
-	~Rule() {}
+	~Rule();
 	bool Start();
 	void Update();
 	void Render(RenderContext& renderContext);
+	void UpdateAnimation();
+	void UpdateInput();
+	void UpdateExit();
 
 private:
-	SpriteRender m_RuleRender;
+   /// <summary>
+   /// ボタン
+   /// </summary>
+	SpriteRender m_LeftButtonRender;
+	SpriteRender m_RightButtonRender;
+
+private:
 	Vector3 m_position;
 	bool m_isEnding = false;
+    float m_time = 0.0f;
+	int m_pageIndex = 0;
+	int m_maxPage = 3; // 3枚(後に増やす予定)
+
+
+	/// <summary>
+  /// 入力防止タイマー
+  /// </summary>
+	float m_inputTimer = 0.0f;
+	const float m_inputInterval = 0.15f; //押されてから0.15秒間動かない
+	std::vector<SpriteRender*> m_rules;
+
 
 
 
