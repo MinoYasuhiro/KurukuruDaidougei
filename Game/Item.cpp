@@ -277,6 +277,15 @@ void Item::ParabolicMotion()
 
 				m_isFlying = false;				//飛行状態を終了
 
+				m_rotY = 0.0f;
+
+				m_shakeTimer = 0.0f;
+
+				if (m_modelRender)
+				{
+					m_modelRender->SetRotation(Quaternion::Identity);
+				}
+
 				m_state = BallState::Idle;		//状態を待機中に戻す
 			}
 			//通常の落下(最初の登場時と傘から落ちたとき)の処理
@@ -335,6 +344,13 @@ void Item::FailFallMotion()
 		m_moveSpeed = Vector3::Zero;
 		m_isFlying = false;
 		m_isCracked = true;
+		m_rotY = 0.0f;
+		m_shakeTimer = 0.0f;
+
+		if (m_modelRender)
+		{
+			m_modelRender->SetRotation(Quaternion::Identity);
+		}
 
 		//地面に付いたらプレイヤーの方向を向き怒る
 		if (m_type == ItemType::penguin && m_modelRender)
@@ -442,7 +458,6 @@ void Item::RandomSpawn()
 	m_position.z = distZ(mt);
 }
 
-//傘の上に乗ったときの処理
 void Item::OnUmbrella()
 {
 	if (!m_player)
@@ -454,35 +469,27 @@ void Item::OnUmbrella()
 
 	if (!m_circle)return;
 
-	m_rotY += 8.0f;
-	m_shakeTimer += 0.5f;
-
-	float shakeIntensity = 1.0f;
-	float shakeX = sinf(m_shakeTimer * 1.3f) * shakeIntensity;
-	float shakeY = cosf(m_shakeTimer * 1.7f) * shakeIntensity;
-
 	//プレイヤーの頭の上に固定
 	Vector3 position = m_player->GetPosition();
 	position.y += 130.0f;	//傘の高さ
 
-	position.x += shakeX;
-	position.y += shakeY;
-
-	m_position = position;
-
-	//アイテムの種類に応じた回転制御
-	if (m_type == ItemType::penguin)
+	//アイテムのタイプによって制御を切り分ける
+	if (m_type != ItemType::penguin)
 	{
-		//ペンギンの場合は回転させず、常に正面を向かせる
-		Quaternion defaultRotation = Quaternion::Identity;
-		if (m_modelRender)
-		{
-			m_modelRender->SetRotation(defaultRotation);
-			m_modelRender->PlayAnimation(enPenguinAnimation_Run);
-		}
-	}
-	else
-	{
+		//ペンギン以外のアイテムの処理
+		//傘の上で回転したり、小刻みに揺れる挙動
+		m_rotY += 8.0f;
+		m_shakeTimer += 0.5f;
+
+		float shakeIntensity = 1.0f;
+		float shakeX = sinf(m_shakeTimer * 1.3f) * shakeIntensity;
+		float shakeY = cosf(m_shakeTimer * 1.7f) * shakeIntensity;
+
+		position.x += shakeX;
+		position.y += shakeY;
+
+		m_position = position;
+
 		//ペンギン以外のアイテムは、回転させる
 		Quaternion rotation;
 		rotation.SetRotationDegX(m_rotY);
@@ -491,6 +498,21 @@ void Item::OnUmbrella()
 		{
 			m_modelRender->SetRotation(rotation);
 		}
+	}
+	else
+	{
+		//ペンギンの処理
+		//コード側で回転や揺れを上書きすると3Dアニメーションとバッティングするため、位置の追従だけを行い、回転や見た目の動きはすべてアニメーション側に委ねる
+		m_position = position;
+
+		if (m_modelRender)
+		{
+			if (m_state == BallState::OnUmbrella)
+			{
+				m_modelRender->PlayAnimation(enPenguinAnimation_Run);
+			}
+		}
+
 	}
 
 	//成功
@@ -633,10 +655,19 @@ void Item::PrepareParabola()
 
 	m_isProcessed = false;
 	m_wasOnUmbrella = false;
+	m_isCracked = false;
+	m_hasPlayedLandSE = false;
+	m_rotY = 0.0f;
+	m_shakeTimer = 0.0f;
 
 	m_plannedVelocity = Vector3(0.0f, 15.0f, 10.0f);
 	m_isFlying = false;
 	m_state = BallState::Idle;
+
+	if (m_type == ItemType::penguin)
+	{
+		m_modelRender->PlayAnimation(enPenguinAnimation_Run);
+	}
 }
 
 void Item::Render(RenderContext& rc)
