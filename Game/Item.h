@@ -75,6 +75,7 @@ private:
 	//ペンギンのアニメーション
 	enum EnItemAnimation
 	{
+		enPenguinAnimation_Anger,
 		enPenguinAnimation_Run,
 		enPenguinAnimation_Num,
 	};
