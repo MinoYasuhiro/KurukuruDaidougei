@@ -1,10 +1,10 @@
-﻿//後々追加
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "SoundOption.h"
 #include "Game.h"
 #include "SoundUI.h"
 #include "Pause.h"
 #include "MenuUI.h"
+#include "Title.h"
 
 bool SoundOption::Start()
 {
@@ -45,15 +45,31 @@ void SoundOption::Update()
 		DeleteGO(m_soundUI);
 		m_soundUI = nullptr;
 
-		//ゲーム状態をポーズに戻す
-		Game::SetState(GameState::Pause);
+		if (m_transitionSource == FromPause)
+		{
+			//ゲーム状態をポーズに戻す
+			Game::SetState(GameState::Pause);
 
-		//ポーズ画面を再生成
-		NewGO<Pause>(0, "pause");
+			//ポーズ画面を再生成
+			NewGO<Pause>(0, "pause");
+		}
+		else if (m_transitionSource == FromTitle)
+		{
+			//ゲーム状態をタイトルに戻す
+			Game::SetState(GameState::Title);
+
+			//タイトル画面を再生成
+			NewGO<Title>(0, "title");
+		}
 
 		//サウンドオプション画面の背景を削除
 		DeleteGO(this);
 	}
+}
+
+void SoundOption::SetTransitionSource(TransitionSource transitionSource)
+{
+	m_transitionSource = transitionSource;
 }
 
 void SoundOption::Render(RenderContext& rc)

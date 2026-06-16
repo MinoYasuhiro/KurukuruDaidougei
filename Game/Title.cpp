@@ -49,7 +49,9 @@ void Title::Update()
 		   Game::SetPrevState(GameState::Title);
 		   Game::SetState(GameState::SoundTest);
 
-		   NewGO<SoundOption>(0, "soundOption");
+		   auto soundOption=NewGO<SoundOption>(0, "soundOption");
+
+		   soundOption->SetTransitionSource(TransitionSource::FromTitle);
 
 		   DeleteGO(m_titleMenu);
 		   m_titleMenu = nullptr;
