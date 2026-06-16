@@ -133,6 +133,9 @@ void Item::Init(ItemType type)
 		m_penguinAnimationState[enPenguinAnimation_Run].Load("Assets/animData/PenguinRun.tka");
 		m_penguinAnimationState[enPenguinAnimation_Run].SetLoopFlag(true);
 
+		m_penguinAnimationState[enPenguinAnimation_Anger].Load("Assets/animData/PenguinAnger.tka");
+		m_penguinAnimationState[enPenguinAnimation_Anger].SetLoopFlag(true);
+
 		m_modelRender->Init("Assets/modelData/Penguin.tkm", m_penguinAnimationState, enPenguinAnimation_Num);
 
 		m_modelRender->PlayAnimation(enPenguinAnimation_Run);
@@ -292,6 +295,33 @@ void Item::FailFallMotion()
 		m_moveSpeed = Vector3::Zero;
 		m_isFlying = false;
 		m_isCracked = true;
+
+		//地面に付いたらプレイヤーの方向を向き怒る
+		if (m_type == ItemType::penguin && m_modelRender)
+		{
+			//アニメーション切り替え
+			m_modelRender->PlayAnimation(enPenguinAnimation_Anger);
+
+			//プレイヤーが存在することを確認して向きを計算
+			if (m_player)
+			{
+				//ペンギンからプレイヤーへの方向ベクトルを計算
+				Vector3 targetDir = m_player->GetPosition() - m_position;
+
+				//高さの差を無視して、地面での向きにする
+				targetDir.y = 0.0f;
+
+				//ベクトルを正規化
+				targetDir.Normalize();
+
+				//方向ベクトルから回転クォータニオンを作成する関数
+				Quaternion lookAtRotation;
+				lookAtRotation.SetRotation({ 0.0f,0.0f,1.0f }, targetDir);
+
+				//計算した向きをペンギンモデルに適用
+				m_modelRender->SetRotation(lookAtRotation);
+			}
+		}
 
 		//SE再生(一回だけ)
 		if (!m_hasPlayedLandSE)
