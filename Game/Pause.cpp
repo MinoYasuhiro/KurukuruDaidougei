@@ -71,7 +71,9 @@ void Pause::Update()
         //サウンドオプション
     case MenuResult::SoundOption:
         Game::SetState(GameState::SoundTest);
-        NewGO<SoundOption>(1, "soundOption");
+        auto soundOption=NewGO<SoundOption>(1, "soundOption");
+
+        soundOption->SetTransitionSource(TransitionSource::FromPause);
 
         CleanupMenu();
         DeleteGO(this);
