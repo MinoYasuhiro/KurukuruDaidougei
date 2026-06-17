@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Confetti.h"
 #include <algorithm>
+#include "Game.h"
 
 bool Confetti::Start()
 {
@@ -48,6 +49,8 @@ bool Confetti::Start()
 
 void Confetti::Update()
 {
+	if (Game::GetState() != GameState::Playing)return;
+
 	//1フレームの時間(60FPS想定)
 	float dt = 1.0f / 60.0f;
 

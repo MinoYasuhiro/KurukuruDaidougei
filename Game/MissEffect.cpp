@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "MissEffect.h"
+#include "Game.h"
 
 bool MissEffect::Start()
 {
@@ -51,6 +52,8 @@ bool MissEffect::Start()
 
 void MissEffect::Update()
 {
+	if (Game::GetState() != GameState::Playing)return;
+
 	float dt = 1.0f / 60.0f;
 
 	for (int i = 0;i < m_activeList.size();i++)
