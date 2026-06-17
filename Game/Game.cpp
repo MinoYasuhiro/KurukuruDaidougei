@@ -205,6 +205,8 @@ void Game::ResetGame()
         missEffect->Reset();
     }
 
+    m_failCount = 0;
+
     // Title からのみ許可
     if (m_gameState != GameState::Title &&
         m_gameState != GameState::GameClear && 
@@ -252,16 +254,6 @@ void Game::ResetGame()
     if (m_coinBox)
     {
         m_coinBox->Reset();
-    }
-
-    if (m_confetti)
-    {
-        m_confetti->Update();
-    }
-
-    if (m_missEffect)
-    {
-        m_missEffect->Update();
     }
 
     // ★ 残っているオブジェクトを消す
