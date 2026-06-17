@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "CoinEffect.h"
+#include "Game.h"
 
 bool CoinEffect::Start()
 {
@@ -28,6 +29,8 @@ bool CoinEffect::Start()
 
 void CoinEffect::Update()
 {
+	if (Game::GetState() != GameState::Playing)return;
+
 	//1フレームの時間(60FPS想定)
 	float dt = 1.0f / 60.0f;
 
