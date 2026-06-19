@@ -3,15 +3,12 @@
 #include "Title.h"
 #include "Game.h"
 #include "BGMManager.h"
+#include "GameClearMenu.h"
 
 
 bool GameClear::Start()
 {
     m_SpriteRender.Init("Assets/Sprite/GameClear.DDS", 1920, 1080);
-
-    m_RetryRender.Init("Assets/Sprite/Retry.DDS", 500, 500);
-    m_RetryRender.SetPosition(Vector3(0, -200, 0)); // ★ 手前
-    m_RetryRender.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 
     m_canInput = false;
 
@@ -24,14 +21,20 @@ bool GameClear::Start()
 
     m_BGM->Play(BGM_GameClear);
 
+
+    if (m_menu == nullptr)
+    {
+        m_menu = NewGO<GameClearMenu>(10, "clearMenu");
+    }
+
     return true;
 }
+
 
 
 void GameClear::Update()
 {
     m_SpriteRender.Update();
-    m_RetryRender.Update();
 
     // ★ 入力持ち越し対策
     if (!m_canInput)
@@ -41,27 +44,40 @@ void GameClear::Update()
     }
 
 
-    // Retry
-    if (g_pad[0]->IsPress(enButtonA))
+    if (m_menu)
     {
-        if (Game* game = FindGO<Game>("game"))
+        switch (m_menu->GetResult())
         {
-            game->ResetGame();
+        case ClearMenuResult::Retry:
+            Game::SetPrevState(GameState::GameClear);
+            FindGO<Game>("game")->ResetGame();
+
+            if (Game* game = FindGO<Game>("game"))
+            {
+               game->ResetGame(); 
+            }
+            DeleteGO(m_menu);
+            m_isDead = true;
+            m_menu = nullptr;
+            break;
+
+        case ClearMenuResult::BTitle:
+            Game::SetPrevState(GameState::GameClear);
+
+            if (Game* game = FindGO<Game>("game"))
+            {
+                game->RequestTitle(); 
+            }
+
+            DeleteGO(m_menu);
+            m_isDead = true;
+            m_menu = nullptr; 
+            break;
         }
-        DeleteGO(this);
-        return;
     }
 
-    
-    // タイトル
-    if (g_pad[0]->IsPress(enButtonB))
-    {
-        if (Game* game = FindGO<Game>("game"))
-        {
-            game->RequestTitle();
-        }
-        DeleteGO(this);
-    }
+
+   
 
 }
 
@@ -69,7 +85,5 @@ void GameClear::Update()
 void GameClear::Render(RenderContext& rc)
 {
     m_SpriteRender.Draw(rc);
-  
-    m_RetryRender.Draw(rc);
 
 }

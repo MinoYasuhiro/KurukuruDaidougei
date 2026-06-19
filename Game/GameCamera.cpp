@@ -1,12 +1,11 @@
 #include "stdafx.h"
 #include "GameCamera.h"
 #include "Player.h"
-
+#include <cmath>   // powf
 
 
 bool GameCamera::Start()
 {
-    // 通常は背後カメラから開始
     m_toCameraPos.Set(0.0f, 50.0f, -200.0f);
     m_player = FindGO<Player>("player");
 
@@ -17,16 +16,20 @@ bool GameCamera::Start()
     m_isZooming = false;
     m_zoomT = 0.0f;
 
-   
+    m_isTestZoom = false;
+    m_testZoomTimer = 0.0f;
 
     return true;
 }
 
 void GameCamera::Update()
 {
-    if (!UpdatePlayer()) return;
-
-    // ★ AfterMove 中だけテストズームを動かす
+    if (!UpdatePlayer())
+        return;
+    if (Game::GetPhase() == GamePhase::QTEMove)
+    {
+        UpdateQTECamera();
+    }
     if (Game::GetPhase() == GamePhase::AfterMove)
     {
         UpdateTestZoom();
@@ -37,52 +40,55 @@ void GameCamera::Update()
     ApplyCamera();
 }
 
-
 bool GameCamera::UpdatePlayer()
 {
-    if (m_player == nullptr)
+    if (!m_player)
     {
         m_player = FindGO<Player>("player");
-        if (m_player == nullptr)
-        return false;
+        if (!m_player)
+            return false;
     }
     return true;
 }
 
+/// <summary>
+/// カメラの位置をゲームのフェーズに応じて更新する関数。現在のフェーズが前回のフェーズと同じ場合や、
+/// ズーム中の場合は何もしません。フェーズがMovePhaseに変わった場合は、MoveCameraForMovePhase関数を呼び出して、
+/// 移動フェーズ用のカメラ位置にズームします。フェーズがAfterMoveに変わった場合は、m_isTestZoomをtrueにして、
+/// m_testZoomTimerを0.0fにリセットし、MoveCameraBehindPlayer関数を呼び出して、プレイヤーの背後にカメラを移動します。
+/// </summary>
 void GameCamera::UpdatePhase()
 {
     GamePhase phase = Game::GetPhase();
 
-    // ★ フェーズが変わった瞬間だけ反応
     if (phase == m_currentPhase || m_isZooming)
         return;
+
 
     m_currentPhase = phase;
 
     switch (phase)
     {
-       
     case GamePhase::MovePhase:
-        ///移動フェーズ：少し引いたカメラへズーム
         MoveCameraForMovePhase();
         break;
 
     case GamePhase::AfterMove:
-
-        // ★ テスト用：ここで開始
         m_isTestZoom = true;
         m_testZoomTimer = 0.0f;
-
-        ///移動後：プレイヤーの背後へ回り込む
-        MoveCameraBehindPlayer();
         break;
 
+    default:
+        break;
     }
 }
-
+/// <summary>
+/// カメラのズームの更新。ズーム中は、m_zoomFromOffsetからm_zoomToOffsetにイージングされた値でm_toCameraPosが更新されていきます。
+/// </summary>
 void GameCamera::UpdateZoom()
 {
-    if (!m_isZooming) return;
+    if (!m_isZooming)
+        return;
 
     m_zoomT += 0.04f;
     if (m_zoomT >= 1.0f)
@@ -91,49 +97,77 @@ void GameCamera::UpdateZoom()
         m_isZooming = false;
     }
 
-    float ease = EaseInOutCubic(m_zoomT);
-    m_toCameraPos = m_zoomFromOffset * (1.0f - ease) + m_zoomToOffset * ease;
-}
+    float ease;
 
+    if (m_useElastic)
+        ease = EaseOutElastic(m_zoomT);
+    else
+        ease = EaseInOutCubic(m_zoomT);
+    m_toCameraPos =
+        m_zoomFromOffset * (1.0f - ease) +
+        m_zoomToOffset * ease;
+    
+}
+/// <summary>
+/// カメラのズームインを開始する関数。m_zoomFromOffsetに現在のカメラオフセット、m_zoomToOffsetにズームイン後のカメラオフセットを設定し、m_isZoomingをtrueにして、m_zoomTを0.0fにリセットします。
+/// </summary>
 void GameCamera::ZoomIn()
 {
-    if (m_isZooming) return;  
+    if (m_isZooming)
+        return;
 
-    // 今の位置（遠い）から
     m_zoomFromOffset = m_toCameraPos;
-
-    // 寄せたい位置（近い）
     m_zoomToOffset = Vector3(0.0f, 50.0f, -200.0f);
 
     m_isZooming = true;
     m_zoomT = 0.0f;
 }
 
-/// <summary>
-/// カメラを引き寄せるテスト処理（機能するかの確認のため）
-/// </summary>
-void GameCamera::UpdateTestZoom()
+
+void GameCamera::UpdateQTECamera()
 {
-    if (!m_isTestZoom)
+    if (m_isZooming) return;
+
+    // QTE用の寄りカメラ
+    Vector3 targetOffset = Vector3(0.0f, 60.0f, -120.0f);
+
+    // すでにその位置なら何もしない
+
+    if ((m_toCameraPos - targetOffset).Length() < 1.0f)
         return;
 
-    // ズーム中は待つ
-    if (m_isZooming)
-        return;
 
-    // 秒数カウント（60fps前提）
-    m_testZoomTimer += 1.0f / 60.0f;
+    m_zoomFromOffset = m_toCameraPos;
+    m_zoomToOffset = targetOffset;
 
-    // 3秒経過したら寄せる
-    if (m_testZoomTimer >= 3.0f)
-    {
-        ZoomIn();            // ★ ここで寄せる
-        m_isTestZoom = false; // テスト終了
-    }
+    m_isZooming = true;
+    m_zoomT = 0.0f;
+
+    m_useElastic = true;
 }
 
+
+void GameCamera::UpdateTestZoom()
+{
+    if (!m_isTestZoom || m_isZooming)
+        return;
+
+    m_testZoomTimer += 1.0f / 60.0f;
+
+    if (m_testZoomTimer >= 3.0f)
+    {
+        ZoomIn();
+        m_isTestZoom = false;
+    }
+}
+/// <summary>
+/// カメラの位置とターゲットを更新して、カメラに反映させる関数。m_playerの位置をターゲットにして、m_toCameraPosのオフセットを加えた位置にカメラが配置されるようになっています。
+/// </summary>
 void GameCamera::ApplyCamera()
 {
+    if (!m_player)
+        return;
+
     Vector3 target = m_player->m_position;
     target.y += 80.0f;
 
@@ -142,8 +176,9 @@ void GameCamera::ApplyCamera()
     g_camera3D->Update();
 }
 
-// ===== フェーズ別カメラ動作 =====
-
+/// <summary>
+/// 通常時のカメラ位置から、移動フェーズのカメラ位置にズームするための関数。m_zoomFromOffsetに現在のカメラオフセット、m_zoomToOffsetに移動フェーズのカメラオフセットを設定し、m_isZoomingをtrueにして、m_zoomTを0.0fにリセットします。
+/// </summary>
 void GameCamera::MoveCameraForMovePhase()
 {
     m_zoomFromOffset = m_toCameraPos;
@@ -152,34 +187,30 @@ void GameCamera::MoveCameraForMovePhase()
     m_isZooming = true;
     m_zoomT = 0.0f;
 }
-
+/// <summary>
+/// カメラの位置をプレイヤーの背後に移動するための関数。m_zoomFromOffsetに現在のカメラオフセット、m_zoomToOffsetにプレイヤーの背後に配置されるカメラオフセットを設定し、m_isZoomingをtrueにして、m_zoomTを0.0fにリセットします。プレイヤーの背後に配置されるカメラオフセットは、現在のカメラオフセットを180度回転させた位置になります。
+/// </summary>
 void GameCamera::MoveCameraBehindPlayer()
 {
-
-    // 現在のオフセットを保存
     m_zoomFromOffset = m_toCameraPos;
 
-    // 今のカメラオフセット
+    m_useElastic = true;
+
     Vector3 to = m_toCameraPos;
 
-    // Y軸周りに180度回転（背後を向く）
     Quaternion qRot;
     qRot.SetRotationDeg(Vector3::AxisY, 180.0f);
     qRot.Apply(to);
-    g_camera3D->RotateOriginTarget(qRot);
 
-    // 高さはそのまま維持
     to.y = m_toCameraPos.y;
-
-    // 補間先として設定
     m_zoomToOffset = to;
 
     m_isZooming = true;
     m_zoomT = 0.0f;
-
-    return;
 }
-
+/// <summary>
+/// カメラの初期化を行う関数。m_toCameraPosを通常時のカメラオフセットにリセットし、m_currentPhaseをStartに設定し、ズーム関連のフラグとタイマーをリセットします。
+/// </summary>
 void GameCamera::Reset()
 {
     m_toCameraPos.Set(0.0f, 50.0f, -200.0f);
@@ -187,19 +218,31 @@ void GameCamera::Reset()
     m_isZooming = false;
     m_zoomT = 0.0f;
 
-
-    // ★ テスト用も初期化
     m_isTestZoom = false;
     m_testZoomTimer = 0.0f;
-
 }
-
-
+/// <summary>
+/// カメラのズームのイージング関数。0.0fから1.0fの範囲でtを渡すと、イージングされた値が返ってきます。
+/// </summary>
+/// <param name="t"></param>
+/// <returns></returns>
 float GameCamera::EaseInOutCubic(float t)
 {
     return (t < 0.5f)
         ? 4.0f * t * t * t
         : 1.0f - powf(-2.0f * t + 2.0f, 3.0f) * 0.5f;
-
 }
 
+/// <summary>
+/// QTE用のカメラ演出のイージングバネ移動
+/// </summary>
+/// <param name="t"></param>
+/// <returns></returns>
+float GameCamera::EaseOutElastic(float t)
+{
+    const float c4 = (2 * 3.14158f) / 3;
+
+    return t == 0 ? 0 :
+        t == 1 ? 1 :
+        powf(2, -6 * t) * sinf((t * 6 - 0.5f) * c4) + 1;
+}
