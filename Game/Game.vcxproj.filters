@@ -44,6 +44,8 @@
     <ClCompile Include="Operation.cpp" />
     <ClCompile Include="TitleMenu.cpp" />
     <ClCompile Include="Rule.cpp" />
+    <ClCompile Include="GameClearMenu.cpp" />
+    <ClCompile Include="GameOverMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -83,5 +85,7 @@
     <ClInclude Include="Operation.h" />
     <ClInclude Include="TitleMenu.h" />
     <ClInclude Include="Rule.h" />
+    <ClInclude Include="GameClearMenu.h" />
+    <ClInclude Include="GameOverMenu.h" />
   </ItemGroup>
 </Project>
