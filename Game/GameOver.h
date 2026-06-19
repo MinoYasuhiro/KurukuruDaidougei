@@ -1,6 +1,7 @@
 ﻿#pragma once
 class Title;
 class Game;
+class GameOverMenu;
 class Player;
 class GameOver : public IGameObject
 {
@@ -17,6 +18,7 @@ private:
 	SpriteRender m_RetryRender;
 	bool m_canInput = false;
 	Player* m_player = nullptr;
+	GameOverMenu* m_menu = nullptr;
 
 
 
