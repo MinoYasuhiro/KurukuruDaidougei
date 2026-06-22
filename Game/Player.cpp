@@ -79,10 +79,6 @@ bool Player::Start()
     m_umbrella = NewGO<Umbrella>(0);
 
 
-    // --- キャラクターコントローラーの初期化 ---
-    m_characterController.Init(10.0f, 50.0f, m_position);
-
-
     // --- 変数の初期化 ---
     number = 1;
     m_prevNumber = 1;
@@ -103,6 +99,11 @@ bool Player::Start()
     m_itemOnUmbrella = false;
     m_isRunSEPlaying = false;
 
+    // --- キャラクターコントローラーの初期化 ---
+    m_characterController.Init(10.0f, 50.0f, m_position);
+
+    m_startPos = m_position;
+
     return true;
 }
 
@@ -120,6 +121,8 @@ void Player::Reset()
 
     m_position = m_startPos;
     m_rotation = Quaternion::Identity;
+
+    m_characterController.SetPosition(m_position);
 
     m_NewModelRender.SetPosition(m_position);
     m_NewModelRender.SetRotation(m_rotation);
@@ -144,7 +147,7 @@ void Player::Reset()
 
 void Player::Update()
 {
-
+    if (Game::GetState() != GameState::Playing)return;
     // --- 必要なオブジェクトの取得 ---
     if (!m_game)
     {
