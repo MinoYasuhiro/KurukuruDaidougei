@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 #include "Math.h"
 #include "Game.h"
 
 class Player;
+class ItemSpawner;
 
 class GameCamera : public IGameObject
 {
@@ -33,6 +34,8 @@ private:
 	float m_testZoomTimer = 0.0f;
 	bool m_useElastic = false;
 	bool m_hasRotated = false;
+
+	ItemSpawner* m_spawner = nullptr;
 
 private:
 	bool UpdatePlayer();
