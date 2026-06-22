@@ -72,6 +72,10 @@ public:
 	//状態取得
 	BallState GetState()const { return m_state; }
 
+	QTEButton* GetButton()const { return m_qteButton; }
+
+	bool IsQTEActive()const { return m_state == BallState::Spinning && m_qteButton != nullptr; }
+
 private:
 
 	QTEButton* m_qteButton = nullptr;

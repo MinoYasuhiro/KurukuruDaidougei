@@ -622,7 +622,7 @@ void Item::StartQTE()
 	m_qteButton = NewGO<QTEButton>(0);
 
 	m_qteButton->StartQTE(m_myQTEPattern, 5.0f);
-	m_qteButton->SetPosition({ 0.0f, -150.0f, 0.0f });
+	m_qteButton->SetPosition({ 0.0f, -300.0f, 0.0f });
 
 	m_qteButton->Update();
 

@@ -99,7 +99,7 @@ public:
 
 private:
     // --- ゲームパラメータ定数 ---
-    static const int   k_spinCountToSuccess = 25;  // 傘回し成功に必要な回数
+    static const int   k_spinCountToSuccess = 2;  // 傘回し成功に必要な回数
     static const int   k_clearCountToWin = 5;   // クリアに必要な成功回数
     static const int   k_errorCountToGameOver = 3;   // ゲームオーバーになるミス数
     static const int   k_spinTimeLimitSec = 3;   // 傘回しの制限時間（秒）
