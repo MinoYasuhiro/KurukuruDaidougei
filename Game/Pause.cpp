@@ -48,6 +48,11 @@ void Pause::Update()
     {
         //タイトルに戻る
     case MenuResult::BackTitle:
+        if (Game* game = FindGO<Game>("game"))
+        {
+            game->RequestTitle();
+        }
+
         Game::SetState(GameState::Title);
         NewGO<Title>(0, "title");
         CleanupMenu();
