@@ -255,13 +255,6 @@ void Game::ResetGame()
         m_coinBox->Reset();
     }
 
-    // ★ 残っているオブジェクトを消す
-    /*if (m_item)
-    {
-        DeleteGO(m_item);
-        m_item = nullptr;
-    }*/
-
     m_phase = GamePhase::Start;
 
     m_requestStart = true;
@@ -618,7 +611,7 @@ void Game::RequestTitle()
     m_gameState = GameState::Title;
 
     // Title を前面に生成
-    NewGO<Title>(20, "title");
+    //NewGO<Title>(20, "title");
 
 }
 
