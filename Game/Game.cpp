@@ -585,6 +585,11 @@ void Game::RequestTitle()
     if (m_gameState == GameState::Title)
         return;
 
+    if (Player* player = FindGO<Player>("player"))
+    {
+        player->Reset();
+    }
+
     // ★ これが重要
     m_requestStart = false;
 
