@@ -133,13 +133,14 @@ private:
 	// ======================================
 	// ■ QTEフェーズ用
 	// ======================================
-	//QTE* m_qte = nullptr;
-	QTEButton* m_button;
-	float m_qteTimer = 0.0f;
-	const float m_qteLimitTime = 3.0f;
-	bool  m_qteStarted = false;
-	bool m_waitQTEResult = false;
-	bool m_qteResultSuccess = false;
+	QTEButton* m_button;				//現在表示中のQTEボタンUIへのポインタ
+	float m_qteTimer = 0.0f;			//QTE中の経過時間計測用
+	const float m_qteLimitTime = 3.0f;	//QTEの制限時間
+
+	bool  m_qteStarted = false;			//QTEが開始されたかどうか
+	bool m_waitQTEResult = false;		//QTE入力を受け付けて結果待ちの状態か
+	bool m_qteResultSuccess = false;	//QTEに成功したかどうか
+	bool m_isSuccessPending = false;	//成功演出を予約中か
 
 	//3カウント用
 	float m_countTimer = 0.0f;

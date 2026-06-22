@@ -7,33 +7,61 @@ QTEButton::QTEButton()
 }
 QTEButton::~QTEButton()
 {
-
+	for (auto sprite : m_buttonSprites)
+	{
+		delete sprite;
+	}
+	m_buttonSprites.clear();
 }
 
-bool QTEButton::Start()
+void QTEButton::StartQTE(const std::vector<ButtonType>& targetButtons, float limitTime)
 {
-	//各ボタンのスプライトを読み込み
-	m_AbuttonRender.Init("Assets/sprite/Abutton.dds", 200.0f, 200.0f);
-	m_BbuttonRender.Init("Assets/sprite/Bbutton.dds", 200.0f, 200.0f);
-	m_YbuttonRender.Init("Assets/sprite/Ybutton.dds", 200.0f, 200.0f);
-	m_XbuttonRender.Init("Assets/sprite/Xbutton.dds", 200.0f, 200.0f);
+	m_targetButtons = targetButtons;	//押すべきボタンを設定
+	m_limitTime = limitTime;			//制限時間を設定
+	m_timer = 0.0f;						//タイマー初期化
+	m_isFinished = false;				//QTE未終了
+	m_isSuccess = false;				//成功状態リセット
+	m_currentStep = 0;
 
-	return true;
-}
+	//同じボタンが連続しても正しく描画できるよう、ボタン数に応じてスプライトを動的に生成する
+	for (auto sprite : m_buttonSprites)
+	{
+		delete sprite;
+	}
+	m_buttonSprites.clear();
 
-void QTEButton::StartQTE(ButtonType target, float limitTime)
-{
-	m_targetButton = target;	//押すべきボタンを設定
-	m_limitTime = limitTime;	//制限時間を設定
-	m_timer = 0.0f;				//タイマー初期化
-	m_isFinished = false;		//QTE未終了
-	m_isSuccess = false;		//成功状態リセット
+	for (const auto& type : targetButtons)
+	{
+		SpriteRender* sprite = new SpriteRender();
+
+		const char* path = "";
+		switch (type)
+		{
+		case ButtonType::A:path = "Assets/sprite/Abutton.dds";
+			break;
+		case ButtonType::B:path = "Assets/sprite/Bbutton.dds";
+			break;
+		case ButtonType::X:path = "Assets/sprite/Xbutton.dds";
+			break;
+		case ButtonType::Y:path = "Assets/sprite/Ybutton.dds";
+			break;
+		}
+
+		sprite->Init(path, 150.0f, 150.0f);
+		m_buttonSprites.push_back(sprite);
+	}
 }
 
 void QTEButton::Update()
 {
 	//すでに終了しているなら何もしない
 	if (m_isFinished)return;
+
+	// クールタイムを減らす
+	if (m_inputCooldown > 0.0f)
+	{
+		m_inputCooldown -= g_gameTime->GetFrameDeltaTime();
+	}
 
 	//経過時間を加算
 	m_timer += g_gameTime->GetFrameDeltaTime();
@@ -46,11 +74,29 @@ void QTEButton::Update()
 		return;
 	}
 
-	Input();
-	m_AbuttonRender.Update();
-	m_BbuttonRender.Update();
-	m_YbuttonRender.Update();
-	m_XbuttonRender.Update();
+	// クールタイム中以外なら入力受付
+	if (m_inputCooldown <= 0.0f)
+	{
+		Input();
+	}
+
+	//画面中央からボタン数に応じて左右に並ぶよう座標を算出
+	const float buttonSpacing = 250.0f;
+	Vector3 drawPos = m_position;
+	drawPos.x -= (float)(m_targetButtons.size() - 1) * buttonSpacing / 2.0f;
+
+	for (int i = 0; i < (int)m_targetButtons.size(); ++i)
+	{
+		m_drawPositions[i] = drawPos;
+		m_drawPositions[i].x += i * buttonSpacing;
+	}
+
+	//次フレームの判定用に現在の入力状態を保存しておく
+	if (g_pad[0]->IsPress(enButtonA))m_lastPressedButton = ButtonType::A;
+	else if (g_pad[0]->IsPress(enButtonB))m_lastPressedButton = ButtonType::B;
+	else if (g_pad[0]->IsPress(enButtonX))m_lastPressedButton = ButtonType::X;
+	else if (g_pad[0]->IsPress(enButtonY))m_lastPressedButton = ButtonType::Y;
+	else m_lastPressedButton = ButtonType::None;
 }
 
 void QTEButton::Input()
@@ -61,29 +107,53 @@ void QTEButton::Input()
 	//何も押されていなければ処理しない
 	if (pressed == ButtonType::None)return;
 
-	//正しいボタンかどうか判定
-	m_isSuccess = (pressed == m_targetButton);
+	// ボタンが押されたらクールタイムをセット（連打防止）
+	m_inputCooldown = COOLDOWN_TIME;
 
-	//間違ったボタンを押した時点でQTE終了
-	m_isFinished = true;
+	//現在のステップの正解ボタンと比較
+	if (pressed == m_targetButtons[m_currentStep])
+	{
+		m_currentStep++;
+		//全てのボタンが正しく入力されたら成功
+		if (m_currentStep >= (int)m_targetButtons.size())
+		{
+			m_isSuccess = true;
+			m_isFinished = true;
+		}
+	}
+	else
+	{
+		//異なるボタンが押されたら即座に失敗
+		m_isSuccess = false;
+		m_isFinished = true;
+	}
 }
 
 ButtonType QTEButton::GetPressedButton()const
 {
-	if (g_pad[0]->IsTrigger(enButtonA))return
-		ButtonType::A;
-	if (g_pad[0]->IsTrigger(enButtonB))return
-		ButtonType::B;
-	if (g_pad[0]->IsTrigger(enButtonX))return
-		ButtonType::X;
-	if (g_pad[0]->IsTrigger(enButtonY))return
-		ButtonType::Y;
+	ButtonType currentPressed = ButtonType::None;
+	if (g_pad[0]->IsPress(enButtonA))currentPressed = ButtonType::A;
+
+	else if (g_pad[0]->IsPress(enButtonB))currentPressed = ButtonType::B;
+
+	else if (g_pad[0]->IsPress(enButtonX))currentPressed = ButtonType::X;
+
+	else if (g_pad[0]->IsPress(enButtonY))currentPressed = ButtonType::Y;
+
+	//今押されているかつ、前回は押されていなかったときのみ入力を許可する
+	//これにより長押しを無視し、1回押すたびに1入力としてカウントする
+	if (currentPressed != ButtonType::None && currentPressed != m_lastPressedButton)
+	{
+		return currentPressed;
+	}
 
 	return ButtonType::None;
 }
 
 void QTEButton::SetPosition(const Vector3& pos)
 {
+	m_position = pos;
+	// 個別のRenderへも反映
 	m_AbuttonRender.SetPosition(pos);
 	m_BbuttonRender.SetPosition(pos);
 	m_XbuttonRender.SetPosition(pos);
@@ -92,22 +162,15 @@ void QTEButton::SetPosition(const Vector3& pos)
 
 void QTEButton::Render(RenderContext& rc)
 {
-	//指定されたターゲットボタンのみ表示
-	switch (m_targetButton)
+	//未入力のボタンのみを順番に描画
+	if (m_isFinished) return;
+
+	for (int i = 0; i < (int)m_targetButtons.size(); ++i)
 	{
-	case ButtonType::A:
-		m_AbuttonRender.Draw(rc);
-		break;
-	case ButtonType::B:
-		m_BbuttonRender.Draw(rc);
-		break;
-	case ButtonType::Y:
-		m_YbuttonRender.Draw(rc);
-		break;
-	case ButtonType::X:
-		m_XbuttonRender.Draw(rc);
-		break;
-	default:
-		break;
+		if (i < m_currentStep) continue;
+
+		m_buttonSprites[i]->SetPosition(m_drawPositions[i]);
+		m_buttonSprites[i]->Update();
+		m_buttonSprites[i]->Draw(rc);
 	}
 }

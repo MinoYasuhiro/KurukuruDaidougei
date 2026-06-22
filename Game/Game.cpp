@@ -8,7 +8,6 @@
 #include "Pause.h" 
 #include "BGM.h"
 #include "BGMManager.h"
-#include "QTE.h"
 #include "QTEButton.h"
 #include <random>
 #include "Umbrella.h"
@@ -407,12 +406,11 @@ void Game::UpdatePlaying()
             }
             else
             {
-                assert(item != nullptr);
-                assert(_CrtIsValidPointer(item, sizeof(Item), TRUE));
+                //アイテムの種類に応じて次のフェーズを決定
+                //QTEが必要なアイテムならQTE専用フェーズへ、通常ならそのまま次の移動へ
                 if (item->IsQTEItem())
                 {
                     m_phase = GamePhase::QTEMove;
-                    m_qteTimer = 0.0f;
                 }
                 else
                 {
@@ -436,53 +434,20 @@ void Game::UpdatePlaying()
         break;
 
     case GamePhase::QTEMove:
-        //if (!m_qteStarted)
-        //{
-        //    m_button = NewGO<QTEButton>(0, "qteButton");
-        //    m_button->StartQTE(ButtonType::Y, 8.0f);
-        //    m_qteStarted = true;
-        //    
-        //}
-
-        //
-        //m_button->Update();
-
-        //if (m_button->IsFinished())
-        //{
-        //    m_qteResultSuccess = m_button->IsSuccess();
-        //    m_waitQTEResult = true;
-
-        //    if (m_button->IsSuccess())
-        //    {
-        //        // 成功処理
-        //        m_gameState = GameState::GameClear;
-        //        NewGO<GameClear>(10, "gameClear");
-        //    }
-        //    else
-        //    {
-        //        // 失敗処理
-        //        m_gameState = GameState::GameOver;
-        //        NewGO<GameOver>(10, "gameOver");
-        //    }
-        //        
-        //    m_phase = GamePhase::Start;
-
-        //    DeleteGO(m_button);
-        //    m_button = nullptr;
-        //    m_qteStarted = false;
-
-        //    return;
-        m_qteTimer += deltaTime;
-
-        if (m_qteTimer >= m_qteLimitTime)
+    {
+        //QTE実行中の結果待ち及び演出待機フェーズ
+        Item* item = m_spawner->GetCurrentItem();
+        //アイテムがSpinning(QTE中)でなくなった=結果が出た後の待機処理
+        if (item != nullptr && item->GetState() != BallState::Spinning)
         {
-            m_qteTimer = 0.0f;
-
-            RequestQTESuccess();
-
-            RequestMovePhase();
+            m_movePhaseTimer += deltaTime;
+            //結果表示後の演出時間を確保してから次の移動フェーズへ
+            if (m_movePhaseTimer >= 1.0f) {
+                RequestMovePhase();
+            }
         }
-        break;
+    }
+    break;
     }
 
     // ===== ここから追加（Game.cpp完結のGameOver判定）=====

@@ -5,12 +5,11 @@ class QTEButton :public IGameObject
 public:
 	QTEButton();
 	~QTEButton();
-	bool Start()override;
 	void Update()override;
 	void Render(RenderContext& renderContext)override;
 
 	//QTE開始
-	void StartQTE(ButtonType targetButton, float limitTime);
+	void StartQTE(const std::vector<ButtonType>& targetButtons, float limitTime);
 	//入力処理
 	void Input();
 
@@ -32,13 +31,22 @@ private:
 	float m_limitTime = 0.0f;	//制限時間
 	float m_timer = 0.0f;		//経過時間
 
-	ButtonType m_targetButton = ButtonType::None;//正解のボタン
+	std::vector<ButtonType> m_targetButtons;	//成功となるボタンのシーケンス
+	int m_currentStep = 0;						//現在の進行度(入力済みのボタンの数)
+	Vector3 m_drawPositions[10];				//各ボタンUIの画面上での描画座標
+	Vector3 m_position;							//QTEUI全体の基準位置
 
+	ButtonType m_lastPressedButton = ButtonType::None;	//長押しによる連続入力を防ぐための判定用変数
+
+	//同じボタンが複数並ぶ場合でも個別に座標管理するため、固定メンバではなく動的配列として保持する
+	std::vector<SpriteRender*>m_buttonSprites;
 	//各ボタンUI
 	SpriteRender m_AbuttonRender;
 	SpriteRender m_BbuttonRender;
 	SpriteRender m_YbuttonRender;
 	SpriteRender m_XbuttonRender;
 
+	float m_inputCooldown = 0.0f;		// クールタイム管理用
+	const float COOLDOWN_TIME = 0.2f;	// 0.2秒間は次の入力を受け付けない
 };
 
