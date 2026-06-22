@@ -5,11 +5,13 @@
 #include "Player.h"
 #include "Circle.h"
 #include "SEManager.h"
+#include "QTEButton.h"
 Item::Item()
 {
 	//起動時にポインタをnullptrで安全に初期化
 	m_modelRender = nullptr;
 	m_failureModelRender = nullptr;
+	m_qteButton = nullptr;
 }
 
 Item::~Item()
@@ -24,6 +26,11 @@ Item::~Item()
 	{
 		delete m_failureModelRender;
 		m_failureModelRender = nullptr;
+	}
+
+	if (m_qteButton)
+	{
+		DeleteGO(m_qteButton);
 	}
 }
 
@@ -81,9 +88,8 @@ void Item::Init(ItemType type)
 		delete m_failureModelRender;
 		m_failureModelRender = nullptr;
 	}
-	//if (m_isModelInited)return;
 
-	m_isModelInited = false;
+	m_isModelInited = true;
 	m_isFailureModelInited = false;
 
 	m_type = type;
@@ -110,6 +116,9 @@ void Item::Init(ItemType type)
 		m_hasFailureModel = true;
 		m_modelRender->Init("Assets/modelData/egg.tkm");
 		m_modelRender->SetScale({ 5.0f,5.0f,5.0f });
+
+		m_myQTEPattern = { ButtonType::A,ButtonType::B,ButtonType::X };
+
 		m_isModelInited = true;
 
 		m_failureModelRender = new ModelRender();
@@ -130,6 +139,9 @@ void Item::Init(ItemType type)
 		m_hasFailureModel = true;
 		m_modelRender->Init("Assets/modelData/Skeleton.tkm");
 		m_modelRender->SetScale({ 2.0f,2.0f,2.0f });
+
+		m_myQTEPattern = { ButtonType::B,ButtonType::B,ButtonType::A,ButtonType::Y };
+
 		m_isModelInited = true;
 
 		m_failureModelRender = new ModelRender();
@@ -165,6 +177,9 @@ void Item::Init(ItemType type)
 
 		m_modelRender->PlayAnimation(enPenguinAnimation_Run);
 		m_modelRender->SetScale({ 0.75f,0.75f,0.75f });
+
+		m_myQTEPattern = { ButtonType::X,ButtonType::A,ButtonType::X,ButtonType::X,ButtonType::Y,ButtonType::B };
+
 		m_isModelInited = true;
 		break;
 	case ItemType::phone:
@@ -195,6 +210,30 @@ void Item::Init(ItemType type)
 //更新処理
 void Item::Update()
 {
+	// QTEフェーズかつボタンが存在する場合
+	if (m_state == BallState::Spinning && m_qteButton != nullptr)
+	{
+		m_qteButton->Update(); // ここでカウントダウンと入力を更新
+
+		if (m_qteButton->IsFinished())
+		{
+			if (m_qteButton->IsSuccess()) {
+				m_state = BallState::SuccessThrow;
+				// Gameクラスに成功を通知
+				m_game->RequestQTESuccess();
+			}
+			else {
+				m_game->RequestFailureLetter();
+				SpinningFailed();
+			}
+
+			// ボタンを削除して無効化
+			DeleteGO(m_qteButton);
+			m_qteButton = nullptr;
+			return;
+		}
+	}
+
 	//無効状態なら何もしない
 	if (!m_isActive)return;
 
@@ -210,6 +249,12 @@ void Item::Update()
 	//ゲームがプレイ中じゃなければ停止
 	if (m_game->GetState() != GameState::Playing)return;
 
+	static BallState lastState = BallState::Idle;
+	if (m_state != lastState)
+	{
+		lastState = m_state;
+	}
+
 	switch (m_state)
 	{
 		//待機中は何もしない
@@ -224,8 +269,9 @@ void Item::Update()
 		OnUmbrella();
 		break;
 	case BallState::Spinning:
-		//QTE中
-		StartQTE();
+		if (m_qteButton == nullptr) {
+			StartQTE();
+		}
 		break;
 	case BallState::DropPrepare:
 		//傘の端へ移動して落とされる準備
@@ -271,6 +317,12 @@ void Item::ParabolicMotion()
 			//成功して飛んだあとの着地処理
 			if (m_state == BallState::SuccessThrow)
 			{
+				if (m_isQTEFinished)
+				{
+					m_game->RequestQTESuccess();
+					m_isQTEFinished = false; // フラグをリセット
+				}
+
 				m_position.y = 0.0f;			//地面に位置を固定
 
 				m_moveSpeed = Vector3::Zero;	//移動速度を完全に停止
@@ -395,7 +447,6 @@ void Item::FailFallMotion()
 			default:
 				break;
 			}
-			//SEManager::Play(SE_crackedEgg);
 			m_hasPlayedLandSE = true;
 		}
 
@@ -518,17 +569,20 @@ void Item::OnUmbrella()
 	//成功
 	if (m_player->m_playerState == 4 && m_state != BallState::SuccessThrow)
 	{
-		m_state = BallState::SuccessThrow;
+		// QTEありアイテムかどうかで状態を分ける
+		if (m_type == ItemType::egg || m_type == ItemType::skeleton || m_type == ItemType::penguin)
+		{
+			m_state = BallState::Spinning; // QTEへ移行
+		}
+		else
+		{
+			m_state = BallState::SuccessThrow; // 通常演出用のステート
+			m_game->RequestNormalSuccess();     // 通常演出の文字表示
+		}
+
 		m_isFlying = true;
 		m_isProcessed = true;
-
-		//前方斜め上に発射
-		m_moveSpeed = { 0.0f,10.0f,15.0f };
-
-		if (m_game)
-		{
-			m_game->RequestNormalSuccess();
-		}
+		m_moveSpeed = { 0.0f, 10.0f, 15.0f };
 		return;
 	}
 
@@ -543,7 +597,32 @@ void Item::OnUmbrella()
 //QTE開始処理
 void Item::StartQTE()
 {
+	if (m_qteButton != nullptr) return;
 
+	m_qteButton = NewGO<QTEButton>(0);
+
+	m_qteButton->StartQTE(m_myQTEPattern, 5.0f);
+	m_qteButton->SetPosition({ 0.0f, -150.0f, 0.0f });
+
+	m_qteButton->Update();
+
+	if (m_qteButton->IsFinished())
+	{
+		if (m_qteButton->IsSuccess())
+		{
+			m_state = BallState::SuccessThrow;
+			m_moveSpeed = { 0.0f, 10.0f, 15.0f }; // 成功時の発射
+
+			m_isQTEFinished = true;
+		}
+		else
+		{
+			m_game->RequestFailureLetter();
+			m_state = BallState::DropPrepare; // 失敗して落下
+		}
+		DeleteGO(m_qteButton);
+		m_qteButton = nullptr;
+	}
 }
 
 //傘回し失敗時の処理

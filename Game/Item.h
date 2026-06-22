@@ -1,10 +1,12 @@
 ﻿#pragma once
 #include "BallState.h"
+#include <vector>
+#include "ButtonType.h"
 
 class Game;
 class Player;
 class Circle;
-
+class QTEButton;
 
 enum ItemType
 {
@@ -72,6 +74,8 @@ public:
 
 private:
 
+	QTEButton* m_qteButton = nullptr;
+
 	//ペンギンのアニメーション
 	enum EnItemAnimation
 	{
@@ -103,11 +107,12 @@ private:
 	bool m_hasFailureModel = false;					//割れた状態用のモデルを持っているかどうか
 	bool m_isModelInited = false;					//通常モデルの初期化が完了しているかどうか
 	bool m_isFailureModelInited = false;			//割れモデルの初期化が完了しているかどうか
-	bool m_isDead = false;							//このアイテムが不要(削除対象)かどうか
 	bool m_isActive = true;							//更新・描画を行うかどうか(非アクティブなら停止)
 	float m_onUmbrellaTimer = 0.0f;					//傘の上にいる時間
 	float m_onUmbrellaLimitTimer = 2.0f;			//制限時間
 	float m_rotY = 0.0f;							//アイテム自体の回転角度(Y軸)
 	float m_shakeTimer = 0.0f;						//揺れを計算するためのタイマー
+	bool m_isQTEFinished = false;						//飛行中のアイテムがQTE成功によるものかどうかの判定用フラグ
+	std::vector<ButtonType>m_myQTEPattern;
 };
 
