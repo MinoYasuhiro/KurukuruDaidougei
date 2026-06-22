@@ -17,7 +17,7 @@ void SEManager::Init()
 	g_soundEngine->ResistWaveFileBank(SE_ball, "Assets/sound/ball.wav");
 	g_soundEngine->ResistWaveFileBank(SE_teaBowl, "Assets/sound/teaBowl.wav");
 	g_soundEngine->ResistWaveFileBank(SE_masu, "Assets/sound/masu.wav");
-	g_soundEngine->ResistWaveFileBank(SE_penguin, "Assets/sound/penguin.wav");
+	g_soundEngine->ResistWaveFileBank(SE_penguin, "Assets/sound/penguinLntimidation.wav");
 	g_soundEngine->ResistWaveFileBank(SE_bone, "Assets/sound/bone.wav");
 	g_soundEngine->ResistWaveFileBank(SE_spotlight, "Assets/sound/spotlight.wav");
 	g_soundEngine->ResistWaveFileBank(SE_cheers, "Assets/sound/cheers.wav");
@@ -27,7 +27,7 @@ void SEManager::Init()
 	g_soundEngine->ResistWaveFileBank(SE_smartphone, "Assets/sound/smartphone.wav");
 }
 
-void SEManager::Play(SE seID,bool loop)
+void SEManager::Play(SE seID, bool loop)
 {
 	SoundSource* se = nullptr;
 
