@@ -444,6 +444,26 @@ void Item::FailFallMotion()
 				SEManager::Play(SE_crackedEgg, false);
 				break;
 
+			case ItemType::box:
+				SEManager::Play(SE_masu, false);
+				break;
+
+			case ItemType::skeleton:
+				SEManager::Play(SE_bone, false);
+				break;
+
+			case ItemType::teaBowl:
+				SEManager::Play(SE_teaBowl, false);
+				break;
+
+			case ItemType::penguin:
+				SEManager::Play(SE_penguin, false);
+				break;
+
+			case ItemType::phone:
+				SEManager::Play(SE_smartphone, false);
+				break;
+
 			default:
 				break;
 			}
