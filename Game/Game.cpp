@@ -383,7 +383,7 @@ void Game::UpdatePlaying()
             }
         }
 
-        if (m_movePhaseTimer >= 15.0f)
+        if (m_movePhaseTimer >= 10.0f)
         {
             m_movePhaseTimer = 0.0f;
 
@@ -584,6 +584,11 @@ void Game::RequestTitle()
     // すでに Title なら何もしない
     if (m_gameState == GameState::Title)
         return;
+
+    if (Player* player = FindGO<Player>("player"))
+    {
+        player->Reset();
+    }
 
     // ★ これが重要
     m_requestStart = false;

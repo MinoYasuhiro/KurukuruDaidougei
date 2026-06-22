@@ -1,13 +1,17 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "GameCamera.h"
 #include "Player.h"
 #include <cmath>   // powf
+#include "Item.h"
+#include "ItemSpawner.h"
 
 
 bool GameCamera::Start()
 {
     m_toCameraPos.Set(0.0f, 50.0f, -200.0f);
     m_player = FindGO<Player>("player");
+
+    m_spawner = FindGO<ItemSpawner>("itemSpawner");
 
     g_camera3D->SetNear(1.0f);
     g_camera3D->SetFar(20000.0f);
@@ -26,10 +30,9 @@ void GameCamera::Update()
 {
     if (!UpdatePlayer())
         return;
-    if (Game::GetPhase() == GamePhase::QTEMove)
-    {
+
         UpdateQTECamera();
-    }
+
     if (Game::GetPhase() == GamePhase::AfterMove)
     {
         UpdateTestZoom();
@@ -126,24 +129,26 @@ void GameCamera::ZoomIn()
 
 void GameCamera::UpdateQTECamera()
 {
-    if (m_isZooming) return;
+    if (!m_spawner)return;
+
+    Item* item = m_spawner->GetCurrentItem();
+    if (!item)return;
+    
+    bool isQTEActive = item->IsQTEActive();
 
     // QTE用の寄りカメラ
-    Vector3 targetOffset = Vector3(0.0f, 60.0f, -120.0f);
+    Vector3 targetOffset = isQTEActive ? Vector3(0.0f, 80.0f, -150.0f): Vector3(0.0f, 100.0f, -250.0f);
 
-    // すでにその位置なら何もしない
+    if (!m_isZooming && (m_toCameraPos - targetOffset).Length() > 1.0f)
+    {
+        m_zoomFromOffset = m_toCameraPos;
+        m_zoomToOffset = targetOffset;
 
-    if ((m_toCameraPos - targetOffset).Length() < 1.0f)
-        return;
+        m_isZooming = true;
+        m_zoomT = 0.0f;
 
-
-    m_zoomFromOffset = m_toCameraPos;
-    m_zoomToOffset = targetOffset;
-
-    m_isZooming = true;
-    m_zoomT = 0.0f;
-
-    m_useElastic = true;
+        m_useElastic = isQTEActive;
+    }
 }
 
 
