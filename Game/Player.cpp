@@ -458,6 +458,10 @@ void Player::ManageState()
         if (!m_NewModelRender.IsPlayingAnimation())
         {
             m_playerState = enPlayerState_GameClear2;
+            if (Game* game = FindGO<Game>("game"))
+            {
+                game->RequestGameClear();
+            }
         }
         break;
 
@@ -466,6 +470,10 @@ void Player::ManageState()
         if (!m_NewModelRender.IsPlayingAnimation())
         {
             m_playerState = enPlayerState_GameOverRun;
+            if (Game* game = FindGO<Game>("game"))
+            {
+                game->RequestGameOver();
+            }
         }
         break;
 
