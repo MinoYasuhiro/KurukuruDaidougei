@@ -561,15 +561,15 @@ void Game::UpdatePlaying()
     }
 }
 
-//void Game::RequestGameClear()
-//{
-//    if (m_gameState != GameState::Playing)
-//        return;
-//
-//    m_gameState = GameState::GameClear;
-//    m_isGameClearShown = true;
-//    NewGO<GameClear>(10, "gameClear");
-//}
+void Game::RequestGameClear()
+{
+    if (m_gameState != GameState::Playing)
+        return;
+
+    m_gameState = GameState::GameClear;
+    m_isGameClearShown = true;
+    NewGO<GameClear>(10, "gameClear");
+}
 
 void Game::RequestTitle()
 {
@@ -611,7 +611,7 @@ void Game::RequestTitle()
     m_gameState = GameState::Title;
 
     // Title を前面に生成
-    //NewGO<Title>(20, "title");
+    NewGO<Title>(0, "title");
 
 }
 
