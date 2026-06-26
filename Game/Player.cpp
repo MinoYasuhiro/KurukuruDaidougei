@@ -366,6 +366,9 @@ void Player::Move()
     }
 
     m_position = m_characterController.Execute(m_moveSpeed, 1.0f / 60.0f);
+
+	LimitMoveArea();
+
     m_NewModelRender.SetPosition(m_position);
 }
 
@@ -832,4 +835,19 @@ void Player::Render(RenderContext& rc)
 {
     m_NewModelRender.Draw(rc);
     //m_font.Draw(rc);
+}
+
+void Player::LimitMoveArea()
+{
+    const float minX = -800.0f;
+    const float maxX = 800.0f;
+    const float minZ = -250.0f;
+    const float maxZ = 800.0f;
+
+    if (m_position.x < minX) m_position.x = minX;
+    if (m_position.x > maxX) m_position.x = maxX;
+    if (m_position.z < minZ) m_position.z = minZ;
+    if (m_position.z > maxZ) m_position.z = maxZ;
+
+    m_characterController.SetPosition(m_position);
 }
