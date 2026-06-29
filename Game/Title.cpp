@@ -6,6 +6,7 @@
 #include "TitleMenu.h"
 #include "Operation.h"
 #include "Rule.h"
+#include "Loading.h"
 
 namespace TITLE {
 
@@ -30,24 +31,18 @@ void Title::Update()
 
 	switch (m_titleMenu->GetResult())
 	{
-	    case MenuResult::GameStart:
-	    {
-			Game* game = FindGO<Game>("game");
-			if (game)
-			{
-				game->ResetGame();
-			}
-			else
-			{
-				game = NewGO<Game>(0, "game");
-				game->ResetGame();
-			}
-	       DeleteGO(m_titleMenu);
-	       m_titleMenu = nullptr;
+	     case MenuResult::GameStart:
+	     {
+		    NewGO<Loading>(0, "loading");
 
-		   DeleteGO(this);
-		   return;
-	    }
+
+		    DeleteGO(m_titleMenu);
+		    m_titleMenu = nullptr;
+
+		    DeleteGO(this);
+		    return;
+	     }
+	   
 
 	    case MenuResult::SoundOption:
 	    {
