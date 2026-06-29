@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "ButtonType.h"
+class QTETimerUI;
 class QTEButton :public IGameObject
 {
 public:
@@ -48,5 +49,7 @@ private:
 
 	float m_inputCooldown = 0.0f;		// クールタイム管理用
 	const float COOLDOWN_TIME = 0.2f;	// 0.2秒間は次の入力を受け付けない
+
+	QTETimerUI* m_qteTimerUI = nullptr;
 };
 

@@ -256,6 +256,7 @@
     <ClCompile Include="Pause.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="QTEButton.cpp" />
+    <ClCompile Include="QTETimerUI.cpp" />
     <ClCompile Include="Rule.cpp" />
     <ClCompile Include="SE.cpp" />
     <ClCompile Include="SEManager.cpp" />
@@ -305,6 +306,7 @@
     <ClInclude Include="Pause.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="QTEButton.h" />
+    <ClInclude Include="QTETimerUI.h" />
     <ClInclude Include="Rule.h" />
     <ClInclude Include="SE.h" />
     <ClInclude Include="SEManager.h" />
