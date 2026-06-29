@@ -46,6 +46,7 @@
     <ClCompile Include="Rule.cpp" />
     <ClCompile Include="GameClearMenu.cpp" />
     <ClCompile Include="GameOverMenu.cpp" />
+    <ClCompile Include="QTETimerUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -87,5 +88,6 @@
     <ClInclude Include="Rule.h" />
     <ClInclude Include="GameClearMenu.h" />
     <ClInclude Include="GameOverMenu.h" />
+    <ClInclude Include="QTETimerUI.h" />
   </ItemGroup>
 </Project>

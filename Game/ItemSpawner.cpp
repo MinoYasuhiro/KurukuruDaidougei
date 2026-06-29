@@ -86,6 +86,7 @@ void ItemSpawner::Reset()
 	if (m_currentItem)
 	{
 		m_currentItem->SetActive(false);
+		DeleteGO(m_pendingDeleteItem);
 		m_currentItem = nullptr;
 	}
 
@@ -93,6 +94,7 @@ void ItemSpawner::Reset()
 	if (m_pendingDeleteItem)
 	{
 		m_pendingDeleteItem->SetActive(false);
+		DeleteGO(m_pendingDeleteItem);
 		m_pendingDeleteItem = nullptr;
 	}
 }

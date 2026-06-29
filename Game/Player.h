@@ -27,6 +27,7 @@ public:
     void SpinCount();       // 傘回しの回転数保持
     void Reset();           // リセット処理
     void EndUmbrellaSpin(); // 傘回し終了処理
+	void LimitMoveArea();     // 移動範囲制限
 
     // --- Getter ---
     Vector3 GetPosition() const

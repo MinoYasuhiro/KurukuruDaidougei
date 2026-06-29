@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "QTEButton.h"
+#include "QTETimerUI.h"
+#include "Game.h"
 
 QTEButton::QTEButton()
 {
@@ -12,6 +14,12 @@ QTEButton::~QTEButton()
 		delete sprite;
 	}
 	m_buttonSprites.clear();
+
+	if (m_qteTimerUI != nullptr)
+	{
+		DeleteGO(m_qteTimerUI);
+		m_qteTimerUI = nullptr;
+	}
 }
 
 void QTEButton::StartQTE(const std::vector<ButtonType>& targetButtons, float limitTime)
@@ -50,12 +58,28 @@ void QTEButton::StartQTE(const std::vector<ButtonType>& targetButtons, float lim
 		sprite->Init(path, 150.0f, 150.0f);
 		m_buttonSprites.push_back(sprite);
 	}
+
+	m_qteTimerUI = NewGO<QTETimerUI>(0);
+
+	m_qteTimerUI->StartQTE(limitTime);
 }
 
 void QTEButton::Update()
 {
+	if (Game::GetState() != GameState::Playing)
+	{
+		if (g_pad[0]->IsPress(enButtonA))m_lastPressedButton = ButtonType::A;
+		else if (g_pad[0]->IsPress(enButtonB))m_lastPressedButton = ButtonType::B;
+		else if (g_pad[0]->IsPress(enButtonX))m_lastPressedButton = ButtonType::X;
+		else if (g_pad[0]->IsPress(enButtonY))m_lastPressedButton = ButtonType::Y;
+		else m_lastPressedButton = ButtonType::None;
+
+		return;
+	}
 	//すでに終了しているなら何もしない
 	if (m_isFinished)return;
+
+	//m_qteTimerUI->Update();
 
 	// クールタイムを減らす
 	if (m_inputCooldown > 0.0f)
@@ -66,11 +90,21 @@ void QTEButton::Update()
 	//経過時間を加算
 	m_timer += g_gameTime->GetFrameDeltaTime();
 
+	float rate = (m_limitTime - m_timer) / m_limitTime;
+
+	m_qteTimerUI->SetProgress(rate);
+
 	//制限時間を超えたら失敗
 	if (m_timer >= m_limitTime)
 	{
 		m_isSuccess = false;	//失敗
 		m_isFinished = true;	//終了
+
+		if (m_qteTimerUI != nullptr)
+		{
+			DeleteGO(m_qteTimerUI);
+			m_qteTimerUI = nullptr;
+		}
 		return;
 	}
 
@@ -119,6 +153,12 @@ void QTEButton::Input()
 		{
 			m_isSuccess = true;
 			m_isFinished = true;
+
+			if (m_qteTimerUI != nullptr)
+			{
+				DeleteGO(m_qteTimerUI);
+				m_qteTimerUI = nullptr;
+			}
 		}
 	}
 	else
@@ -126,6 +166,12 @@ void QTEButton::Input()
 		//異なるボタンが押されたら即座に失敗
 		m_isSuccess = false;
 		m_isFinished = true;
+
+		if (m_qteTimerUI != nullptr)
+		{
+			DeleteGO(m_qteTimerUI);
+			m_qteTimerUI = nullptr;
+		}
 	}
 }
 
