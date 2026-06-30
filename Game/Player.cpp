@@ -83,7 +83,7 @@ bool Player::Start()
     number = 1;
     m_prevNumber = 1;
     m_prevPlayerState = -1;
-    m_playerState = 0;
+    m_playerState = enPlayerState_StartWait;
     m_finishRot.SetRotationY(Math::DegToRad(-90.0f));
 
 
@@ -103,6 +103,10 @@ bool Player::Start()
     m_characterController.Init(10.0f, 50.0f, m_position);
 
     m_startPos = m_position;
+
+    m_rotation.SetRotationY(Math::DegToRad(180.0f));
+    m_NewModelRender.SetRotation(m_rotation);
+    m_NewModelRender.Update();
 
     return true;
 }
@@ -172,11 +176,19 @@ void Player::Update()
 
 
     // --- ゲーム開始タイマー（一定時間後に操作可能になる）---
-    m_gameStartTimer += 1.0f / 60.0f;
-
-    if (m_gameStartTimer >= k_gameStartDelay)
+    if (!m_canPlayerMove)
     {
-        m_canPlayerMove = true;
+        m_gameStartTimer += 1.0f / 60.0f;
+
+        if (m_gameStartTimer >= k_gameStartDelay)
+        {
+            m_canPlayerMove = true;
+            m_playerState = enPlayerState_Idle;
+        }
+    }
+    else
+    {
+        //何もしない。
     }
 
 
@@ -207,8 +219,7 @@ void Player::Update()
     }
     else
     {
-        // 開始前は待機状態
-        m_playerState = enPlayerState_Idle;
+        //何もしない。
     }
 
 
@@ -511,7 +522,7 @@ void Player::PlayerAction()
     {
         // 正面向き処理
         Quaternion targetRot;
-        targetRot.SetRotationY(0.0f);
+        targetRot.SetRotationY(135.0f);
 
         Quaternion rot;
         rot.Slerp(0.08f, m_rotation, targetRot);
@@ -722,6 +733,10 @@ void Player::PlayAnimation2()
         // 完全停止のアニメーション
         m_NewModelRender.PlayAnimation(enPlayerAnimationState_Idle);
         break;
+
+    case enPlayerState_StartWait:
+        //ゲーム開始待機のアニメーション
+        m_NewModelRender.PlayAnimation(enPlayerAnimationState_GameClear2);
     }
 }
 

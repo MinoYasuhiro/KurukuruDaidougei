@@ -66,6 +66,7 @@ public:
         enPlayerState_GameClear2 = 8,   // ゲームクリア2
         enPlayerState_GameOver = 9,   // ゲームオーバー
         enPlayerState_GameOverRun = 10,  // ゲームオーバー後の走り
+        enPlayerState_StartWait = 11, //ゲーム開始待機
         enPlayerState_Stop = 30,  // 完全停止
     };
 
