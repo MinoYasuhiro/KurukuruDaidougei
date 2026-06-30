@@ -72,6 +72,18 @@ bool Game::Start()
 
     m_successLetter.Init("Assets/sprite/Success.dds", 500.0f, 300.0f);
 
+    m_AudienceSpriteRender.Init("Assets/modelData/kyaku.DDS", 1920.0f, 700.0f);
+    m_AudienceSpriteRender1.Init("Assets/modelData/kyaku.sippai.DDS", 1920.0f, 700.0f);
+    m_AudienceSpriteRender2.Init("Assets/modelData/kyaku.seikou.DDS", 1920.0f, 700.0f);
+
+    m_AudienceSpriteRender.SetPosition({ 0.0f, -300.0f, 0.0f });
+    m_AudienceSpriteRender1.SetPosition({ 0.0f, -300.0f, 0.0f });
+    m_AudienceSpriteRender2.SetPosition({ 0.0f, -300.0f, 0.0f });
+
+    m_AudienceSpriteRender.Update();
+    m_AudienceSpriteRender1.Update();
+    m_AudienceSpriteRender2.Update();
+
     m_count1.Init("Assets/sprite/count1.dds",125.0f,125.0f);
     m_count2.Init("Assets/sprite/count2.dds",125.0f,125.0f);
     m_count3.Init("Assets/sprite/count3.dds",125.0f,125.0f);
@@ -102,6 +114,8 @@ bool Game::Start()
     m_BGM->Play(BGM_NormalUmbrella);
 
     m_coinBox = NewGO<CoinBox>(0, "coinBox");
+    
+    m_player = FindGO<Player>("player");
 
     return true;
 }
@@ -154,6 +168,33 @@ void Game::Update()
     m_count2.Update();
     m_count3.Update();
     m_countDown.Update();
+
+    switch (m_player->m_playerState)
+    {
+    case 0:
+    case 2:
+    case 3:
+        AudienceImage = 0;
+        break;
+    case 1:
+    case 5:
+    case 9:
+    case 10:
+    case 30:
+        AudienceImage = 1;
+        break;
+    case 4:
+    case 6:
+    case 7:
+    case 8:
+        AudienceImage = 2;
+        break;
+
+    default:
+        AudienceImage = 0;
+        break;
+
+    }
 }
 
 GamePhase Game::GetPhase()
@@ -728,5 +769,18 @@ void Game::Render(RenderContext& rc)
         {
             m_count1.Draw(rc);
         }
+    }
+
+    switch (AudienceImage)
+    {
+    case 0:
+        m_AudienceSpriteRender.Draw(rc);
+        break;
+    case 1:
+        m_AudienceSpriteRender1.Draw(rc);
+        break;
+    case 2:
+        m_AudienceSpriteRender2.Draw(rc);
+        break;
     }
 }

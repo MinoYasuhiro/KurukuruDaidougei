@@ -93,6 +93,9 @@ private:
 	SpriteRender m_count2;
 	SpriteRender m_count3;
 	SpriteRender m_countDown;
+	SpriteRender m_AudienceSpriteRender;
+	SpriteRender m_AudienceSpriteRender1;
+	SpriteRender m_AudienceSpriteRender2;
 	SkyCube* m_skyCube;
 	GameCamera* m_gameCamera;
 	CoinEffect* m_coin = nullptr;
@@ -125,6 +128,7 @@ private:
 	Vector3 m_prevPos = Vector3::Zero;
 	float   m_idleTimer = 0.0f;
 	const float m_idleLimitTime = 8.0f; // 何秒でGameOverにするか
+	int AudienceImage;
 	int m_phaseStep = 0;
 	// 0: 通常傘回し
 	// 1: 特殊傘回し
