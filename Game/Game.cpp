@@ -575,7 +575,7 @@ void Game::UpdatePlaying()
     if (m_showFailure)
     {
         m_failureTimer += 1.0f / 60.0f;
-        if (m_failureTimer >= 2.0f)
+        if (m_failureTimer >= 4.0f)
         {
             m_showFailure = false;
         }
@@ -584,7 +584,7 @@ void Game::UpdatePlaying()
     if (m_showSuccess)
     {
         m_successTimer += 1.0f / 60.0f;
-        if (m_successTimer >= 2.0f)
+        if (m_successTimer >= 4.0f)
         {
             m_showSuccess = false;
         }
@@ -592,7 +592,7 @@ void Game::UpdatePlaying()
 
     if (m_showSuccess || m_showFailure)
     {
-        if ((m_showSuccess && m_successTimer >= 2.0f) || (m_showFailure && m_failureTimer >= 2.0f))
+        if ((m_showSuccess && m_successTimer >= 4.0f) || (m_showFailure && m_failureTimer >= 4.0f))
         {
             m_showSuccess = false;
             m_showFailure = false;
