@@ -8,13 +8,20 @@
 
 bool GameCamera::Start()
 {
+
+    m_normalCameraPos =
+    {
+        0.0f,
+        250.0f,
+        -600.0f
+    };
+
     m_toCameraPos.Set(0.0f, 50.0f, -200.0f);
     m_player = FindGO<Player>("player");
-
     m_spawner = FindGO<ItemSpawner>("itemSpawner");
 
-    g_camera3D->SetNear(1.0f);
-    g_camera3D->SetFar(20000.0f);
+    ::g_camera3D->SetNear(1.0f);
+    ::g_camera3D->SetFar(20000.0f);
 
     m_currentPhase = GamePhase::Start;
     m_isZooming = false;
@@ -23,34 +30,36 @@ bool GameCamera::Start()
     m_isTestZoom = false;
     m_testZoomTimer = 0.0f;
 
+    m_currentCameraPos = m_normalCameraPos;
     return true;
 }
+
 
 void GameCamera::Update()
 {
     if (!UpdatePlayer())
         return;
-
-        UpdateQTECamera();
-
-    if (Game::GetPhase() == GamePhase::AfterMove)
-    {
-        UpdateTestZoom();
-    }
-
+  
+    UpdateQTECamera();
+   
     UpdatePhase();
     UpdateZoom();
     ApplyCamera();
 }
+
 
 bool GameCamera::UpdatePlayer()
 {
     if (!m_player)
     {
         m_player = FindGO<Player>("player");
+
         if (!m_player)
+        {
             return false;
+        }
     }
+
     return true;
 }
 
@@ -64,68 +73,170 @@ void GameCamera::UpdatePhase()
 {
     GamePhase phase = Game::GetPhase();
 
-    if (phase == m_currentPhase || m_isZooming)
+    if (phase == m_currentPhase)
+    {
         return;
-
+    }
 
     m_currentPhase = phase;
 
     switch (phase)
     {
     case GamePhase::MovePhase:
-        MoveCameraForMovePhase();
+
+        // 移動フェーズ用カメラ
+        //MoveCameraForMovePhase();
         break;
 
     case GamePhase::AfterMove:
-        m_isTestZoom = true;
-        m_testZoomTimer = 0.0f;
+
+        m_zoomFromOffset = m_toCameraPos;
+
+        m_zoomToOffset =
+        {
+            0.0f,
+            150.0f,
+            -200.0f
+        };
+
+        m_useElastic = false;
+
+        m_isZooming = true;
+        m_zoomT = 0.0f;
+
+        break;
+
+    case GamePhase::QTEMove:
+
         break;
 
     default:
         break;
     }
 }
+
+
 /// <summary>
-/// カメラのズームの更新。ズーム中は、m_zoomFromOffsetからm_zoomToOffsetにイージングされた値でm_toCameraPosが更新されていきます。
+/// 移動中はカメラを固定し、傘回し開始時にズームする処理
+/// </summary>
+/// 
+void GameCamera::ApplyCamera()
+{
+    // 固定カメラにする条件
+
+    bool isFixedCamera =
+        (
+            Game::GetPhase() == GamePhase::MovePhase ||
+            Game::GetPhase() == GamePhase::AfterMove ||
+            Game::GetPhase() == GamePhase::SpecialMove||
+            Game::GetPhase() == GamePhase::QTEMove
+            )
+        &&
+        !m_player->m_itemOnUmbrella;
+
+ 
+
+    if (isFixedCamera)
+    {
+       
+        Vector3 fixedTarget =
+        {
+            0.0f,
+            80.0f,
+            300.0f
+        };
+
+        ::g_camera3D->SetTarget(fixedTarget);
+        ::g_camera3D->SetPosition(m_normalCameraPos);
+
+        m_currentCameraPos = m_normalCameraPos;
+
+        ::g_camera3D->Update();
+        return;
+    }
+
+    // ===== 傘回し中 =====
+
+    Vector3 playerPos = m_player->GetPosition();
+
+    Vector3 target = playerPos;
+    target.y += 80.0f;
+
+    ::g_camera3D->SetTarget(target);
+
+    Vector3 targetPos = m_normalCameraPos;
+
+    if (m_player->m_itemOnUmbrella)
+    {
+        targetPos =
+        {
+            playerPos.x + m_toCameraPos.x,
+            playerPos.y + m_toCameraPos.y,
+            playerPos.z + m_toCameraPos.z
+        };
+    }
+
+   
+    if (Game::GetPhase() == GamePhase::QTEMove)
+    {
+        m_currentCameraPos = targetPos;
+    }
+    else
+    {
+        m_currentCameraPos +=
+            (targetPos - m_currentCameraPos) * 0.08f;
+    }
+
+ 
+
+    ::g_camera3D->SetPosition(m_currentCameraPos);
+    ::g_camera3D->Update();
+}
+
+/// <summary>
+/// カメラのズームを更新する関数。ズーム中でない場合は何もしません。ズーム中の場合、m_zoomTを0.04f増加させ、1.0f以上になった場合は1.0fに固定し、ズーム中フラグをfalseにします。その後、イージング関数を使用して、m_toCameraPosをm_zoomFromOffsetとm_zoomToOffsetの間で補間します。
 /// </summary>
 void GameCamera::UpdateZoom()
 {
+
     if (!m_isZooming)
+    {
         return;
+    }
+
+
 
     m_zoomT += 0.04f;
+
     if (m_zoomT >= 1.0f)
     {
         m_zoomT = 1.0f;
         m_isZooming = false;
     }
 
-    float ease;
+    float ease = 0.0f;
 
     if (m_useElastic)
+    {
         ease = EaseOutElastic(m_zoomT);
+    }
     else
+    {
         ease = EaseInOutCubic(m_zoomT);
+    }
+
+
     m_toCameraPos =
         m_zoomFromOffset * (1.0f - ease) +
         m_zoomToOffset * ease;
-    
+
 }
+
 /// <summary>
-/// カメラのズームインを開始する関数。m_zoomFromOffsetに現在のカメラオフセット、m_zoomToOffsetにズームイン後のカメラオフセットを設定し、m_isZoomingをtrueにして、m_zoomTを0.0fにリセットします。
+/// QTE用のカメラ演出を更新する関数。ズーム中でない場合、QTE用の寄りカメラのオフセットを設定し、
+/// m_toCameraPosがすでにその位置にある場合は何もしません。
 /// </summary>
-void GameCamera::ZoomIn()
-{
-    if (m_isZooming)
-        return;
-
-    m_zoomFromOffset = m_toCameraPos;
-    m_zoomToOffset = Vector3(0.0f, 50.0f, -200.0f);
-
-    m_isZooming = true;
-    m_zoomT = 0.0f;
-}
-
+/// void GameCamera::UpdateQTECamera()
 
 void GameCamera::UpdateQTECamera()
 {
@@ -133,92 +244,35 @@ void GameCamera::UpdateQTECamera()
 
     Item* item = m_spawner->GetCurrentItem();
     if (!item)return;
-    
+
     bool isQTEActive = item->IsQTEActive();
 
     // QTE用の寄りカメラ
-    Vector3 targetOffset = isQTEActive ? Vector3(0.0f, 80.0f, -150.0f): Vector3(0.0f, 100.0f, -250.0f);
+    Vector3 targetOffset = isQTEActive ? Vector3(0.0f, 80.0f, -150.0f) : Vector3(0.0f, 150.0f, -250.0f);
 
     if (!m_isZooming && (m_toCameraPos - targetOffset).Length() > 1.0f)
     {
         m_zoomFromOffset = m_toCameraPos;
         m_zoomToOffset = targetOffset;
 
+
         m_isZooming = true;
         m_zoomT = 0.0f;
 
-        m_useElastic = isQTEActive;
+       m_useElastic = isQTEActive;
+
+       
+
     }
 }
 
 
-void GameCamera::UpdateTestZoom()
-{
-    if (!m_isTestZoom || m_isZooming)
-        return;
-
-    m_testZoomTimer += 1.0f / 60.0f;
-
-    if (m_testZoomTimer >= 3.0f)
-    {
-        ZoomIn();
-        m_isTestZoom = false;
-    }
-}
-/// <summary>
-/// カメラの位置とターゲットを更新して、カメラに反映させる関数。m_playerの位置をターゲットにして、m_toCameraPosのオフセットを加えた位置にカメラが配置されるようになっています。
-/// </summary>
-void GameCamera::ApplyCamera()
-{
-    if (!m_player)
-        return;
-
-    Vector3 target = m_player->m_position;
-    target.y += 80.0f;
-
-    g_camera3D->SetTarget(target);
-    g_camera3D->SetPosition(target + m_toCameraPos);
-    g_camera3D->Update();
-}
-
-/// <summary>
-/// 通常時のカメラ位置から、移動フェーズのカメラ位置にズームするための関数。m_zoomFromOffsetに現在のカメラオフセット、m_zoomToOffsetに移動フェーズのカメラオフセットを設定し、m_isZoomingをtrueにして、m_zoomTを0.0fにリセットします。
-/// </summary>
-void GameCamera::MoveCameraForMovePhase()
-{
-    m_zoomFromOffset = m_toCameraPos;
-    m_zoomToOffset = Vector3(0.0f, 100.0f, -250.0f);
-
-    m_isZooming = true;
-    m_zoomT = 0.0f;
-}
-/// <summary>
-/// カメラの位置をプレイヤーの背後に移動するための関数。m_zoomFromOffsetに現在のカメラオフセット、m_zoomToOffsetにプレイヤーの背後に配置されるカメラオフセットを設定し、m_isZoomingをtrueにして、m_zoomTを0.0fにリセットします。プレイヤーの背後に配置されるカメラオフセットは、現在のカメラオフセットを180度回転させた位置になります。
-/// </summary>
-void GameCamera::MoveCameraBehindPlayer()
-{
-    m_zoomFromOffset = m_toCameraPos;
-
-    m_useElastic = true;
-
-    Vector3 to = m_toCameraPos;
-
-    Quaternion qRot;
-    qRot.SetRotationDeg(Vector3::AxisY, 180.0f);
-    qRot.Apply(to);
-
-    to.y = m_toCameraPos.y;
-    m_zoomToOffset = to;
-
-    m_isZooming = true;
-    m_zoomT = 0.0f;
-}
 /// <summary>
 /// カメラの初期化を行う関数。m_toCameraPosを通常時のカメラオフセットにリセットし、m_currentPhaseをStartに設定し、ズーム関連のフラグとタイマーをリセットします。
 /// </summary>
 void GameCamera::Reset()
 {
-    m_toCameraPos.Set(0.0f, 50.0f, -200.0f);
+    m_toCameraPos.Set(0.0f, 150.0f, -200.0f);
     m_currentPhase = GamePhase::Start;
     m_isZooming = false;
     m_zoomT = 0.0f;

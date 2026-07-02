@@ -13,16 +13,16 @@ public:
 
 	bool Start() override;
 	void Update() override;
-	void UpdateTestZoom();
+	//void UpdateTestZoom();
 	void UpdateQTECamera();
-	void MoveCameraForMovePhase();
-	void MoveCameraBehindPlayer();
+	//void MoveCameraForMovePhase();
+	//void MoveCameraBehindPlayer();
 	void Reset();
 
 private:
 	Player* m_player = nullptr;
 	Vector3 m_toCameraPos = Vector3::Zero;
-
+	Vector3 m_qteCameraBasePos;
 	GamePhase m_currentPhase;
 
 	bool    m_isZooming = false;
@@ -30,11 +30,34 @@ private:
 	Vector3 m_zoomFromOffset;
 	Vector3 m_zoomToOffset;
 
+	Vector3 m_normalCameraPos =
+	{
+
+		0.0f,
+		220.0f,
+		-600.0f
+	};
+
+	Vector3 m_closeCameraPos =
+	{
+		0.0f,
+		220.0f,
+		-180.0f
+	};
+
+	Vector3 m_currentCameraPos =
+	{
+		0.0f,
+		220.0f,
+		-300.0f
+	};
+
 	bool  m_isTestZoom = false;
 	float m_testZoomTimer = 0.0f;
 	bool m_useElastic = false;
 	bool m_hasRotated = false;
-
+	float m_startCameraTimer = 0.0f;
+	bool m_isStartCamera = true;
 	ItemSpawner* m_spawner = nullptr;
 
 private:
