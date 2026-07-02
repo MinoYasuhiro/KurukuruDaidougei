@@ -526,13 +526,13 @@ void Item::RandomSpawn()
 
 	//座標をランダム生成
 	std::uniform_real_distribution<float>distX(-700.0f, 700.0f);
-	std::uniform_real_distribution<float>distY(0.0f, 10.0f);
-	std::uniform_real_distribution<float>distZ(-400.0f, 200.0f);
+	//std::uniform_real_distribution<float>distY(0.0f, 10.0f);
+	//std::uniform_real_distribution<float>distZ(-400.0f, 200.0f);
 
 	//ランダムに生成した値をそれぞれの座標に代入
 	m_position.x = distX(mt);
-	m_position.y = distY(mt);
-	m_position.z = distZ(mt);
+	m_position.y = 10.0f;
+	m_position.z = -400.0f;
 }
 
 void Item::OnUmbrella()
@@ -772,7 +772,23 @@ void Item::PrepareParabola()
 	m_rotY = 0.0f;
 	m_shakeTimer = 0.0f;
 
-	m_plannedVelocity = Vector3(0.0f, 15.0f, 10.0f);
+	static std::random_device rd;
+	static std::mt19937 mt(rd());
+
+	std::uniform_real_distribution<float>targetDistZ(400.0f, 800.0f);
+	float targetZ = targetDistZ(mt);
+
+	float vy = 15.0f;
+	float g = m_gravity.y;
+
+	float discriminant = vy * -2.0f * g * m_position.y;
+	float t = (-vy - sqrtf(discriminant)) / g;
+
+	float vz = (targetZ - m_position.z) / t;
+
+	m_plannedVelocity = Vector3(0.0f, vy, vz);
+
+	//m_plannedVelocity = Vector3(0.0f, 15.0f, 10.0f);
 	m_isFlying = false;
 	m_state = BallState::Idle;
 
