@@ -217,6 +217,12 @@ void Item::Update()
 
 		if (m_qteButton->IsFinished())
 		{
+			// ★ここを追加
+			if (m_player)
+			{
+				m_player->GetUmbrella()->SetAutoSpin(false);
+			}
+
 			if (m_qteButton->IsSuccess()) {
 				m_state = BallState::SuccessThrow;
 				// Gameクラスに成功を通知
@@ -618,6 +624,13 @@ void Item::OnUmbrella()
 void Item::StartQTE()
 {
 	if (m_qteButton != nullptr) return;
+
+	// ★QTE中は傘を自動回転
+	if (m_player)
+	{
+		m_player->GetUmbrella()->SetAutoSpin(true);
+	}
+
 
 	m_qteButton = NewGO<QTEButton>(0);
 

@@ -35,6 +35,11 @@ public:
         return m_position;
     }
 
+    Umbrella* GetUmbrella() const
+    {
+        return m_umbrella;
+    }
+
     // --- アニメーション状態 ---
     enum EnPlayerAnimationState
     {

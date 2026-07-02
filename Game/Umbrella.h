@@ -26,6 +26,7 @@ public:
     void SetSpinSpeed(float speed);             // 傘の回転速度をセット
     void SetPosition(const Vector3& pos);       // 傘の座標をセット
     void SetRotation(const Quaternion& rot);    // 傘の回転をセット
+    void SetAutoSpin(bool flag);
 
     // --- モデル描画 ---
     ModelRender m_modelRender;
@@ -44,6 +45,7 @@ private:
     float m_rotationY = 0.0f;  // Y軸の累積回転角度
     float m_angleX = 0.0f;  // X軸の回転角度
     float m_angleY = 0.0f;  // Y軸の回転角度
+    bool m_isAutoSpin = false;
 
     // --- 傘ズレ関連（傘回し中にランダムに傾く処理）---
     float m_offsetAngleX = 0.0f;  // ランダムズレ角度X

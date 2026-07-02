@@ -65,8 +65,15 @@ void Umbrella::Update()
     const float deltaTime = 1.0f / 60.0f;
 
     // --- スピン速度の減衰 ---
-    m_spinSpeed *= 0.96f;
-    m_rotationY += m_spinSpeed;
+    if (m_isAutoSpin)
+    {
+        m_rotationY += 10.0f;      // 一定速度で回す
+    }
+    else
+    {
+        m_spinSpeed *= 0.96f;
+        m_rotationY += m_spinSpeed;
+    }
 
     // --- 右スティック入力の取得（傘回し中のみ使用）---
     float x = 0.0f;
@@ -209,4 +216,9 @@ void Umbrella::OnStartSpin()
     m_angleX = 0.0f;
     m_angleY = 0.0f;
     m_rotation = Quaternion::Identity;
+}
+
+void Umbrella::SetAutoSpin(bool flag)
+{
+    m_isAutoSpin = flag;
 }
