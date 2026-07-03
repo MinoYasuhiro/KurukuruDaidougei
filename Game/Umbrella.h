@@ -27,6 +27,10 @@ public:
     void SetPosition(const Vector3& pos);       // 傘の座標をセット
     void SetRotation(const Quaternion& rot);    // 傘の回転をセット
     void SetAutoSpin(bool flag);
+    void SetShakePower(float power)
+    {
+        m_shakePower = power;
+    }
 
     // --- モデル描画 ---
     ModelRender m_modelRender;
@@ -55,6 +59,7 @@ private:
     float m_offsetForceX = 0.0f;  // ランダム力X
     float m_offsetForceZ = 0.0f;  // ランダム力Z
     float m_offsetNoiseTimer = 0.0f;  // ランダム力の切り替えタイマー
+	float m_shakePower = 0.0f;  // 傘の揺れの強さ
 
     // --- その他 ---
     Vector3 m_respawnPosition;              // 初期配置座標

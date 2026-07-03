@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "Circle.h"
 #include "SEManager.h"
+#include "Umbrella.h"
 #include "QTEButton.h"
 Item::Item()
 {
@@ -55,6 +56,7 @@ bool Item::Start()
 
 	m_game = FindGO<Game>("game");
 	m_player = FindGO<Player>("player");
+	m_umbrella = FindGO<Umbrella>("umbrella");
 
 	if (m_game)
 	{
@@ -110,6 +112,14 @@ void Item::Init(ItemType type)
 		m_modelRender->Init("Assets/modelData/ball.tkm");
 		m_modelRender->SetScale({ 2.0f,2.0f,2.0f });
 		m_isModelInited = true;
+		if (!m_player) m_player = FindGO<Player>("player");
+		if (m_player) {
+			m_player->SetSpinCountSuccess(20);
+			if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
+			if (m_umbrella) {
+				m_umbrella->SetShakePower(0.4f);
+			}
+		}
 		break;
 	case ItemType::egg:
 		m_category = ItemCategory::QTE;
@@ -126,6 +136,14 @@ void Item::Init(ItemType type)
 		m_failureModelRender->Init("Assets/modelData/eggCracked.tkm");
 		m_failureModelRender->SetScale({ 5.0f,5.0f,5.0f });
 		m_isFailureModelInited = true;
+		if (!m_player) m_player = FindGO<Player>("player");
+		if (m_player) {
+			m_player->SetSpinCountSuccess(25);
+		}
+		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
+		if(m_umbrella) {
+			m_umbrella->SetShakePower(0.4f);
+		}
 		break;
 	case ItemType::box:
 		m_category = ItemCategory::Normal;
@@ -133,6 +151,14 @@ void Item::Init(ItemType type)
 		m_modelRender->Init("Assets/modelData/Lift.tkm");
 		m_modelRender->SetScale({ 0.75f,0.75f,0.75f });
 		m_isModelInited = true;
+		if (!m_player) m_player = FindGO<Player>("player");
+		if (m_player) {
+			m_player->SetSpinCountSuccess(29);
+		}
+		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
+		if (m_umbrella) {
+			m_umbrella->SetShakePower(0.5f);
+		}
 		break;
 	case ItemType::skeleton:
 		m_category = ItemCategory::QTE;
@@ -149,6 +175,14 @@ void Item::Init(ItemType type)
 		m_failureModelRender->Init("Assets/modelData/SkeletonBroken.tkm");
 		m_failureModelRender->SetScale({ 2.0f,2.0f,2.0f });
 		m_isFailureModelInited = true;
+		if (!m_player) m_player = FindGO<Player>("player");
+		if (m_player) {
+			m_player->SetSpinCountSuccess(33);
+		}
+		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
+		if (m_umbrella) {
+			m_umbrella->SetShakePower(0.5f);
+		}
 		break;
 	case ItemType::teaBowl:
 		m_category = ItemCategory::Normal;
@@ -162,6 +196,14 @@ void Item::Init(ItemType type)
 		m_failureModelRender->Init("Assets/modelData/TeaBowlBroken.tkm");
 		m_failureModelRender->SetScale({ 2.5f,2.5f,2.5f });
 		m_isFailureModelInited = true;
+		if (!m_player) m_player = FindGO<Player>("player");
+		if (m_player) {
+			m_player->SetSpinCountSuccess(36);
+		}
+		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
+		if (m_umbrella) {
+			m_umbrella->SetShakePower(0.6f);
+		}
 		break;
 	case ItemType::penguin:
 		m_category = ItemCategory::QTE;
@@ -181,6 +223,14 @@ void Item::Init(ItemType type)
 		m_myQTEPattern = { ButtonType::X,ButtonType::A,ButtonType::X,ButtonType::X,ButtonType::Y,ButtonType::B };
 
 		m_isModelInited = true;
+		if (!m_player) m_player = FindGO<Player>("player");
+		if (m_player) {
+			m_player->SetSpinCountSuccess(39);
+		}
+		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
+		if (m_umbrella) {
+			m_umbrella->SetShakePower(0.6f);
+		}
 		break;
 	case ItemType::phone:
 		m_category = ItemCategory::Normal;
@@ -194,6 +244,14 @@ void Item::Init(ItemType type)
 		m_failureModelRender->Init("Assets/modelData/PhoneBroken.tkm");
 		m_failureModelRender->SetScale({ 2.5f,2.5f,2.5f });
 		m_isFailureModelInited = true;
+		if (!m_player) m_player = FindGO<Player>("player");
+		if (m_player) {
+			m_player->SetSpinCountSuccess(42);
+		}
+		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
+		if (m_umbrella) {
+			m_umbrella->SetShakePower(0.7f);
+		}
 		break;
 	default:
 		m_category = ItemCategory::Normal;
