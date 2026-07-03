@@ -2,11 +2,13 @@
 #include "BallState.h"
 #include <vector>
 #include "ButtonType.h"
+#include "Umbrella.h"
 
 class Game;
 class Player;
 class Circle;
 class QTEButton;
+class Umbrella;
 
 enum ItemType
 {
@@ -93,6 +95,7 @@ private:
 	Game* m_game = nullptr;
 	Player* m_player = nullptr;
 	Circle* m_circle = nullptr;
+	Umbrella* m_umbrella = nullptr;
 
 	ItemType m_type = ItemType::ball;
 	ItemCategory m_category;

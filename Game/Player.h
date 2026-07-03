@@ -29,6 +29,12 @@ public:
     void EndUmbrellaSpin(); // 傘回し終了処理
 	void LimitMoveArea();     // 移動範囲制限
 
+	//--- Setter ---
+    void SetSpinCountSuccess(int count)
+    { 
+        m_spinCountSuccess = count;
+    }
+
     // --- Getter ---
     Vector3 GetPosition() const
     {
@@ -106,13 +112,13 @@ public:
 
 private:
     // --- ゲームパラメータ定数 ---
-    static const int   k_spinCountToSuccess = 25;  // 傘回し成功に必要な回数
-    static const int   k_clearCountToWin = 5;   // クリアに必要な成功回数
-    static const int   k_errorCountToGameOver = 3;   // ゲームオーバーになるミス数
-    static const int   k_spinTimeLimitSec = 3;   // 傘回しの制限時間（秒）
-    static const float k_spinTimeLimit;              // 傘回しの制限時間（float版、cppで定義）
-    static const float k_gameStartDelay;             // ゲーム開始までの待機時間（cppで定義）
-    static const float k_gameOverRunTime;            // ゲームオーバー後の走り時間（cppで定義）
+    static const int   CLEAR_COUNT_TO_WIN = 5;         // クリアに必要な成功回数
+    static const int   ERROR_COUNT_TO_GAME_OVER = 3;   // ゲームオーバーになるミス数
+    static const int   SPIN_TIME_LIMIT_SEC = 3;        // 傘回しの制限時間（秒）
+
+    static const float SPIN_TIME_LIMIT;                // 傘回しの制限時間（float版）
+    static const float GAME_START_DELAY;               // ゲーム開始までの待機時間
+    static const float GAME_OVER_RUN_TIME;             // ゲームオーバー後の走り時間
 
     // --- 関連オブジェクト ---
     Umbrella* m_umbrella = nullptr;
@@ -123,6 +129,7 @@ private:
     float m_spinSpeed = 0.0f;
     float m_spinTimer = 0.0f;
     int   m_spinCount = 0;    // 傘回しのカチカチ回数
+    int   m_spinCountSuccess = 0;  //傘回しに必要な回転数。
 
     // --- スティック入力（傘回し計算用）---
     Vector2 m_prevStick = Vector2(0, 0);  // CalcStickRotationSpeed用
