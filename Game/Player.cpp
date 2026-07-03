@@ -860,7 +860,7 @@ void Player::LimitMoveArea()
     const float minX = -800.0f;
     const float maxX = 800.0f;
     const float minZ = -250.0f;
-    const float maxZ = 850.0f;
+    const float maxZ = 1000.0f;
 
     if (m_position.x < minX) m_position.x = minX;
     if (m_position.x > maxX) m_position.x = maxX;
