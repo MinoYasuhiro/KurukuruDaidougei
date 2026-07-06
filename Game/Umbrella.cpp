@@ -101,8 +101,8 @@ void Umbrella::Update()
         }
 
         // ② ランダム力を速度に加算（ゆっくり加速させる）
-        m_offsetVelX += m_offsetForceX * deltaTime * 0.4f;
-        m_offsetVelZ += m_offsetForceZ * deltaTime * 0.4f;
+        m_offsetVelX += m_offsetForceX * deltaTime * m_shakePower;
+        m_offsetVelZ += m_offsetForceZ * deltaTime * m_shakePower;
 
         // ③ 速度を減衰（慣性を持たせてゆったり動かす）
         m_offsetVelX *= 0.97f;

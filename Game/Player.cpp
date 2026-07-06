@@ -20,9 +20,9 @@
 #include "Circle.h"
 
 // 傘回しゲームのパラメータ定数（Player.hのk_系と対応）
-const float Player::k_spinTimeLimit = 3.0f;   // 傘回しの制限時間
-const float Player::k_gameStartDelay = 3.0f;   // ゲーム開始までの待機時間
-const float Player::k_gameOverRunTime = 3.0f;  // ゲームオーバー後の走り時間
+const float Player::SPIN_TIME_LIMIT = 3.0f;
+const float Player::GAME_START_DELAY = 3.0f;
+const float Player::GAME_OVER_RUN_TIME = 3.0f;
 
 
 Player::Player()
@@ -147,6 +147,8 @@ void Player::Reset()
     m_isRunSEPlaying = false;
 
     m_gameOverRunTimer = 0.0f;
+
+    m_spinCountSuccess = 0;
 }
 
 void Player::Update()
@@ -180,7 +182,7 @@ void Player::Update()
     {
         m_gameStartTimer += 1.0f / 60.0f;
 
-        if (m_gameStartTimer >= k_gameStartDelay)
+        if (m_gameStartTimer >=GAME_START_DELAY)
         {
             m_canPlayerMove = true;
             m_playerState = enPlayerState_Idle;
@@ -407,14 +409,14 @@ void Player::ManageState()
     case enPlayerState_Idle: // 待機
     {
         // ★クリア判定
-        if (m_playerClear >= k_clearCountToWin)
+        if (m_playerClear >= CLEAR_COUNT_TO_WIN)
         {
             m_playerState = enPlayerState_GameClear1;
             return;
         }
 
         // ★ゲームオーバー判定
-        if (m_playerError >= k_errorCountToGameOver)
+        if (m_playerError >= ERROR_COUNT_TO_GAME_OVER)
         {
             m_playerState = enPlayerState_GameOver;
             return;
@@ -549,8 +551,8 @@ void Player::PlayerAction()
         // ★タイマー加算
         m_spinTimer += 1.0f / 60.0f;
 
-        // ★成功判定（25回）
-        if (m_spinCount >= k_spinCountToSuccess)
+        // ★成功判定　必要回転数はアイテムによって異なる。
+        if (m_spinCount >= m_spinCountSuccess)
         {
             m_playerState = enPlayerState_Success;
             m_playerClear++;
@@ -562,7 +564,7 @@ void Player::PlayerAction()
         }
 
         // ★失敗判定（3秒）
-        else if (m_spinTimer >= k_spinTimeLimit)
+        else if (m_spinTimer >= SPIN_TIME_LIMIT)
         {
             m_playerState = enPlayerState_Fail;
             m_playerError++;
@@ -608,7 +610,7 @@ void Player::PlayerAction()
         m_gameOverRunTimer += 1.0f / 60.0f;
 
         // 3秒後に待機へ
-        if (m_gameOverRunTimer >= k_gameOverRunTime)
+        if (m_gameOverRunTimer >= GAME_OVER_RUN_TIME)
         {
             m_playerError = 0;     // ←追加
             m_itemOnUmbrella = false; // ←追加
@@ -839,6 +841,7 @@ void Player::EndUmbrellaSpin()
     m_prevStick2 = Vector2::Zero;
 
     m_spinCount = 0;
+	m_spinCountSuccess = 0;
     m_spinTimer = 0.0f;
 
     m_umbrella->Reset();
@@ -857,7 +860,7 @@ void Player::LimitMoveArea()
     const float minX = -800.0f;
     const float maxX = 800.0f;
     const float minZ = -250.0f;
-    const float maxZ = 800.0f;
+    const float maxZ = 1000.0f;
 
     if (m_position.x < minX) m_position.x = minX;
     if (m_position.x > maxX) m_position.x = maxX;
