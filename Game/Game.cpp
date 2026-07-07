@@ -103,19 +103,24 @@ bool Game::Start()
     m_successTimer = 0.0f;
     m_showSuccess = false;
 
-    m_BGM = FindGO<BGMManager>("bgmManager");
+    //m_BGM = FindGO<BGMManager>("bgmManager");
 
     if (m_BGM == nullptr)
     {
         m_BGM = NewGO<BGMManager>(0, "bgmManager");
         m_BGM->Init();
     }
+    
+    else
+    {
+        m_BGM->Stop();
+    }
 
     m_BGM->Play(BGM_NormalUmbrella);
 
     m_coinBox = NewGO<CoinBox>(0, "coinBox");
     
-    m_player = FindGO<Player>("player");
+   // m_player = FindGO<Player>("player");
 
     return true;
 }
@@ -217,6 +222,7 @@ void Game::ResetGame()
 
     if (m_BGM != nullptr)
     {
+        m_BGM->Stop();
         m_BGM->Play(BGM_NormalUmbrella);
     }
 
@@ -317,6 +323,11 @@ void Game::UpdatePlaying()
     if (m_phase != GamePhase::QTEMove&& g_pad[0]->IsPress(enButtonStart) && m_gameState == GameState::Playing)
     {
         SEManager::StopLoop(SE_run);
+
+        if (m_showFailure || m_showSuccess)
+        {
+            return;
+        }
 
         NewGO<Pause>(1, "pause");
         m_gameState = GameState::Pause;
