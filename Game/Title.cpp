@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "SoundOption.h"
 #include "BGMManager.h"
+#include "BGM.h"
 #include "TitleMenu.h"
 #include "Operation.h"
 #include "Rule.h"
@@ -20,6 +21,16 @@ bool Title::Start()
 
 	m_titleMenu = NewGO<TitleMenu>(0, "titleMenu");
 
+	m_BGM = FindGO<BGMManager>("bgmManager");
+
+	if (m_BGM == nullptr)
+	{
+		m_BGM = NewGO <BGMManager>(0, "bgmManager");
+		m_BGM->Init();
+	}
+	
+	m_BGM->Play(BGM_Title);
+
 	return true;
 }
 
@@ -33,6 +44,11 @@ void Title::Update()
 	{
 	     case MenuResult::GameStart:
 	     {
+			 if (m_BGM)
+			 {
+				 m_BGM->Stop();
+			 }
+
 		    NewGO<Loading>(0, "loading");
 
 

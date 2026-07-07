@@ -16,6 +16,12 @@ void BGMManager::Init()
 
 void BGMManager::Play(BGM bgmID)
 {
+    //IDが一致しているなら再生しないようにする
+    if (m_currentBGMId == bgmID)
+    {
+        return;
+    }
+
     Stop();
 
     m_currentBGM = NewGO<SoundSource>(0);
@@ -24,15 +30,21 @@ void BGMManager::Play(BGM bgmID)
     m_currentBGM->SetVolume(SoundSettings::Master * SoundSettings::BGM);
 
     m_currentBGM->Play(true); // ループ
+
+    //再生中のBGMIDを保持
+    m_currentBGMId = bgmID;
 }
 
 void BGMManager::Stop()
 {
     if (m_currentBGM)
     {
+        m_currentBGM->Stop();
         DeleteGO(m_currentBGM);
         m_currentBGM = nullptr;
     }
+    //BGMが完全に止まったのでIDリセット
+    m_currentBGMId = -1;
 }
 
 void BGMManager::ApplyVolume()

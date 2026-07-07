@@ -25,6 +25,7 @@ void SEManager::Init()
 	g_soundEngine->ResistWaveFileBank(SE_booing, "Assets/sound/booing.wav");
 	g_soundEngine->ResistWaveFileBank(SE_hitHead, "Assets/sound/hitHead.wav");
 	g_soundEngine->ResistWaveFileBank(SE_smartphone, "Assets/sound/smartphone.wav");
+	g_soundEngine->ResistWaveFileBank(SE_buttonInputSuccess, "Assets/sound/QTEButton.wav");
 }
 
 void SEManager::Play(SE seID, bool loop)
