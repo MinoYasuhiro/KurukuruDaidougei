@@ -2,6 +2,7 @@
 #include "QTEButton.h"
 #include "QTETimerUI.h"
 #include "Game.h"
+#include "SEManager.h"
 
 QTEButton::QTEButton()
 {
@@ -148,6 +149,9 @@ void QTEButton::Input()
 	if (pressed == m_targetButtons[m_currentStep])
 	{
 		m_currentStep++;
+
+		SEManager::Play(SE_buttonInputSuccess, false);
+
 		//全てのボタンが正しく入力されたら成功
 		if (m_currentStep >= (int)m_targetButtons.size())
 		{

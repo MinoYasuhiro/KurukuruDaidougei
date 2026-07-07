@@ -13,5 +13,6 @@ public:
 
 private:
 	SoundSource* m_currentBGM = nullptr;
+	int m_currentBGMId = -1;	//現在のBGMIDを記憶する変数
 };
 

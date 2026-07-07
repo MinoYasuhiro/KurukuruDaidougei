@@ -14,5 +14,6 @@ enum SE
 	SE_booing,				//ブーイング
 	SE_hitHead,				//頭を打つ音
 	SE_smartphone,			//スマホ落下音
+	SE_buttonInputSuccess   //QTEボタン入力成功音
 };
 
