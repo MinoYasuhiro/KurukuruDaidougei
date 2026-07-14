@@ -1,5 +1,6 @@
-#pragma once
+﻿#pragma once
 class Fade;
+class SEManager;
 class Rule : public IGameObject
 {
 public:

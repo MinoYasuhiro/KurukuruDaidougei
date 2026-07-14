@@ -26,6 +26,12 @@ void SEManager::Init()
 	g_soundEngine->ResistWaveFileBank(SE_hitHead, "Assets/sound/hitHead.wav");
 	g_soundEngine->ResistWaveFileBank(SE_smartphone, "Assets/sound/smartphone.wav");
 	g_soundEngine->ResistWaveFileBank(SE_buttonInputSuccess, "Assets/sound/QTEButton.wav");
+	g_soundEngine->ResistWaveFileBank(SE_cursor, "Assets/sound/ka-soru.wav");
+	g_soundEngine->ResistWaveFileBank(SE_pause, "Assets/sound/Pause.wav");
+	g_soundEngine->ResistWaveFileBank(SE_choice, "Assets/sound/Choice.wav");
+	g_soundEngine->ResistWaveFileBank(SE_return, "Assets/sound/Return.wav");
+	g_soundEngine->ResistWaveFileBank(SE_decision, "Assets/sound/decision.wav");
+	g_soundEngine->ResistWaveFileBank(SE_QTEmiss, "Assets/sound/QTEmiss.wav");
 }
 
 void SEManager::Play(SE seID, bool loop)

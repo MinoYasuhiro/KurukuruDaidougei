@@ -329,6 +329,8 @@ void Game::UpdatePlaying()
             return;
         }
 
+		SEManager::Play(SE_pause, false);
+
         NewGO<Pause>(1, "pause");
         m_gameState = GameState::Pause;
         return;                      // Game は消さない

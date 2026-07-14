@@ -76,7 +76,7 @@ bool Player::Start()
 
 
     // --- 傘の生成 ---
-    m_umbrella = NewGO<Umbrella>(0);
+    m_umbrella = NewGO<Umbrella>(0, "umbrella");
 
 
     // --- 変数の初期化 ---

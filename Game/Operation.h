@@ -1,4 +1,5 @@
-#pragma once
+﻿#pragma once
+class SEManager;
 class Operation : public IGameObject
 {
 public:

@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "MenuUI.h"
+#include "SEManager.h"
 
 MenuUI::MenuUI()
 {
@@ -27,6 +28,8 @@ bool MenuUI::Start()
 	m_restartRender.SetPosition({ -300.0f, 50.0f, 0.0f });
 	m_soundTestRender.SetPosition({ 300.0f, 50.0f, 0.0f });
 
+	SEManager::Init();
+
 
 	return true;
 }
@@ -45,6 +48,9 @@ void MenuUI::Update()
 
 void MenuUI::Input()
 {
+	//変更前の選択位置を保存
+	int oldSelectIndex = m_selectIndex;
+
 	//上入力
 	if (g_pad[0]->IsPress(enButtonUp))
 	{
@@ -53,14 +59,14 @@ void MenuUI::Input()
 		else if (m_selectIndex == 1)m_selectIndex = 3;
 	}
 	//下入力
-	if (g_pad[0]->IsPress(enButtonDown))
+	else if (g_pad[0]->IsPress(enButtonDown))
 	{
 		//下側の項目へ移動
 		if (m_selectIndex == 2)m_selectIndex = 0;
 		else if (m_selectIndex == 3)m_selectIndex = 1;
 	}
 	//左入力
-	if (g_pad[0]->IsPress(enButtonLeft))
+	else if (g_pad[0]->IsPress(enButtonLeft))
 	{
 		//右側の項目なら左へ移動
 		if (m_selectIndex % 2 == 1)
@@ -69,7 +75,7 @@ void MenuUI::Input()
 		}
 	}
 	//右入力
-	if (g_pad[0]->IsPress(enButtonRight))
+	else if (g_pad[0]->IsPress(enButtonRight))
 	{
 		//左側の項目なら右へ移動
 		if (m_selectIndex % 2 == 0)
@@ -78,28 +84,38 @@ void MenuUI::Input()
 		}
 	}
 	//決定ボタン
-	if (g_pad[0]->IsPress(enButtonA))
+	else if (g_pad[0]->IsPress(enButtonA))
 	{
+		SEManager::Play(SE_decision, false);
+
 		switch (m_selectIndex)
 		{
 			//タイトルに戻る
 		case 0:
 			m_result = MenuResult::BackTitle;
 			break;
+
 			//始めから
 		case 1:
 			m_result = MenuResult::Retry;
 			break;
+
 			//ゲーム再開
 		case 2:
 			m_result = MenuResult::Restart;
 			break;
+
 			//サウンドオプション
 		case 3:
 			m_result = MenuResult::SoundOption;
 			break;
 		}
+	}
 
+	//選択位置が変化した場合のみSEを鳴らす
+	if (oldSelectIndex != m_selectIndex)
+	{
+		SEManager::Play(SE_choice, false);
 	}
 }
 

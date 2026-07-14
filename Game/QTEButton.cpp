@@ -171,6 +171,8 @@ void QTEButton::Input()
 		m_isSuccess = false;
 		m_isFinished = true;
 
+		SEManager::Play(SE_QTEmiss, false);
+
 		if (m_qteTimerUI != nullptr)
 		{
 			DeleteGO(m_qteTimerUI);

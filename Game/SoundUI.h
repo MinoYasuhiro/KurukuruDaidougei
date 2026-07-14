@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+class SEManager;
 class SoundUI :public IGameObject
 {
 public:

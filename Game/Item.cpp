@@ -115,10 +115,6 @@ void Item::Init(ItemType type)
 		if (!m_player) m_player = FindGO<Player>("player");
 		if (m_player) {
 			m_player->SetSpinCountSuccess(20);
-			if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
-			if (m_umbrella) {
-				m_umbrella->SetShakePower(0.4f);
-			}
 		}
 		break;
 	case ItemType::egg:
@@ -140,10 +136,6 @@ void Item::Init(ItemType type)
 		if (m_player) {
 			m_player->SetSpinCountSuccess(25);
 		}
-		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
-		if(m_umbrella) {
-			m_umbrella->SetShakePower(0.4f);
-		}
 		break;
 	case ItemType::box:
 		m_category = ItemCategory::Normal;
@@ -154,10 +146,6 @@ void Item::Init(ItemType type)
 		if (!m_player) m_player = FindGO<Player>("player");
 		if (m_player) {
 			m_player->SetSpinCountSuccess(29);
-		}
-		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
-		if (m_umbrella) {
-			m_umbrella->SetShakePower(0.5f);
 		}
 		break;
 	case ItemType::skeleton:
@@ -179,10 +167,6 @@ void Item::Init(ItemType type)
 		if (m_player) {
 			m_player->SetSpinCountSuccess(33);
 		}
-		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
-		if (m_umbrella) {
-			m_umbrella->SetShakePower(0.5f);
-		}
 		break;
 	case ItemType::teaBowl:
 		m_category = ItemCategory::Normal;
@@ -199,10 +183,6 @@ void Item::Init(ItemType type)
 		if (!m_player) m_player = FindGO<Player>("player");
 		if (m_player) {
 			m_player->SetSpinCountSuccess(36);
-		}
-		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
-		if (m_umbrella) {
-			m_umbrella->SetShakePower(0.6f);
 		}
 		break;
 	case ItemType::penguin:
@@ -227,10 +207,6 @@ void Item::Init(ItemType type)
 		if (m_player) {
 			m_player->SetSpinCountSuccess(39);
 		}
-		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
-		if (m_umbrella) {
-			m_umbrella->SetShakePower(0.6f);
-		}
 		break;
 	case ItemType::phone:
 		m_category = ItemCategory::Normal;
@@ -247,10 +223,6 @@ void Item::Init(ItemType type)
 		if (!m_player) m_player = FindGO<Player>("player");
 		if (m_player) {
 			m_player->SetSpinCountSuccess(42);
-		}
-		if (!m_umbrella) m_umbrella = FindGO<Umbrella>("umbrella");
-		if (m_umbrella) {
-			m_umbrella->SetShakePower(0.7f);
 		}
 		break;
 	default:
@@ -288,6 +260,10 @@ void Item::Update()
 			}
 			else {
 				m_game->RequestFailureLetter();
+				if (m_player)
+				{
+					m_player->m_playerError++;
+				}
 				SpinningFailed();
 			}
 
@@ -540,6 +516,7 @@ void Item::FailFallMotion()
 			if (m_game)
 			{
 				m_game->RequestFailureLetter();
+				m_player->m_playerError++;
 			}
 		}
 		//状態リセット
@@ -603,6 +580,47 @@ void Item::OnUmbrella()
 	if (!m_player)return;
 
 	if (!m_circle)return;
+
+	if (!m_umbrella)
+	{
+		m_umbrella = FindGO<Umbrella>("umbrella");
+	}
+
+	if (m_umbrella == nullptr)
+	{
+		return;
+	}
+
+	switch (m_type)
+	{
+	case ItemType::ball:
+		m_umbrella->SetShakePower(0.4f);
+		break;
+
+	case ItemType::egg:
+		m_umbrella->SetShakePower(0.4f);
+		break;
+
+	case ItemType::box:
+		m_umbrella->SetShakePower(0.5f);
+		break;
+
+	case ItemType::skeleton:
+		m_umbrella->SetShakePower(0.5f);
+		break;
+
+	case ItemType::teaBowl:
+		m_umbrella->SetShakePower(0.6f);
+		break;
+
+	case ItemType::penguin:
+		m_umbrella->SetShakePower(0.6f);
+		break;
+
+	case ItemType::phone:
+		m_umbrella->SetShakePower(0.7f);
+		break;
+	}
 
 	//プレイヤーの頭の上に固定
 	Vector3 position = m_player->GetPosition();
@@ -710,6 +728,7 @@ void Item::StartQTE()
 		{
 			m_game->RequestFailureLetter();
 			m_state = BallState::DropPrepare; // 失敗して落下
+
 		}
 		DeleteGO(m_qteButton);
 		m_qteButton = nullptr;

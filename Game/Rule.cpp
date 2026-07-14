@@ -1,8 +1,9 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Rule.h"
 #include "Title.h"
 #include "Game.h"
 #include <algorithm>
+#include "SEManager.h"
 
 namespace RULE
 {
@@ -55,6 +56,8 @@ bool Rule::Start()
    
 
 	m_isEnding = false;
+
+	SEManager::Init();
 	return true;
 }
 
@@ -139,6 +142,8 @@ void Rule::UpdateExit()
         Game::SetState(GameState::Title);
         NewGO<Title>(0, "title");
 
+		SEManager::Play(SE_return, false);
+
         m_isDead = true;
         return;
     }
@@ -146,6 +151,8 @@ void Rule::UpdateExit()
     if (g_pad[0]->IsPress(enButtonB))
     {
         m_isEnding = true;
+
+		SEManager::Play(SE_return, false);
         return;
     }
 }
