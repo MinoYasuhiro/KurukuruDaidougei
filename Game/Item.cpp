@@ -260,6 +260,10 @@ void Item::Update()
 			}
 			else {
 				m_game->RequestFailureLetter();
+				if (m_player)
+				{
+					m_player->m_playerError++;
+				}
 				SpinningFailed();
 			}
 
@@ -688,7 +692,6 @@ void Item::OnUmbrella()
 	if (m_player->m_playerState == 1 && m_state != BallState::DropPrepare)
 	{
 		SpinningFailed();
-		m_player->m_playerError++;
 		return;
 	}
 }
