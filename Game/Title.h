@@ -2,6 +2,7 @@
 class BGMManager;
 class Operation;
 class TitleMenu;
+class SEManager;
 class Title : public IGameObject
 {
 public:

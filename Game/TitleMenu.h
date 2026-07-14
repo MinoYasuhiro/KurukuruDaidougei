@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 
 enum class MenuResult
@@ -10,6 +10,7 @@ enum class MenuResult
     Rule
 };
 
+class SEManager;
 class TitleMenu : public IGameObject
 {
 public:
