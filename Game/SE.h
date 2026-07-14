@@ -20,5 +20,6 @@ enum SE
 	SE_pause,				//ポーズ音
 	SE_return,				//戻る音
 	SE_decision,			//決定音
+	SE_QTEmiss				//QTE失敗音
 };
 
