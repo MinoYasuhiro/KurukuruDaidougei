@@ -30,6 +30,7 @@ void SEManager::Init()
 	g_soundEngine->ResistWaveFileBank(SE_pause, "Assets/sound/Pause.wav");
 	g_soundEngine->ResistWaveFileBank(SE_choice, "Assets/sound/Choice.wav");
 	g_soundEngine->ResistWaveFileBank(SE_return, "Assets/sound/Return.wav");
+	g_soundEngine->ResistWaveFileBank(SE_decision, "Assets/sound/decision.wav");
 }
 
 void SEManager::Play(SE seID, bool loop)
