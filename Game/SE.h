@@ -19,5 +19,6 @@ enum SE
 	SE_choice,				//選択音
 	SE_pause,				//ポーズ音
 	SE_return,				//戻る音
+	SE_decision,			//決定音
 };
 

@@ -73,7 +73,7 @@ void TitleMenu::Input()
         m_selectIndex--;
         if (m_selectIndex < 0) m_selectIndex = 3;
         
-        SEManager::Play(SE_cursor, false);
+        SEManager::Play(SE_choice, false);
         m_inputTimer = m_inputinterval; 
     }
 
@@ -82,13 +82,13 @@ void TitleMenu::Input()
         m_selectIndex++;
         if (m_selectIndex > 3) m_selectIndex = 0;
 
-        SEManager::Play(SE_cursor, false);
+        SEManager::Play(SE_choice, false);
         m_inputTimer = m_inputinterval; 
     }
 
     if (g_pad[0]->IsPress(enButtonA))
     {
-		SEManager::Play(SE_choice, false);
+		SEManager::Play(SE_decision, false);
         switch (m_selectIndex)
         {
         case 0: m_result = MenuResult::Operation; break;
