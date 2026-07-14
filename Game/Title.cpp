@@ -8,6 +8,7 @@
 #include "Operation.h"
 #include "Rule.h"
 #include "Loading.h"
+#include "SEManager.h"
 
 namespace TITLE {
 
@@ -16,6 +17,8 @@ namespace TITLE {
 
 bool Title::Start()
 {
+	SEManager::Init();
+
 	m_spriteRender.Init("Assets/Sprite/Title.DDS", 1920, 1080);
 	m_spriteRender.SetPosition({ TITLE::POSITION });
 

@@ -9,6 +9,7 @@ enum class MenuResult
 	SoundOption,//サウンド設定
 };
 
+class SEManager;
 class MenuUI :public IGameObject
 {
 public:

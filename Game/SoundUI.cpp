@@ -3,6 +3,7 @@
 #include "SEManager.h"
 #include "BGMManager.h"
 #include "SoundSettings.h"
+#include "SEManager.h"
 
 SoundUI::SoundUI()
 {
@@ -67,6 +68,8 @@ bool SoundUI::Start()
 	}
 
 	m_inputTimer = m_inputInterval;
+
+	SEManager::Init();
 
 	return true;
 }
@@ -183,6 +186,9 @@ void SoundUI::Input()
 
 		//SEキャッシュをクリア
 		SEManager::ClearCache();
+
+		// 戻るSE
+		SEManager::Play(SE_return, false);
 
 		//このUIを終了状態にする
 		m_isFinished = true;
