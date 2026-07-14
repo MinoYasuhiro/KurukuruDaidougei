@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "ButtonType.h"
 class QTETimerUI;
+class SEManager;
 class QTEButton :public IGameObject
 {
 public:
