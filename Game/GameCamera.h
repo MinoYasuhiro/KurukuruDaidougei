@@ -4,7 +4,7 @@
 
 class Player;
 class ItemSpawner;
-
+class Item;
 class GameCamera : public IGameObject
 {
 public:
@@ -35,14 +35,14 @@ private:
 
 		0.0f,
 		220.0f,
-		-600.0f
+		-300.0f
 	};
 
 	Vector3 m_closeCameraPos =
 	{
 		0.0f,
 		220.0f,
-		-180.0f
+		-150.0f
 	};
 
 	Vector3 m_currentCameraPos =
@@ -59,6 +59,7 @@ private:
 	float m_startCameraTimer = 0.0f;
 	bool m_isStartCamera = true;
 	ItemSpawner* m_spawner = nullptr;
+	bool m_prevQTEActive = false;
 
 private:
 	bool UpdatePlayer();
