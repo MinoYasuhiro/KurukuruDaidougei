@@ -577,7 +577,7 @@ void Player::PlayerAction()
             vib->Init(0, 1.0f, 1.0f);
 
             m_playerState = enPlayerState_Fail;
-            m_playerError++;
+           //m_playerError++;
         }
     }
     break;
