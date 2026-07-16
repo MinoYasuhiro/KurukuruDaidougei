@@ -156,9 +156,6 @@ void QTEButton::Input()
 
 		SEManager::Play(SE_buttonInputSuccess, false);
 
-		auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
-		vib->Init(0, 0.2f, 0.5f);
-
 		//全てのボタンが正しく入力されたら成功
 		if (m_currentStep >= (int)m_targetButtons.size())
 		{

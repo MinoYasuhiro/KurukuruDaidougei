@@ -443,6 +443,20 @@ void Player::ManageState()
 
     case enPlayerState_Run: // 移動
     {
+        // ★クリア判定
+        if (m_playerClear >= CLEAR_COUNT_TO_WIN)
+        {
+            m_playerState = enPlayerState_GameClear1;
+            return;
+        }
+
+        // ★ゲームオーバー判定
+        if (m_playerError >= ERROR_COUNT_TO_GAME_OVER)
+        {
+            m_playerState = enPlayerState_GameOver;
+            return;
+        }
+
         // 傘回し開始
         if (m_itemOnUmbrella)
         {
@@ -577,7 +591,7 @@ void Player::PlayerAction()
             vib->Init(0, 1.0f, 1.0f);
 
             m_playerState = enPlayerState_Fail;
-            m_playerError++;
+           //m_playerError++;
         }
     }
     break;
