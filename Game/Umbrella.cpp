@@ -11,6 +11,7 @@
 #include "stdafx.h"
 #include "Umbrella.h"
 #include "Player.h"
+#include "HID/GamePadVibration.h"
 
 
 Umbrella::Umbrella()
@@ -125,6 +126,8 @@ void Umbrella::Update()
         {
             if (m_player && m_player->m_playerState == Player::enPlayerState_Spinning)
             {
+                auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+                vib->Init(0, 1.0f, 1.0f);
                 // プレイヤーを失敗状態にしてミスカウントを増やす
                 m_player->m_playerState = Player::enPlayerState_Fail;
                 m_player->m_playerError++;

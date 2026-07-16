@@ -3,6 +3,7 @@
 #include "QTETimerUI.h"
 #include "Game.h"
 #include "SEManager.h"
+#include "HID/GamePadVibration.h"
 
 QTEButton::QTEButton()
 {
@@ -98,6 +99,9 @@ void QTEButton::Update()
 	//制限時間を超えたら失敗
 	if (m_timer >= m_limitTime)
 	{
+		auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+		vib->Init(0, 1.0f, 0.8f);
+
 		m_isSuccess = false;	//失敗
 		m_isFinished = true;	//終了
 
@@ -152,9 +156,15 @@ void QTEButton::Input()
 
 		SEManager::Play(SE_buttonInputSuccess, false);
 
+		auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+		vib->Init(0, 0.2f, 0.5f);
+
 		//全てのボタンが正しく入力されたら成功
 		if (m_currentStep >= (int)m_targetButtons.size())
 		{
+			auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+			vib->Init(0, 1.0f, 0.8f);
+
 			m_isSuccess = true;
 			m_isFinished = true;
 
@@ -167,6 +177,9 @@ void QTEButton::Input()
 	}
 	else
 	{
+		auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+		vib->Init(0, 1.0f, 1.0f);
+
 		//異なるボタンが押されたら即座に失敗
 		m_isSuccess = false;
 		m_isFinished = true;

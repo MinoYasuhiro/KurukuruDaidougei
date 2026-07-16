@@ -5,6 +5,7 @@
 
 class Arrow;
 class Circle;
+class GamePadVibration;
 class Player : public IGameObject
 {
 public:
