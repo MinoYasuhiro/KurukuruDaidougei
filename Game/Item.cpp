@@ -7,6 +7,7 @@
 #include "SEManager.h"
 #include "Umbrella.h"
 #include "QTEButton.h"
+#include "HID/GamePadVibration.h"
 Item::Item()
 {
 	//起動時にポインタをnullptrで安全に初期化
@@ -259,11 +260,7 @@ void Item::Update()
 				m_game->RequestQTESuccess();
 			}
 			else {
-				m_game->RequestFailureLetter();
-				if (m_player)
-				{
-					m_player->m_playerError++;
-				}
+			
 				SpinningFailed();
 			}
 
@@ -410,6 +407,8 @@ void Item::ParabolicMotion()
 					}
 				}
 				//失敗
+				auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+				vib->Init(0, 1.0f, 1.0f);
 				m_state = BallState::FailFall;
 			}
 		}
