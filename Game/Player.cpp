@@ -18,6 +18,7 @@
 #include "CoinBox.h"
 #include "Arrow.h"
 #include "Circle.h"
+#include "HID/GamePadVibration.h"
 
 // 傘回しゲームのパラメータ定数（Player.hのk_系と対応）
 const float Player::SPIN_TIME_LIMIT = 3.0f;
@@ -230,6 +231,9 @@ void Player::Update()
     {
         if (m_playerState == enPlayerState_Spinning)
         {
+            auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+            vib->Init(0, 0.35f, 0.8f);
+
             if (m_umbrella)
             {
                 m_umbrella->OnStartSpin();
@@ -554,6 +558,9 @@ void Player::PlayerAction()
         // ★成功判定　必要回転数はアイテムによって異なる。
         if (m_spinCount >= m_spinCountSuccess)
         {
+            auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+            vib->Init(0, 1.0f, 0.8f);
+
             m_playerState = enPlayerState_Success;
             m_playerClear++;
 
@@ -566,6 +573,9 @@ void Player::PlayerAction()
         // ★失敗判定（3秒）
         else if (m_spinTimer >= SPIN_TIME_LIMIT)
         {
+            auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
+            vib->Init(0, 1.0f, 1.0f);
+
             m_playerState = enPlayerState_Fail;
             m_playerError++;
         }
