@@ -668,9 +668,15 @@ void Item::OnUmbrella()
 
 	}
 
-	//成功
+	// 傘の上にいる時間を加算
+	m_onUmbrellaTimer += 1.0f / 60.0f; // 60FPS想定
+
+	// 成功
 	if (m_player->m_playerState == 4 && m_state != BallState::SuccessThrow)
 	{
+		// 傘回しが一定時間終わっていなければQTEや成功に遷移しない
+		if (m_onUmbrellaTimer < m_onUmbrellaLimitTimer)return;
+
 		// QTEありアイテムかどうかで状態を分ける
 		if (m_type == ItemType::egg || m_type == ItemType::skeleton || m_type == ItemType::penguin)
 		{
@@ -685,6 +691,7 @@ void Item::OnUmbrella()
 		m_isFlying = true;
 		m_isProcessed = true;
 		m_moveSpeed = { 0.0f, 10.0f, 15.0f };
+		m_onUmbrellaTimer = 0.0f; // タイマーリセット
 		return;
 	}
 
