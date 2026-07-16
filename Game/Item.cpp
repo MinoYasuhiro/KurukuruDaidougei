@@ -260,7 +260,8 @@ void Item::Update()
 				m_game->RequestQTESuccess();
 			}
 			else {
-			
+				m_game->RequestFailureLetter();
+				m_player->m_playerError++;
 				SpinningFailed();
 			}
 

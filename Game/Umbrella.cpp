@@ -130,7 +130,7 @@ void Umbrella::Update()
                 vib->Init(0, 1.0f, 1.0f);
                 // プレイヤーを失敗状態にしてミスカウントを増やす
                 m_player->m_playerState = Player::enPlayerState_Fail;
-                m_player->m_playerError++;
+                //m_player->m_playerError++;
 
                 // オフセットをリセット
                 m_offsetAngleX = 0.0f;
