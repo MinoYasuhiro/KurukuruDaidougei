@@ -2,6 +2,12 @@
 #include "Math.h"
 #include "Game.h"
 
+enum class CameraEaseType
+{
+    Cubic,
+	Elastic,
+    Back
+};
 class Player;
 class ItemSpawner;
 class Item;
@@ -19,17 +25,29 @@ public:
 	//void MoveCameraBehindPlayer();
 	void Reset();
 
+	/// <summary>
+	/// ゲームクリア時のカメラ演出更新
+	/// </summary>
+	void ClearCameraMove();
+
+	/// <summary>
+	/// ゲームオーバー時のカメラ演出更新
+	/// </summary>
+	void GameOverCameraMove();
+
 private:
 	Player* m_player = nullptr;
 	Vector3 m_toCameraPos = Vector3::Zero;
 	Vector3 m_qteCameraBasePos;
 	GamePhase m_currentPhase;
-
+	bool m_isEndingCamera = false;
 	bool    m_isZooming = false;
 	float   m_zoomT = 0.0f;
 	Vector3 m_zoomFromOffset;
 	Vector3 m_zoomToOffset;
-
+	bool m_isEndingCameraFinished = false;
+	CameraEaseType m_easeType
+		= CameraEaseType::Cubic;
 	Vector3 m_normalCameraPos =
 	{
 
@@ -72,4 +90,5 @@ private:
 
 	static float EaseInOutCubic(float t);
 	static float EaseOutElastic(float t);
+	static float EaseOutBack(float t);
 };

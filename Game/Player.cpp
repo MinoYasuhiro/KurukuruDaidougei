@@ -19,6 +19,7 @@
 #include "Arrow.h"
 #include "Circle.h"
 #include "HID/GamePadVibration.h"
+#include "GameCamera.h"
 
 // 傘回しゲームのパラメータ定数（Player.hのk_系と対応）
 const float Player::SPIN_TIME_LIMIT = 3.0f;
@@ -415,6 +416,10 @@ void Player::ManageState()
         // ★クリア判定
         if (m_playerClear >= CLEAR_COUNT_TO_WIN)
         {
+            if (GameCamera* camera = FindGO<GameCamera>("gameCamera"))
+            {
+                camera->ClearCameraMove();
+            }
             m_playerState = enPlayerState_GameClear1;
             return;
         }
@@ -422,6 +427,10 @@ void Player::ManageState()
         // ★ゲームオーバー判定
         if (m_playerError >= ERROR_COUNT_TO_GAME_OVER)
         {
+            if (GameCamera* camera = FindGO<GameCamera>("gameCamera"))
+            {
+                camera->GameOverCameraMove();
+            }
             m_playerState = enPlayerState_GameOver;
             return;
         }
