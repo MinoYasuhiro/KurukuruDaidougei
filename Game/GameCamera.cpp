@@ -31,7 +31,7 @@ bool GameCamera::Start()
     m_testZoomTimer = 0.0f;
 
     m_currentCameraPos = m_normalCameraPos;
-    g_camera3D->SetViewAngle(Math::DegToRad(50.0f));
+    ::g_camera3D->SetViewAngle(Math::DegToRad(50.0f));
     return true;
 }
 
@@ -99,7 +99,7 @@ void GameCamera::UpdatePhase()
             -150.0f
         };
 
-        m_useElastic = false;
+        m_easeType = CameraEaseType::Cubic;
 
         m_isZooming = true;
         m_zoomT = 0.0f;
@@ -123,17 +123,59 @@ void GameCamera::UpdatePhase()
 void GameCamera::ApplyCamera()
 {
     // 固定カメラにする条件
+    if (m_isEndingCameraFinished)
+    {
+        Vector3 playerPos = m_player->GetPosition();
 
+        Vector3 target = playerPos;
+        target.y += 80.0f;
+
+        ::g_camera3D->SetTarget(target);
+
+        Vector3 cameraPos =
+        {
+            playerPos.x + m_zoomToOffset.x,
+            playerPos.y + m_zoomToOffset.y,
+            playerPos.z + m_zoomToOffset.z
+        };
+
+        ::g_camera3D->SetPosition(cameraPos);
+        ::g_camera3D->Update();
+
+        return;
+    }
+
+    if (m_isEndingCamera)
+    {
+        Vector3 playerPos = m_player->GetPosition();
+
+        Vector3 target = playerPos;
+        target.y += 80.0f;
+
+        ::g_camera3D->SetTarget(target);
+
+        Vector3 cameraPos =
+        {
+            playerPos.x + m_toCameraPos.x,
+            playerPos.y + m_toCameraPos.y,
+            playerPos.z + m_toCameraPos.z
+        };
+
+        ::g_camera3D->SetPosition(cameraPos);
+        ::g_camera3D->Update();
+        return;
+    }
     bool isFixedCamera =
         (
-            Game::GetPhase() == GamePhase::MovePhase ||
-            Game::GetPhase() == GamePhase::AfterMove ||
-            Game::GetPhase() == GamePhase::SpecialMove||
+            Game::GetPhase() == GamePhase::MovePhase||
+            Game::GetPhase() == GamePhase::AfterMove||
+           // Game::GetPhase() == GamePhase::SpecialMove||
             Game::GetPhase() == GamePhase::QTEMove
             )
         &&
-        !m_player->m_itemOnUmbrella;
-
+        !m_player->m_itemOnUmbrella
+        &&
+        !m_isEndingCamera;
  
 
     if (isFixedCamera)
@@ -212,18 +254,31 @@ void GameCamera::UpdateZoom()
     {
         m_zoomT = 1.0f;
         m_isZooming = false;
+
+        if (m_isEndingCamera)
+        {
+            m_isEndingCameraFinished = true;
+        }
     }
+    
 
     float ease = 0.0f;
 
-    if (m_useElastic)
+    switch (m_easeType)
     {
-        ease = EaseOutElastic(m_zoomT);
-    }
-    else
-    {
+    case CameraEaseType::Cubic:
         ease = EaseInOutCubic(m_zoomT);
+        break;
+
+    case CameraEaseType::Elastic:
+        ease = EaseOutElastic(m_zoomT);
+        break;
+
+    case CameraEaseType::Back:
+        ease = EaseOutBack(m_zoomT);
+        break;
     }
+    
 
 
     m_toCameraPos =
@@ -249,24 +304,62 @@ void GameCamera::UpdateQTECamera()
 
     if (isQTEActive != m_prevQTEActive)
     {
-        Vector3 targetOffset =
+        m_zoomFromOffset = m_toCameraPos;
+
+        m_zoomToOffset =
             isQTEActive
             ? Vector3(0.0f, 80.0f, -150.0f)
             : Vector3(0.0f, 150.0f, -250.0f);
 
-        m_zoomFromOffset = m_toCameraPos;
-        m_zoomToOffset = targetOffset;
+      
+		m_easeType = 
+            isQTEActive
+            ? CameraEaseType::Elastic
+			: CameraEaseType::Cubic;
 
         m_isZooming = true;
         m_zoomT = 0.0f;
 
-        m_useElastic = isQTEActive;
     }
 
     m_prevQTEActive = isQTEActive;
 }
 
+void GameCamera::ClearCameraMove()
+{
+    m_isEndingCamera = true;
 
+    m_zoomFromOffset = m_toCameraPos;
+
+    m_zoomToOffset =
+    {
+        0.0f,
+        80.0f,
+        -650.0f
+    };
+
+	m_easeType = CameraEaseType::Back;
+    m_isZooming = true;
+    m_zoomT = 0.0f;
+}
+
+void GameCamera::GameOverCameraMove()
+{
+    m_isEndingCamera = true;
+
+    m_zoomFromOffset = m_toCameraPos;
+
+    m_zoomToOffset =
+    {
+        0.0f,
+        100.0f,
+        -500.0f
+    };
+
+	m_easeType = CameraEaseType::Back;
+    m_isZooming = true;
+    m_zoomT = 0.0f;
+}
 
 
 /// <summary>
@@ -275,13 +368,20 @@ void GameCamera::UpdateQTECamera()
 void GameCamera::Reset()
 {
     m_toCameraPos.Set(0.0f, 150.0f, -200.0f);
+
     m_currentPhase = GamePhase::Start;
+
     m_isZooming = false;
     m_zoomT = 0.0f;
 
-    m_isTestZoom = false;
-    m_testZoomTimer = 0.0f;
+    m_isEndingCamera = false;
+    m_prevQTEActive = false;
+
+    m_easeType = CameraEaseType::Cubic;
+
+    m_currentCameraPos = m_normalCameraPos;
 }
+
 /// <summary>
 /// カメラのズームのイージング関数。0.0fから1.0fの範囲でtを渡すと、イージングされた値が返ってきます。
 /// </summary>
@@ -306,4 +406,19 @@ float GameCamera::EaseOutElastic(float t)
     return t == 0 ? 0 :
         t == 1 ? 1 :
         powf(2, -6 * t) * sinf((t * 6 - 0.5f) * c4) + 1;
+}
+
+/// <summary>
+/// ゲームクリア、ゲームオーバー時のカメラ演出のイージングバック移動
+/// </summary>
+/// <param name="t"></param>
+/// <returns></returns>
+float GameCamera::EaseOutBack(float t)
+{
+    const float c1 = 1.70158f;
+    const float c3 = c1 + 1.0f;
+
+    return 1.0f +
+        c3 * powf(t - 1.0f, 3.0f) +
+        c1 * powf(t - 1.0f, 2.0f);
 }
