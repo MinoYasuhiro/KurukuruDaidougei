@@ -77,6 +77,9 @@ public:
 	static GameState GetPrevState();
 	bool m_fromTitleStart = false;
 
+	//観客用
+	bool m_QTESuccess30;
+
 private:
 	//ModelRender m_modelRender;
 	Vector3 m_pos;
@@ -154,4 +157,30 @@ private:
 	bool m_coinPlayed = false;
 
 	int m_failCount = 0;
+
+	//観客用
+	//観客用
+	bool m_isSuccess = false;
+	float m_successTimer2 = 0.0f;
+	float m_time = 0.0f;
+	bool m_bigSuccess = false;
+	
+
+	Vector3 m_basePos1;
+	Vector3 m_basePos2;
+	Vector3 m_basePos3;
+	Vector3 m_basePos4;
+	Vector3 m_basePos5;
+	Vector3 m_basePos6;
+	Vector3 m_basePos7;
+	Vector3 m_basePos8;
+
+	SpriteRender m_sprite1;
+	SpriteRender m_sprite2;
+	SpriteRender m_sprite3;
+	SpriteRender m_sprite4;
+	SpriteRender m_sprite5;
+	SpriteRender m_sprite6;
+	SpriteRender m_sprite7;
+	SpriteRender m_sprite8;
 };
