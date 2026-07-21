@@ -5,6 +5,7 @@
 #include "SEManager.h"
 #include "HID/GamePadVibration.h"
 
+
 QTEButton::QTEButton()
 {
 
@@ -105,6 +106,9 @@ void QTEButton::Update()
 		m_isSuccess = false;	//失敗
 		m_isFinished = true;	//終了
 
+		Game* game = FindGO<Game>("game");
+		game->m_QTESuccess30 = true;
+
 		if (m_qteTimerUI != nullptr)
 		{
 			DeleteGO(m_qteTimerUI);
@@ -187,6 +191,9 @@ void QTEButton::Input()
 		{
 			DeleteGO(m_qteTimerUI);
 			m_qteTimerUI = nullptr;
+
+			Game* game = FindGO<Game>("game");
+			game->m_QTESuccess30 = false;
 		}
 	}
 }
