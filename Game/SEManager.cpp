@@ -36,30 +36,42 @@ void SEManager::Init()
 
 void SEManager::Play(SE seID, bool loop)
 {
-	SoundSource* se = nullptr;
-
-	//すでに同じSEが再生中なら一度削除
-	//同じ音を重複管理しないため
-	auto it = g_seSources.find(seID);
-	if (it != g_seSources.end())
+	if (loop)
 	{
-		DeleteGO(it->second);
-		g_seSources.erase(it);
+		//すでに同じSEが再生中なら一度削除
+	//同じ音を重複管理しないため
+		auto it = g_seSources.find(seID);
+		if (it != g_seSources.end())
+		{
+			if (it->second != nullptr && (uintptr_t)it->second != 0xFFFFFFFFFFFFFFFF)
+			{
+				it->second->Stop();
+				DeleteGO(it->second);
+			}
+			g_seSources.erase(it);
+		}
+		//効果音用のサウンドソースを生成
+		SoundSource*se = NewGO<SoundSource>(seID);
+
+		//登録済みのSEを初期化
+		se->Init(seID);
+
+		//音量設定(マスター音量×SE音量）
+		se->SetVolume(SoundSettings::Master * SoundSettings::SE);
+
+		//効果音再生(loop=trueでループ)
+		se->Play(true);
+
+		//キャッシュに保存(後で停止や管理に使う)
+		g_seSources[seID] = se;
 	}
-	//効果音用のサウンドソースを生成
-	se = NewGO<SoundSource>(seID);
-
-	//登録済みのSEを初期化
-	se->Init(seID);
-
-	//音量設定(マスター音量×SE音量）
-	se->SetVolume(SoundSettings::Master * SoundSettings::SE);
-
-	//効果音再生(loop=trueでループ)
-	se->Play(loop);
-
-	//キャッシュに保存(後で停止や管理に使う)
-	g_seSources[seID] = se;
+	else
+	{
+		SoundSource* se = NewGO<SoundSource>(seID);
+		se->Init(seID);
+		se->SetVolume(SoundSettings::Master * SoundSettings::SE);
+		se->Play(false);
+	}
 }
 
 //キャッシュ全削除
@@ -67,8 +79,9 @@ void SEManager::ClearCache()
 {
 	for (auto& pair : g_seSources)
 	{
-		if (pair.second)
+		if (pair.second != nullptr && (uintptr_t)pair.second != 0xFFFFFFFFFFFFFFFF)
 		{
+			pair.second->Stop();
 			//再生中のSEを削除
 			DeleteGO(pair.second);
 		}
