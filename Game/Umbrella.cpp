@@ -57,6 +57,7 @@ void Umbrella::Reset()
     m_spinSpeed = 0.0f;
 
     m_rotation = Quaternion::Identity;
+    m_finalRotation = Quaternion::Identity;
     m_modelRender.SetRotation(m_rotation);
 }
 
@@ -312,6 +313,8 @@ void Umbrella::Update()
     // 最終回転
     Quaternion finalRot = spin * tilt;
 
+    m_finalRotation = spin * tilt;
+
     m_modelRender.SetRotation(finalRot);
     m_modelRender.Update();
 }
@@ -342,6 +345,7 @@ void Umbrella::OnStartSpin()
     m_angleX = 0.0f;
     m_angleY = 0.0f;
     m_rotation = Quaternion::Identity;
+    m_finalRotation = Quaternion::Identity;
 }
 
 void Umbrella::SetAutoSpin(bool flag)

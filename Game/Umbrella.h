@@ -19,7 +19,12 @@ public:
     // --- Getter ---
     Quaternion GetRotation() const
     {
-        return m_rotation;
+        return m_finalRotation;
+    }
+
+    const Vector3& GetVisualPosition()const
+    {
+        return m_position;
     }
 
     // --- Setter ---
@@ -38,6 +43,7 @@ public:
     // --- トランスフォーム ---
     Vector3    m_position;                          // 傘の座標
     Quaternion m_rotation;                          // 傘の回転
+    Quaternion m_finalRotation=Quaternion::Identity;
     Vector3    m_scale = Vector3(1.0f, 1.0f, 1.0f); // 傘のスケール
 
     // --- 関連オブジェクト ---
