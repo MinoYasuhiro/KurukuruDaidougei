@@ -69,6 +69,28 @@ void QTEButton::StartQTE(const std::vector<ButtonType>& targetButtons, float lim
 
 void QTEButton::Update()
 {
+	if (m_successEffectTimer > 0.0f)
+	{
+		m_successEffectTimer -= g_gameTime->GetFrameDeltaTime();
+
+		if (m_successEffectTimer <= 0.0f)
+		{
+			m_successEffectTimer = 0.0f;
+			m_effectIndex = -1;
+		}
+	}
+
+	if (m_failureEffectTimer > 0.0f)
+	{
+		m_failureEffectTimer -= g_gameTime->GetFrameDeltaTime();
+
+		if (m_failureEffectTimer <= 0.0f)
+		{
+			m_failureEffectTimer = 0.0f;
+			m_failureEffectIndex = -1;
+		}
+	}
+
 	if (Game::GetState() != GameState::Playing)
 	{
 		if (g_pad[0]->IsPress(enButtonA))m_lastPressedButton = ButtonType::A;
@@ -156,6 +178,10 @@ void QTEButton::Input()
 	//現在のステップの正解ボタンと比較
 	if (pressed == m_targetButtons[m_currentStep])
 	{
+
+		m_effectIndex = m_currentStep;
+		m_successEffectTimer = 0.15f;
+
 		m_currentStep++;
 
 		SEManager::Play(SE_buttonInputSuccess, false);
@@ -180,6 +206,9 @@ void QTEButton::Input()
 	{
 		auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
 		vib->Init(0, 1.0f, 1.0f);
+
+		m_failureEffectIndex = m_currentStep;
+		m_failureEffectTimer = 0.15f;
 
 		//異なるボタンが押されたら即座に失敗
 		m_isSuccess = false;
@@ -231,15 +260,52 @@ void QTEButton::SetPosition(const Vector3& pos)
 
 void QTEButton::Render(RenderContext& rc)
 {
-	//未入力のボタンのみを順番に描画
-	if (m_isFinished) return;
-
-	for (int i = 0; i < (int)m_targetButtons.size(); ++i)
+	if (m_isFinished &&
+		m_successEffectTimer <= 0.0f &&
+		m_failureEffectTimer <= 0.0f)
 	{
-		if (i < m_currentStep) continue;
+		return;
+	}
+
+	for (int i = 0; i < (int)m_targetButtons.size(); i++)
+	{
+		if (i < m_currentStep)
+		{
+			bool drawSuccess =
+				(i == m_effectIndex && m_successEffectTimer > 0.0f);
+
+			bool drawFailure =
+				(i == m_failureEffectIndex && m_failureEffectTimer > 0.0f);
+
+			if (!drawSuccess && !drawFailure)
+			{
+				continue;
+			}
+		}
+
+		if (i == m_effectIndex && m_successEffectTimer > 0.0f)
+		{
+			//成功
+			m_buttonSprites[i]->SetMulColor(Vector4(6, 6, 0.8f, 1));
+			m_buttonSprites[i]->SetScale(Vector3(2.0f, 2.0f, 1));
+		}
+		else if (i == m_failureEffectIndex && m_failureEffectTimer > 0.0f)
+		{
+			//失敗
+			m_buttonSprites[i]->SetMulColor(Vector4(2.5f, 0.3f, 0.3f, 1.0f));
+			m_buttonSprites[i]->SetScale(Vector3(2.0f, 2.0f, 1));
+		}
+		else
+		{
+			m_buttonSprites[i]->SetMulColor(Vector4(1, 1, 1, 1));
+			m_buttonSprites[i]->SetScale(Vector3::One);
+		}
 
 		m_buttonSprites[i]->SetPosition(m_drawPositions[i]);
 		m_buttonSprites[i]->Update();
 		m_buttonSprites[i]->Draw(rc);
 	}
+
+	
+
 }
