@@ -53,5 +53,15 @@ private:
 	const float COOLDOWN_TIME = 0.2f;	// 0.2秒間は次の入力を受け付けない
 
 	QTETimerUI* m_qteTimerUI = nullptr;
+
+	float m_successEffectTimer = 0.0f;
+	// 光らせるボタン番号
+	int m_effectIndex = -1;
+
+
+	//追加
+	float m_failureEffectTimer = 0.0f;
+	int m_failureEffectIndex = -1;
+
 };
 
