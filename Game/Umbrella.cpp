@@ -55,6 +55,7 @@ void Umbrella::Reset()
     m_angleY = 0.0f;
     m_rotationY = 0.0f;
     m_spinSpeed = 0.0f;
+    m_isAutoSpin = false;
 
     m_rotation = Quaternion::Identity;
     m_finalRotation = Quaternion::Identity;

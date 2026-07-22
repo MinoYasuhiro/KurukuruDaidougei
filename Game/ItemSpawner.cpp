@@ -85,8 +85,9 @@ void ItemSpawner::Reset()
 	//現在のアイテムを消す
 	if (m_currentItem)
 	{
+		m_currentItem->ResetItem();
 		m_currentItem->SetActive(false);
-		DeleteGO(m_pendingDeleteItem);
+		DeleteGO(m_currentItem);
 		m_currentItem = nullptr;
 	}
 
