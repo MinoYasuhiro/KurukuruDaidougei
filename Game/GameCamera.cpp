@@ -375,6 +375,8 @@ void GameCamera::Reset()
     m_zoomT = 0.0f;
 
     m_isEndingCamera = false;
+    m_isEndingCameraFinished = false; //終了後のカメラ固定フラグもリセット
+
     m_prevQTEActive = false;
 
     m_easeType = CameraEaseType::Cubic;
