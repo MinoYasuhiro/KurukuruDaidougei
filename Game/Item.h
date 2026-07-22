@@ -61,6 +61,7 @@ public:
 	void DropPrepare();		//傘から落とす準備
 	void PrepareParabola();	//放物準備
 	void SetActive(bool isActive);	//有効フラグ
+	void ResetItem();
 
 	//現在の速度から予測される着地点を取得
 	Vector3 GetPlannedLandingPosition()const;
