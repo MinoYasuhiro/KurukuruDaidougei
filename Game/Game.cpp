@@ -76,6 +76,7 @@ bool Game::Start()
     m_AudienceSpriteRender1.Init("Assets/modelData/kyaku.sippai.DDS", 1920.0f, 700.0f);
     m_AudienceSpriteRender2.Init("Assets/modelData/kyaku.seikou.DDS", 1920.0f, 700.0f);
 
+
     m_AudienceSpriteRender.SetPosition({ 0.0f, -300.0f, 0.0f });
     m_AudienceSpriteRender1.SetPosition({ 0.0f, -300.0f, 0.0f });
     m_AudienceSpriteRender2.SetPosition({ 0.0f, -300.0f, 0.0f });
@@ -83,6 +84,42 @@ bool Game::Start()
     m_AudienceSpriteRender.Update();
     m_AudienceSpriteRender1.Update();
     m_AudienceSpriteRender2.Update();
+
+    m_sprite1.Init("Assets/modelData/okyaku1.DDS", 1920.0f, 700.0f);
+    m_sprite2.Init("Assets/modelData/okyaku2.DDS", 1920.0f, 700.0f);
+    m_sprite3.Init("Assets/modelData/okyaku3.DDS", 1920.0f, 700.0f);
+    m_sprite4.Init("Assets/modelData/okyaku4.DDS", 1920.0f, 700.0f);
+    m_sprite5.Init("Assets/modelData/okyaku5.DDS", 1920.0f, 700.0f);
+    m_sprite6.Init("Assets/modelData/okyaku6.DDS", 1920.0f, 700.0f);
+    m_sprite7.Init("Assets/modelData/okyaku7.DDS", 1920.0f, 700.0f);
+    m_sprite8.Init("Assets/modelData/okyaku8.DDS", 1920.0f, 700.0f);
+
+    m_basePos1 = { 0.0f, -300.0f, 0.0f };
+    m_basePos2 = { 0.0f, -300.0f, 0.0f };
+    m_basePos3 = { 0.0f, -300.0f, 0.0f };
+    m_basePos4 = { 0.0f, -300.0f, 0.0f };
+    m_basePos5 = { 0.0f, -300.0f, 0.0f };
+    m_basePos6 = { 0.0f, -300.0f, 0.0f };
+    m_basePos7 = { 0.0f, -300.0f, 0.0f };
+    m_basePos8 = { 0.0f, -300.0f, 0.0f };
+
+    m_sprite1.SetPosition(m_basePos1);
+    m_sprite2.SetPosition(m_basePos2);
+    m_sprite3.SetPosition(m_basePos3);
+    m_sprite4.SetPosition(m_basePos4);
+    m_sprite5.SetPosition(m_basePos5);
+    m_sprite6.SetPosition(m_basePos6);
+    m_sprite7.SetPosition(m_basePos7);
+    m_sprite8.SetPosition(m_basePos8);
+
+    m_sprite1.Update();
+    m_sprite2.Update();
+    m_sprite3.Update();
+    m_sprite4.Update();
+    m_sprite5.Update();
+    m_sprite6.Update();
+    m_sprite7.Update();
+    m_sprite8.Update();
 
     m_count1.Init("Assets/sprite/count1.dds",125.0f,125.0f);
     m_count2.Init("Assets/sprite/count2.dds",125.0f,125.0f);
@@ -158,6 +195,125 @@ void Game::Update()
     case GameState::GameOver:
         break;
     }
+
+    m_time += g_gameTime->GetFrameDeltaTime();
+
+    if (m_player->m_playerState == 4 && !m_isSuccess)
+    {
+        m_isSuccess = true;
+        m_successTimer2 = 3.0f;
+    }
+
+    if (m_isSuccess)
+    {
+        m_successTimer2 -= g_gameTime->GetFrameDeltaTime();
+
+        if (m_successTimer2 <= 0.0f)
+        {
+            m_isSuccess = false;
+            m_bigSuccess = false;   // ←追加
+        }
+
+
+    }
+
+    float t = m_time;
+
+    if (m_isSuccess && !m_bigSuccess)
+    {
+        Vector3 pos;
+
+        pos = m_basePos1;
+        pos.y += sinf(t * 10.0f + 0.0f) * 8.0f;
+        m_sprite1.SetPosition(pos);
+
+        pos = m_basePos2;
+        pos.y += sinf(t * 10.0f + 0.3f) * 8.0f;
+        m_sprite2.SetPosition(pos);
+
+        pos = m_basePos3;
+        pos.y += sinf(t * 10.0f + 0.6f) * 8.0f;
+        m_sprite3.SetPosition(pos);
+
+        pos = m_basePos4;
+        pos.y += sinf(t * 10.0f + 0.9f) * 8.0f;
+        m_sprite4.SetPosition(pos);
+
+        pos = m_basePos5;
+        pos.y += sinf(t * 10.0f + 1.2f) * 8.0f;
+        m_sprite5.SetPosition(pos);
+
+        pos = m_basePos6;
+        pos.y += sinf(t * 10.0f + 1.5f) * 8.0f;
+        m_sprite6.SetPosition(pos);
+
+        pos = m_basePos7;
+        pos.y += sinf(t * 10.0f + 1.8f) * 8.0f;
+        m_sprite7.SetPosition(pos);
+
+        pos = m_basePos8;
+        pos.y += sinf(t * 10.0f + 2.1f) * 8.0f;
+        m_sprite8.SetPosition(pos);
+    }
+
+    else if (m_isSuccess && m_bigSuccess)
+    {
+        Vector3 pos;
+
+        pos = m_basePos1;
+        pos.y += sinf(t * 14.0f + 0.0f) * 15.0f;
+        m_sprite1.SetPosition(pos);
+
+        pos = m_basePos2;
+        pos.y += sinf(t * 14.0f + 0.3f) * 15.0f;
+        m_sprite2.SetPosition(pos);
+
+        pos = m_basePos3;
+        pos.y += sinf(t * 14.0f + 0.6f) * 15.0f;
+        m_sprite3.SetPosition(pos);
+
+        pos = m_basePos4;
+        pos.y += sinf(t * 14.0f + 0.9f) * 15.0f;
+        m_sprite4.SetPosition(pos);
+
+        pos = m_basePos5;
+        pos.y += sinf(t * 14.0f + 1.2f) * 15.0f;
+        m_sprite5.SetPosition(pos);
+
+        pos = m_basePos6;
+        pos.y += sinf(t * 14.0f + 1.5f) * 15.0f;
+        m_sprite6.SetPosition(pos);
+
+        pos = m_basePos7;
+        pos.y += sinf(t * 14.0f + 1.8f) * 15.0f;
+        m_sprite7.SetPosition(pos);
+
+        pos = m_basePos8;
+        pos.y += sinf(t * 14.0f + 2.1f) * 15.0f;
+        m_sprite8.SetPosition(pos);
+    }
+
+    else
+    {
+        m_sprite1.SetPosition(m_basePos1);
+        m_sprite2.SetPosition(m_basePos2);
+        m_sprite3.SetPosition(m_basePos3);
+        m_sprite4.SetPosition(m_basePos4);
+        m_sprite5.SetPosition(m_basePos5);
+        m_sprite6.SetPosition(m_basePos6);
+        m_sprite7.SetPosition(m_basePos7);
+        m_sprite8.SetPosition(m_basePos8);
+    }
+
+    m_sprite1.Update();
+    m_sprite2.Update();
+    m_sprite3.Update();
+    m_sprite4.Update();
+    m_sprite5.Update();
+    m_sprite6.Update();
+    m_sprite7.Update();
+    m_sprite8.Update();
+
 
     if (m_circle!=nullptr)
     {
@@ -287,6 +443,10 @@ void Game::ResetGame()
     m_countTimer = 0.0f;
     m_isCounting = false;
     m_countNumber = 0.0f;
+
+    m_isSuccess = false;
+    m_bigSuccess = false;
+    m_QTESuccess30 = false;
 
     m_count1.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
     m_count2.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -722,6 +882,9 @@ void Game::RequestNormalSuccess()
 
 void Game::RequestQTESuccess()
 {
+    m_isSuccess = true;          // ←追加
+    m_successTimer2 = 3.0f;      // ←追加
+    m_bigSuccess = true;   // 大成功なら
     m_showSuccess = true;
     m_successTimer = 0.0f;
     SEManager::Play(SE_cheers, false);
@@ -793,7 +956,14 @@ void Game::Render(RenderContext& rc)
         m_AudienceSpriteRender1.Draw(rc);
         break;
     case 2:
-        m_AudienceSpriteRender2.Draw(rc);
+        m_sprite1.Draw(rc);
+        m_sprite2.Draw(rc);
+        m_sprite3.Draw(rc);
+        m_sprite4.Draw(rc);
+        m_sprite5.Draw(rc);
+        m_sprite6.Draw(rc);
+        m_sprite7.Draw(rc);
+        m_sprite8.Draw(rc);
         break;
     }
 }

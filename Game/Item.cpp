@@ -101,6 +101,7 @@ void Item::Init(ItemType type)
 	m_wasOnUmbrella = false;
 	m_isCracked = false;
 	m_hasPlayedLandSE = false;
+	m_onUmbrellaTimer = 0.0f;
 
 	m_modelRender = new ModelRender();
 	m_failureModelRender = nullptr;
@@ -246,6 +247,42 @@ void Item::Update()
 	{
 		m_qteButton->Update(); // ここでカウントダウンと入力を更新
 
+		if (m_umbrella)
+		{
+			Vector3 position = m_umbrella->GetVisualPosition();
+			Quaternion umbrellaRot = m_umbrella->GetRotation();
+
+			float offsetDistance = 85.0f;
+
+			if (m_type == ItemType::penguin)
+			{
+				offsetDistance = 85.0f;
+			}
+			position.y += offsetDistance;
+			m_position = position;
+
+			if (m_type == ItemType::penguin && m_modelRender)
+			{
+				Vector3 umbrellaUp = Vector3::Up;
+				umbrellaRot.Apply(umbrellaUp);
+				umbrellaUp.Normalize();
+
+				Quaternion tiltRot;
+				tiltRot.SetRotation(Vector3::Up, umbrellaUp);
+				m_modelRender->SetRotation(tiltRot);
+			}
+			else if (m_modelRender)
+			{
+				m_rotX += 8.0f;
+				Quaternion rotation;
+				rotation.SetRotationDegX(m_rotX);
+
+				if (m_modelRender)
+				{
+					m_modelRender->SetRotation(rotation);
+				}
+			}
+		}
 		if (m_qteButton->IsFinished())
 		{
 			// ★ここを追加
@@ -325,16 +362,23 @@ void Item::Update()
 		break;
 	}
 
+	Vector3 renderPosition = m_position;
+	if (m_state == BallState::Flying)
+	{
+		const float visualOffsetZ = 100.0f;
+		renderPosition.z += visualOffsetZ;
+	}
+
 	if (m_isCracked && m_hasFailureModel && m_isFailureModelInited)
 	{
 		//卵が割れたモデル表示
-		m_failureModelRender->SetPosition(m_position);
+		m_failureModelRender->SetPosition(renderPosition);
 		m_failureModelRender->Update();
 	}
 	else if (m_isModelInited)
 	{
 		//通常モデル表示
-		m_modelRender->SetPosition(m_position);
+		m_modelRender->SetPosition(renderPosition);
 		m_modelRender->Update();
 	}
 }
@@ -349,6 +393,32 @@ void Item::ParabolicMotion()
 		//位置を更新
 		m_position += m_moveSpeed;
 
+		if (m_position.y <= 130.0f && m_state != BallState::SuccessThrow && m_moveSpeed.y < 0.0f)
+		{
+			if (m_game)
+			{
+				m_player = FindGO<Player>("player");
+				m_circle = m_game->GetCircle();
+			}
+
+			//傘に乗ったか判定
+			if (m_player && m_circle)
+			{
+				bool success = IsInsideCircle(
+					m_player->GetPosition(),
+					m_circle->GetPosition(),
+					m_circle->GetRadius());
+
+				//成功
+				if (success && !m_isProcessed)
+				{
+					m_wasOnUmbrella = true;
+					m_player->m_itemOnUmbrella = true;
+					m_state = BallState::OnUmbrella;
+					return;
+				}
+			}
+		}
 		//地面に付いたらリセット
 		if (m_position.y <= 0.0f)
 		{
@@ -367,7 +437,7 @@ void Item::ParabolicMotion()
 
 				m_isFlying = false;				//飛行状態を終了
 
-				m_rotY = 0.0f;
+				m_rotX = 0.0f;
 
 				m_shakeTimer = 0.0f;
 
@@ -383,33 +453,7 @@ void Item::ParabolicMotion()
 			{
 				m_moveSpeed = { 0.0f,0.0f,0.0f };
 				m_isFlying = false;
-
-				if (m_game)
-				{
-					m_player = FindGO<Player>("player");
-					m_circle = m_game->GetCircle();
-
-					//傘に乗ったか判定
-					if (m_player && m_circle)
-					{
-						bool success = IsInsideCircle(
-							m_player->GetPosition(),
-							m_circle->GetPosition(),
-							m_circle->GetRadius());
-
-						//成功
-						if (success && !m_isProcessed)
-						{
-							m_wasOnUmbrella = true;
-							m_player->m_itemOnUmbrella = true;
-							m_state = BallState::OnUmbrella;
-							return;
-						}
-					}
-				}
 				//失敗
-				auto vib = NewGO<nsK2EngineLow::GamePadVibration>(0);
-				vib->Init(0, 1.0f, 1.0f);
 				m_state = BallState::FailFall;
 			}
 		}
@@ -436,7 +480,7 @@ void Item::FailFallMotion()
 		m_moveSpeed = Vector3::Zero;
 		m_isFlying = false;
 		m_isCracked = true;
-		m_rotY = 0.0f;
+		m_rotX = 0.0f;
 		m_shakeTimer = 0.0f;
 
 		if (m_modelRender)
@@ -623,29 +667,43 @@ void Item::OnUmbrella()
 	}
 
 	//プレイヤーの頭の上に固定
-	Vector3 position = m_player->GetPosition();
-	position.y += 130.0f;	//傘の高さ
+	Vector3 position = m_umbrella->GetVisualPosition();
+
+	Quaternion umbrellaRot = m_umbrella->GetRotation();
+
+	/*Vector3 umbrellaUp = Vector3::Up;
+	umbrellaRot.Apply(umbrellaUp);
+	umbrellaUp.Normalize();*/
+
+	float offsetDistance = 85.0f;
+
+	if (m_type == ItemType::penguin)
+	{
+		offsetDistance = 75.0f;
+	}
+	position.y += offsetDistance;
 
 	//アイテムのタイプによって制御を切り分ける
 	if (m_type != ItemType::penguin)
 	{
 		//ペンギン以外のアイテムの処理
 		//傘の上で回転したり、小刻みに揺れる挙動
-		m_rotY += 8.0f;
+		m_rotX += 8.0f;
 		m_shakeTimer += 0.5f;
 
 		float shakeIntensity = 1.0f;
 		float shakeX = sinf(m_shakeTimer * 1.3f) * shakeIntensity;
 		float shakeY = cosf(m_shakeTimer * 1.7f) * shakeIntensity;
 
-		position.x += shakeX;
-		position.y += shakeY;
+		Vector3 shakeOffset = Vector3(shakeX, shakeY, 0.0f);
+		umbrellaRot.Apply(shakeOffset);
+		position += shakeOffset;
 
 		m_position = position;
 
 		//ペンギン以外のアイテムは、回転させる
 		Quaternion rotation;
-		rotation.SetRotationDegX(m_rotY);
+		rotation.SetRotationDegX(m_rotX);
 
 		if (m_modelRender)
 		{
@@ -660,6 +718,15 @@ void Item::OnUmbrella()
 
 		if (m_modelRender)
 		{
+			Vector3 umbrellaUp = Vector3::Up;
+			umbrellaRot.Apply(umbrellaUp);
+			umbrellaUp.Normalize();
+
+			Quaternion tiltRot;
+			tiltRot.SetRotation(Vector3::Up, umbrellaUp);
+
+			m_modelRender->SetRotation(tiltRot);
+
 			if (m_state == BallState::OnUmbrella)
 			{
 				m_modelRender->PlayAnimation(enPenguinAnimation_Run);
@@ -667,6 +734,8 @@ void Item::OnUmbrella()
 		}
 
 	}
+
+	m_position = position;
 
 	// 傘の上にいる時間を加算
 	m_onUmbrellaTimer += 1.0f / 60.0f; // 60FPS想定
@@ -720,7 +789,7 @@ void Item::StartQTE()
 	m_qteButton->StartQTE(m_myQTEPattern, 5.0f);
 	m_qteButton->SetPosition({ 0.0f, -300.0f, 0.0f });
 
-	m_qteButton->Update();
+	//m_qteButton->Update();
 
 	if (m_qteButton->IsFinished())
 	{
@@ -853,8 +922,9 @@ void Item::PrepareParabola()
 	m_wasOnUmbrella = false;
 	m_isCracked = false;
 	m_hasPlayedLandSE = false;
-	m_rotY = 0.0f;
+	m_rotX = 0.0f;
 	m_shakeTimer = 0.0f;
+	m_onUmbrellaTimer = 0.0f;
 
 	static std::random_device rd;
 	static std::mt19937 mt(rd());
