@@ -1,13 +1,14 @@
 #pragma once
 
-enum class LoadingPhase
+enum class  LoadStep
 {
-	Gear1,
-	Gear2,
-	Gear3,
-	Loop
+	Start,
+	CreateGame,
+	WaitGameCreate,
+	Finish,
 };
 
+class LoadingManager;
 class Loading : public IGameObject
 {
 public:
@@ -25,9 +26,9 @@ public:
 	/// </summary>
 	void LoadingMate();
 
-    /// <summary>
+	/// <summary>
 	/// メーターを時間計測に沿って伸ばしていく処理
-    /// </summary>
+	/// </summary>
 	void UpdateBar();
 
 	/// <summary>
@@ -35,43 +36,56 @@ public:
 	/// </summary>
 	void LoadingLetter();
 
-private:
 
+	void SetProgress(float progress);
+	void UpdateLoading();
+
+
+
+
+private:
+	LoadStep m_loadStep = LoadStep::Start;
 	Vector3 m_position;
+	LoadingManager* m_loadingManager = nullptr;
 	SpriteRender m_Sprite;
 	SpriteRender m_CircleRender;
 	SpriteRender m_baseBar;
 	SpriteRender m_fillBar;
 	SpriteRender m_Letter;
+	FontRender m_font;
 	std::unique_ptr<SpriteRender> m_lightSprite;
 
 	/// <summary>
 	/// 開始時間を記録
 	/// </summary>
-	std::chrono::steady_clock::time_point m_startTime;
+	//std::chrono::steady_clock::time_point m_startTime;
 
 private:
 
-	
+
 	float m_angle = 0.0f;
 	float m_barWidth = 580.0f;
 	float m_elapsedTime = 0.0f;   // 経過時間
-	float m_totalTime = 5.0f;     // ロード完了までの時間（秒）
+	const float m_totalTime = 5.0f;     // ロード完了までの時間（秒）
 	float m_progress = 0.0f;      // 0.0～1.0
 	bool  m_isFinished = false;
 	float radius = 350.0f;
 
-	LoadingPhase m_phase = LoadingPhase::Gear1;
+
+	//LoadingPhase m_phase = LoadingPhase::Gear1;
+
 	float m_animTimer = 0.0f;
 	float m_animInterval = 0.2f;
 
 	////////遅延、待機時間処理////////
 
 	float m_finishTimer = 0.0f;
-	float m_finishWaitTime = 1.0f; // 1秒待つ
+	const float m_finishWaitTime = 1.0f; // 1秒待つ
 	bool m_isWaiting = false;
-	float m_displayProgress = 0.0f;
+	float m_displayProgress = 0.0f; // 0.0～1.0
 
 };
+
+
 
 

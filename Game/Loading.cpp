@@ -3,25 +3,19 @@
 #include <chrono>
 #include "Game.h"
 #include "Title.h"
+#include "LoadingManager.h"
 
 namespace LOADING
 {
+    // 背景
     const Vector3 BACKGROUND_POSITION = { 0.0f, 0.0f, 0.0f };
 
-    // 円（右下）
-    const Vector3 CIRCLE_POSITION = { 700.0f, -400.0f, 0.0f };
-
-    // バー位置（中央寄りに調整）
+    // バー位置
     const Vector3 BAR_POSITION = { 0.0f, -300.0f, 0.0f };
 
-    // バーの枠の位置
+    // バー枠位置
     const Vector3 BASEBAR_POSITION = { -10.0f,-305.0f,0.0f };
-};
-
-namespace LIGHT
-{
-    const Vector3 SCALE = { 2.0f, 2.0f, 1.0f };
-};
+}
 
 namespace LETTER
 {
@@ -30,37 +24,63 @@ namespace LETTER
 
 bool Loading::Start()
 {
-    // ------------------------
+    //---------------------------------------
     // 背景
-    // ------------------------
-    m_Sprite.Init("Assets/Sprite/LoadingBackGround.DDS", 1920, 1080);
-    m_Sprite.SetPosition(LOADING::BACKGROUND_POSITION);
+    //---------------------------------------
+    m_Sprite.Init(
+        "Assets/Sprite/LoadingBackGround.DDS",
+        1920,
+        1080);
 
-    // ------------------------
-    // メーター（中身）
-    // ------------------------
-    m_fillBar.Init("Assets/Sprite/bar_file.DDS", m_barWidth, 40);
-    m_fillBar.SetPosition(LOADING::BAR_POSITION);
+    m_Sprite.SetPosition(
+        LOADING::BACKGROUND_POSITION);
 
-    // ------------------------
-    // メーター（外枠）
-    // ------------------------
-    m_baseBar.Init("Assets/Sprite/LoadingBar.DDS", 780, 65);
-    m_baseBar.SetPosition(LOADING::BASEBAR_POSITION);
-
-    m_Letter.Init("Assets/Sprite/LoadingLetter.DDS", 400, 150);
-    m_Letter.SetPosition(LETTER::POSITION);
-
-   
-
-    // ✔ 色（UIに合わせる）
-   // m_fillBar.SetMulColor({ 0.8f, 0.2f, 1.0f, 1.0f });
+    //---------------------------------------
+    // LoadingManager
+    //---------------------------------------
+    m_loadingManager = NewGO<LoadingManager>(0, "loadingManager");
 
 
-    // ------------------------
-    // 時間
-    // ------------------------
-    m_startTime = std::chrono::steady_clock::now();
+    //---------------------------------------
+    // バー本体
+    //---------------------------------------
+    m_fillBar.Init(
+        "Assets/Sprite/bar_file.DDS",
+        m_barWidth,
+        40);
+
+    m_fillBar.SetPosition(
+        LOADING::BAR_POSITION);
+
+    //---------------------------------------
+    // バー枠
+    //---------------------------------------
+    m_baseBar.Init(
+        "Assets/Sprite/LoadingBar.DDS",
+        780,
+        65);
+
+    m_baseBar.SetPosition(
+        LOADING::BASEBAR_POSITION);
+
+    //---------------------------------------
+    // Loading文字
+    //---------------------------------------
+    m_Letter.Init(
+        "Assets/Sprite/LoadingLetter.DDS",
+        400,
+        150);
+
+    m_Letter.SetPosition(
+        LETTER::POSITION);
+
+    //---------------------------------------
+    // 初期化
+    //---------------------------------------
+    m_progress = 0.0f;
+    m_displayProgress = 0.0f;
+    m_finishTimer = 0.0f;
+    m_isWaiting = false;
 
     return true;
 }
@@ -68,67 +88,68 @@ bool Loading::Start()
 void Loading::Update()
 {
     m_Sprite.Update();
-   
-    // ------------------------
-    // 進行度
-    // ------------------------
-    LoadingMate();
 
-    // ------------------------
-    // バー更新
-    // ------------------------
+    UpdateLoading();
+
+    //---------------------------------------
+    // ロード完了
+    //---------------------------------------
+    if (m_loadingManager &&
+        m_loadingManager->IsFinished() &&
+        m_displayProgress >= 0.99f)
+    {
+        Game* game =
+            FindGO<Game>("game");
+
+        if (!game)
+        {
+            game =
+                NewGO<Game>(0, "game");
+        }
+
+        game->ResetGame();
+
+        DeleteGO(this);
+
+        return;
+    }
+}
+
+void Loading::UpdateLoading()
+{
+    //---------------------------------------
+    // LoadingManager更新
+    //---------------------------------------
+    if (m_loadingManager)
+    {
+        SetProgress(
+            m_loadingManager->GetProgress()
+        );
+    }
+
+    //---------------------------------------
+    // バーを滑らかに補間
+    //---------------------------------------
+    m_displayProgress +=
+        (m_progress - m_displayProgress)
+        * 0.08f;
+
+    //---------------------------------------
+    // バー描画更新
+    //---------------------------------------
     UpdateBar();
 
-    //-------------------------
-    //文字点滅
-    //-------------------------
+    //---------------------------------------
+    // Loading文字点滅
+    //---------------------------------------
     LoadingLetter();
-    // ------------------------
-    // 遷移
-    // ------------------------
-    if (m_isWaiting)
-    {
-        m_finishTimer += g_gameTime->GetFrameDeltaTime();
-
-        if (m_finishTimer >= m_finishWaitTime)
-        {
-            Game* game = FindGO<Game>("game");
-
-            if (!game)
-            {
-                game = NewGO<Game>(0, "game");
-            }
-
-            game->ResetGame();
-
-            DeleteGO(this);
-            return;
-        }
-    }
-   
 }
 
-void Loading::LoadingMate()
-{
-    auto now = std::chrono::steady_clock::now();
-
-    float elapsed = std::chrono::duration<float>(now - m_startTime).count();
-
-    m_progress = elapsed / m_totalTime;
-
-    if (m_progress >= 1.0f)
-    {
-        m_progress = 1.0f;
-        m_isFinished = true;
-        m_isWaiting = true; //待機スタート
-    }
-
-}
 
 void Loading::UpdateBar()
 {
 
-    if (m_progress <= 0.0f)
+    if (m_displayProgress <= 0.0f)
     {
         return;
     }
@@ -139,7 +160,7 @@ void Loading::UpdateBar()
     // 進行度
     // ------------------------
 
-    float safeProgress = m_progress;
+    float safeProgress = m_displayProgress;
 
     // 範囲固定
     safeProgress = max(0.001f, safeProgress);
@@ -170,8 +191,8 @@ void Loading::UpdateBar()
     // ------------------------
     // 色を和風に
     // ------------------------
-    float glow = sinf(m_progress * 10.0f) * 0.2f + 0.8f;
-  
+    float glow = sinf(m_displayProgress * 10.0f) * 0.2f + 0.8f;
+
     m_fillBar.SetMulColor({
         0.9f,
         0.6f + glow * 0.2f,
@@ -179,39 +200,73 @@ void Loading::UpdateBar()
         1.0f
         });
 
+
     m_fillBar.Update();
 }
 
+/// <summary>
+/// Loading文字を点滅表示する処理
+/// </summary>
 void Loading::LoadingLetter()
 {
-    
-    // タイマー加算
-    m_animTimer += g_gameTime->GetFrameDeltaTime();
+    //---------------------------------------
+    // 点滅タイマー
+    //---------------------------------------
+    m_animTimer +=
+        g_gameTime->GetFrameDeltaTime();
 
-    // 点滅（sin波）
-    float alpha = 0.5f + 0.5f * sinf(m_animTimer * 3.0f);
+    //---------------------------------------
+    // α値
+    //---------------------------------------
+    float alpha =
+        0.5f +
+        0.5f *
+        sinf(m_animTimer * 3.0f);
 
-    m_Letter.SetMulColor({
-        1.0f,
-        1.0f,
-        1.0f,
-        alpha
+    m_Letter.SetMulColor(
+        {
+            1.0f,
+            1.0f,
+            1.0f,
+            alpha
         });
 
     m_Letter.Update();
-
-
 }
+
+
+void Loading::SetProgress(float progress)
+{
+    m_progress = progress;
+
+    if (m_progress < 0.0f)
+    {
+        m_progress = 0.0f;
+    }
+
+    if (m_progress > 1.0f)
+    {
+        m_progress = 1.0f;
+    }
+}
+
 
 void Loading::Render(RenderContext& rc)
 {
+    //---------------------------------------
+    // 背景
+    //---------------------------------------
     m_Sprite.Draw(rc);
 
-    // ✅ メーター
+    //---------------------------------------
+    // バー
+    //---------------------------------------
     m_fillBar.Draw(rc);
     m_baseBar.Draw(rc);
 
-    //文字
+    //---------------------------------------
+    // Loading文字
+    //---------------------------------------
     m_Letter.Draw(rc);
-   
 }
+

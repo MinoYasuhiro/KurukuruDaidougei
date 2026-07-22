@@ -250,6 +250,7 @@
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="ItemSpawner.cpp" />
     <ClCompile Include="Loading.cpp" />
+    <ClCompile Include="LoadingManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MenuUI.cpp" />
     <ClCompile Include="MissEffect.cpp" />
@@ -302,6 +303,7 @@
     <ClInclude Include="Item.h" />
     <ClInclude Include="ItemSpawner.h" />
     <ClInclude Include="Loading.h" />
+    <ClInclude Include="LoadingManager.h" />
     <ClInclude Include="MenuUI.h" />
     <ClInclude Include="MissEffect.h" />
     <ClInclude Include="Operation.h" />
