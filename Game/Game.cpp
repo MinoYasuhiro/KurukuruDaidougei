@@ -454,7 +454,18 @@ void Game::ResetGame()
 
     if (m_spawner)
     {
+        Item* currentItem = m_spawner->GetCurrentItem();
+        if (currentItem != nullptr)
+        {
+            currentItem->ResetItem();
+            DeleteGO(currentItem);
+        }
         m_spawner->Reset();
+    }
+
+    if (QTEButton* button = FindGO<QTEButton>("qteButton"))
+    {
+        DeleteGO(button);
     }
 
     if (m_coinBox)
@@ -811,7 +822,18 @@ void Game::RequestTitle()
 
     if (m_spawner)
     {
+        Item* currentItem = m_spawner->GetCurrentItem();
+        if (currentItem != nullptr)
+        {
+            currentItem->ResetItem();
+            DeleteGO(currentItem);
+        }
         m_spawner->Reset();
+    }
+
+    if (QTEButton* button = FindGO<QTEButton>("qteButton"))
+    {
+        DeleteGO(button);
     }
 
     m_BGM = FindGO<BGMManager>("bgmManager");

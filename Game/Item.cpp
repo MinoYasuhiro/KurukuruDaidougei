@@ -78,6 +78,11 @@ void Item::SetActive(bool isActive)
 
 void Item::Init(ItemType type)
 {
+	if(m_qteButton!=nullptr)
+	{
+		DeleteGO(m_qteButton);
+		m_qteButton = nullptr;
+	}
 	//次のアイテムへの切り替えに伴う古いリソースの解放
 	//Initが何度も呼び出されるため、newする前に古いモデルのメモリを確実に解放しDirectXのメモリ領域のリークや二重確保によるクラッシュを防ぐ
 	if (m_modelRender != nullptr)
@@ -950,6 +955,22 @@ void Item::PrepareParabola()
 	{
 		m_modelRender->PlayAnimation(enPenguinAnimation_Run);
 	}
+}
+
+void Item::ResetItem()
+{
+	if (m_qteButton != nullptr)
+	{
+		DeleteGO(m_qteButton);
+		m_qteButton = nullptr;
+	}
+
+	m_state = BallState::Idle;
+	m_isFlying = false;
+	m_wasOnUmbrella = false;
+	m_isCracked = false;
+	m_onUmbrellaLimitTimer = 0.0f;
+	m_isActive = false;
 }
 
 void Item::Render(RenderContext& rc)
