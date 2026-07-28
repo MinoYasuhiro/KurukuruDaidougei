@@ -36,6 +36,8 @@ public:
         m_spinCountSuccess = count;
     }
 
+    void SetMoveSpeedRate(float rate);
+
     // --- Getter ---
     Vector3 GetPosition() const
     {
@@ -151,6 +153,8 @@ private:
     int     number = 1;
     int     m_prevNumber = 1;
     Vector3 m_startPos = { 0.0f, 0.0f, 0.0f };
+    float m_moveSpeedRate = 1.0f;
+    float m_slowTimer = 0.0f;   // 追加
 
     // --- UI ---
     FontRender m_font;
