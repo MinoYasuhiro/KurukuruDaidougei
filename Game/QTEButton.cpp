@@ -309,3 +309,10 @@ void QTEButton::Render(RenderContext& rc)
 	
 
 }
+
+bool QTEButton::CanDelete() const
+{
+	return m_isFinished &&
+		m_successEffectTimer <= 0.0f &&
+		m_failureEffectTimer <= 0.0f;
+}
