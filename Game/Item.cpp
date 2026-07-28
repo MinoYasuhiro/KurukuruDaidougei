@@ -306,11 +306,12 @@ void Item::Update()
 				m_player->m_playerError++;
 				SpinningFailed();
 			}
+		}
 
-			// ボタンを削除して無効化
+		if (m_qteButton != nullptr && m_qteButton->CanDelete())
+		{
 			DeleteGO(m_qteButton);
 			m_qteButton = nullptr;
-			return;
 		}
 	}
 

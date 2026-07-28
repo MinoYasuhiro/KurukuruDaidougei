@@ -27,6 +27,8 @@ public:
 	//成功したかどうか
 	bool IsSuccess()const { return m_isSuccess; }
 
+	bool CanDelete() const;
+
 private:
 	bool m_isFinished = false;	//判定終了フラグ
 	bool m_isSuccess = false;	//成功フラグ
