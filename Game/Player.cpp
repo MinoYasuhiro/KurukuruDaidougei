@@ -195,6 +195,17 @@ void Player::Update()
         //何もしない。
     }
 
+	// --- 移動速度の減速タイマー ---
+    if (m_slowTimer > 0.0f)
+    {
+        m_slowTimer -= g_gameTime->GetFrameDeltaTime();
+
+        if (m_slowTimer <= 0.0f)
+        {
+            m_slowTimer = 0.0f;
+            m_moveSpeedRate = 1.0f;   // 元の速度に戻す
+        }
+    }
 
     // --- デバッグ表示（スピン回数）---
     wchar_t text[256];
@@ -369,8 +380,8 @@ void Player::Move()
     forward.y = 0.0f;
     right.y = 0.0f;
 
-    right *= stickL.x * 400.0f;
-    forward *= stickL.y * 400.0f;
+    right *= stickL.x * 400.0f * m_moveSpeedRate;
+    forward *= stickL.y * 400.0f * m_moveSpeedRate;
 
     m_moveSpeed += right + forward;
 
@@ -901,4 +912,10 @@ void Player::LimitMoveArea()
     if (m_position.z > maxZ) m_position.z = maxZ;
 
     m_characterController.SetPosition(m_position);
+}
+
+void Player::SetMoveSpeedRate(float rate)
+{
+    m_moveSpeedRate = rate;
+    m_slowTimer = 1.5f;      // 1.5秒間スロー
 }

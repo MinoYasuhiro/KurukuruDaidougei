@@ -23,6 +23,7 @@
 #include "Confetti.h"
 #include "MissEffect.h"
 #include "Arrow.h"
+#include "WaterPuddle.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -62,6 +63,17 @@ bool Game::Start()
     m_player = NewGO<Player>(0, "player");
 
     m_gameCamera = NewGO<GameCamera>(0, "gameCamera");
+
+    m_waterPuddle1 = NewGO<WaterPuddle>(0);
+    m_waterPuddle1->SetPosition({ -300.0f, 1.0f, 500.0f });
+	m_waterPuddle1->m_model.SetScale({ 5.0f,5.0f,5.0f });
+
+    m_waterPuddle2 = NewGO<WaterPuddle>(0);
+    m_waterPuddle2->SetPosition({ 0.0f, 1.0f, 700.0f });
+    m_waterPuddle2->m_model.SetScale({ 5.0f,5.0f,5.0f });
+    m_waterPuddle3 = NewGO<WaterPuddle>(0);
+    m_waterPuddle3->SetPosition({ 300.0f, 1.0f, 550.0f });
+    m_waterPuddle3->m_model.SetScale({ 5.0f,5.0f,5.0f });
 
     m_skyCube = NewGO<SkyCube>(0, "skyCube");
     m_skyCube->SetType(enSkyCubeType_SunriseToon);

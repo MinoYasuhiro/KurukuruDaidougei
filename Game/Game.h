@@ -17,6 +17,7 @@ class CoinEffect;
 class AudienceManager;
 class Confetti;
 class MissEffect;
+class WaterPuddle;
 enum class GamePhase
 {
 	Start,
@@ -101,6 +102,9 @@ private:
 	SpriteRender m_AudienceSpriteRender2;
 	SkyCube* m_skyCube;
 	GameCamera* m_gameCamera;
+	WaterPuddle* m_waterPuddle1 = nullptr;
+	WaterPuddle* m_waterPuddle2 = nullptr;
+	WaterPuddle* m_waterPuddle3 = nullptr;
 	CoinEffect* m_coin = nullptr;
 	CoinBox* m_coinBox = nullptr;
 	Item* m_item = nullptr;
