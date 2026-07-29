@@ -10,6 +10,7 @@ void BGMManager::Init()
 	g_soundEngine->ResistWaveFileBank(BGM_NormalUmbrella, "Assets/BGM/Normal_umbrella_BGM.wav");
 	g_soundEngine->ResistWaveFileBank(BGM_AudienceParticipationUmbrella, "Assets/BGM/Audience-participation_umbrella_BGM.wav");
 	g_soundEngine->ResistWaveFileBank(BGM_GameClear, "Assets/BGM/GmeClear.wav");
+    g_soundEngine->ResistWaveFileBank(BGM_GameOver, "Assets/BGM/GameOver.wav");
 }
 
 

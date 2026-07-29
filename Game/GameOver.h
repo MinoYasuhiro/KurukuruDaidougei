@@ -2,6 +2,7 @@
 class Title;
 class Game;
 class GameOverMenu;
+class BGMManager;
 class Player;
 class GameOver : public IGameObject
 {
@@ -19,7 +20,7 @@ private:
 	bool m_canInput = false;
 	Player* m_player = nullptr;
 	GameOverMenu* m_menu = nullptr;
-
+	BGMManager* m_BGM = nullptr;
 
 
 
