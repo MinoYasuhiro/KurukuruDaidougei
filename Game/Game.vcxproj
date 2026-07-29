@@ -274,6 +274,7 @@
     <ClCompile Include="Title.cpp" />
     <ClCompile Include="TitleMenu.cpp" />
     <ClCompile Include="Umbrella.cpp" />
+    <ClCompile Include="WaterPuddle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Arrow.h" />
@@ -322,6 +323,7 @@
     <ClInclude Include="Title.h" />
     <ClInclude Include="TitleMenu.h" />
     <ClInclude Include="Umbrella.h" />
+    <ClInclude Include="WaterPuddle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
