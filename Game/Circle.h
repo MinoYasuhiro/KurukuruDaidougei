@@ -1,10 +1,10 @@
 ﻿#pragma once
+#include "graphics/effect/Effect.h"
 class Circle :public IGameObject
 {
 public:
 	bool Start()override;
 	void Update()override;
-	void Render(RenderContext& renderContext)override;
 
 	void Reset();
 
@@ -14,7 +14,7 @@ public:
 
 	//表示の切り替え
 	//falseにすると描画されなくなる
-	void SetVisible(bool visible) { m_isVisible = visible; }
+	void SetVisible(bool visible);
 
 	//半径を取得
 	float GetRadius()const { return m_radius; }
@@ -27,9 +27,9 @@ public:
 	bool IsVisible()const { return m_isVisible; }
 
 private:
-	ModelRender m_modelRender;					//円のモデル
+	nsK2EngineLow::Effect m_effect;
 	Vector3 m_position = { 0.0f,-10.0f,0.0f };	//円の現在位置
 	bool m_isVisible = true;					//表示するかどうかのフラグ
-	float m_radius = 50.0f;						//円の半径
+	float m_radius = 55.0f;						//円の半径
 };
 
