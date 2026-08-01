@@ -34,6 +34,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	// ここから初期化を行うコードを記述する。
 	//////////////////////////////////////
 
+	nsK2EngineLow::EffectEngine::GetInstance()->ResistEffect(0, u"Assets/effect/Circle.efkefc");
+
 	//Gameクラスのオブジェクトを作成。
 	NewGO<Title>(0, "title");
 
