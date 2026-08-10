@@ -58,6 +58,15 @@ public:
 	void RequestFailureLetter();
 	void RequestNormalSuccess();
 	void RequestQTESuccess();
+	void StartClearAnimation()
+	{
+		m_isGameClearAnimation = true;
+	}
+
+	bool IsClearAnimation() const
+	{
+		return m_isGameClearAnimation;
+	}
 
 	Circle* GetCircle()const { return m_circle; }
 
@@ -129,6 +138,7 @@ private:
 	static GameState m_gameState;
 	bool m_requestStart = false;
 	bool m_isStarting = false;
+	bool m_isGameClearAnimation = false;
 	/// <summary>
 	/// ゲームオーバー（仮）
 	/// </summary>

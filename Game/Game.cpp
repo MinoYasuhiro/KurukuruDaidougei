@@ -179,6 +179,11 @@ void Game::Update()
     nsK2EngineLow::GamePad::BeginFrame();
     g_pad[0]->Update();
 
+    if (m_isGameClearAnimation)
+    {
+        return;
+    }
+
     // ★ 次フレーム開始処理
     if (m_requestStart)
     {
@@ -459,6 +464,8 @@ void Game::ResetGame()
     m_isSuccess = false;
     m_bigSuccess = false;
     m_QTESuccess30 = false;
+
+    m_isGameClearAnimation = false;
 
     m_count1.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
     m_count2.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
