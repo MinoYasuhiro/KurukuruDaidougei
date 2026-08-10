@@ -465,6 +465,8 @@ void Game::ResetGame()
     m_bigSuccess = false;
     m_QTESuccess30 = false;
 
+    m_isGameClearAnimation = false;
+
     m_count1.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
     m_count2.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
     m_count3.SetMulColor(Vector4(1.0f, 1.0f, 1.0f, 1.0f));
