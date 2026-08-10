@@ -179,6 +179,11 @@ void Game::Update()
     nsK2EngineLow::GamePad::BeginFrame();
     g_pad[0]->Update();
 
+    if (m_isGameClearAnimation)
+    {
+        return;
+    }
+
     // ★ 次フレーム開始処理
     if (m_requestStart)
     {

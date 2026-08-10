@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "ItemSpawner.h"
+#include "Game.h"
 
 bool ItemSpawner::Start()
 {
@@ -14,6 +15,21 @@ bool ItemSpawner::Start()
 
 void ItemSpawner::SpawnNext()
 {
+	if (Game* game = FindGO<Game>("game"))
+	{
+		// Game側に IsClearAnimation() などの判定用関数を用意しておく
+		if (game->IsClearAnimation())
+		{
+			// 必要に応じて現在画面上にあるアイテムも非表示/消去する
+			if (m_currentItem)
+			{
+				m_pendingDeleteItem = m_currentItem;
+				m_currentItem->SetActive(false);
+				m_currentItem = nullptr;
+			}
+			return;
+		}
+	}
 	//今のアイテムがある場合→削除予約
 	if (m_currentItem)
 	{
@@ -59,6 +75,20 @@ void ItemSpawner::SpawnNext()
 
 void ItemSpawner::StartThrow()
 {
+	if (Game* game = FindGO<Game>("game"))
+	{
+		if (game->IsClearAnimation())
+		{
+			if (m_currentItem)
+			{
+				m_pendingDeleteItem = m_currentItem;
+				m_currentItem->SetActive(false);
+				m_currentItem = nullptr;
+			}
+			return;
+		}
+	}
+
 	//現在のアイテムがあるときだけ
 	if (m_currentItem)
 	{

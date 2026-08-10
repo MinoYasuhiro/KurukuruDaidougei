@@ -466,6 +466,17 @@ void Player::ManageState()
         // ★クリア判定
         if (m_playerClear >= CLEAR_COUNT_TO_WIN)
         {
+            if (GameCamera* camera = FindGO<GameCamera>("gameCamera"))
+            {
+                camera->ClearCameraMove();
+            }
+
+            // ★追加: Game側にクリア演出が始まったことを通知してアイテム生成を止める
+            if (Game* game = FindGO<Game>("game"))
+            {
+                game->StartClearAnimation(); // または game->StopItemSpawn(); などの関数
+            }
+
             m_playerState = enPlayerState_GameClear1;
             return;
         }
@@ -602,8 +613,27 @@ void Player::PlayerAction()
             {
                 coin->AddCoin();
             }
-        }
 
+            if (m_playerClear >= CLEAR_COUNT_TO_WIN)
+            {
+                if (GameCamera* camera = FindGO<GameCamera>("gameCamera"))
+                {
+                    camera->ClearCameraMove();
+                }
+
+                if (Game* game = FindGO<Game>("game"))
+                {
+                    game->StartClearAnimation(); // Game側にクリア演出開始を通知
+                    game->RequestQTESuccess();
+                }
+
+                m_playerState = enPlayerState_GameClear1;
+            }
+            else
+            {
+                m_playerState = enPlayerState_Success;
+            }
+        }
         // ★失敗判定（3秒）
         else if (m_spinTimer >= SPIN_TIME_LIMIT)
         {
