@@ -65,6 +65,13 @@ void QTEButton::StartQTE(const std::vector<ButtonType>& targetButtons, float lim
 	m_qteTimerUI = NewGO<QTETimerUI>(0);
 
 	m_qteTimerUI->StartQTE(limitTime);
+
+	Game* game = FindGO<Game>("game");
+
+	if (game)
+	{
+		game->ShowQTERadialLines();
+	}
 }
 
 void QTEButton::Update()
@@ -129,7 +136,13 @@ void QTEButton::Update()
 		m_isFinished = true;	//終了
 
 		Game* game = FindGO<Game>("game");
-		game->m_QTESuccess30 = true;
+
+		if (game)
+		{
+			game->HideQTERadialLines();
+			game->m_QTESuccess30 = true;
+		}
+		
 
 		if (m_qteTimerUI != nullptr)
 		{
@@ -195,6 +208,12 @@ void QTEButton::Input()
 			m_isSuccess = true;
 			m_isFinished = true;
 
+			Game* game = FindGO<Game>("game");
+			if (game)
+			{
+				game->HideQTERadialLines();
+			}
+
 			if (m_qteTimerUI != nullptr)
 			{
 				DeleteGO(m_qteTimerUI);
@@ -215,6 +234,14 @@ void QTEButton::Input()
 		m_isFinished = true;
 
 		SEManager::Play(SE_QTEmiss, false);
+
+		Game* game = FindGO<Game>("game");
+
+		if (game)
+		{
+			game->HideQTERadialLines();
+			game->m_QTESuccess30 = false;
+		}
 
 		if (m_qteTimerUI != nullptr)
 		{

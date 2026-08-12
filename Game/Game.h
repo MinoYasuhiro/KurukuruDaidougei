@@ -18,6 +18,7 @@ class AudienceManager;
 class Confetti;
 class MissEffect;
 class WaterPuddle;
+class QTERadialLines;
 enum class GamePhase
 {
 	Start,
@@ -37,6 +38,10 @@ enum class GameState
 	SoundTest
 };
 
+enum  EffectID
+{
+	EFFECT_QTE_RADIAL_LINES = 0,
+};
 
 class Game : public IGameObject
 {
@@ -58,6 +63,8 @@ public:
 	void RequestFailureLetter();
 	void RequestNormalSuccess();
 	void RequestQTESuccess();
+	void ShowQTERadialLines();
+	void HideQTERadialLines();
 	void StartClearAnimation()
 	{
 		m_isGameClearAnimation = true;
@@ -121,6 +128,7 @@ private:
 	BGMManager* m_BGM = nullptr;
 	Confetti* m_confetti = nullptr;
 	MissEffect* m_missEffect = nullptr;
+	QTERadialLines* m_qteRadialLines = nullptr;
 	float m_movePhaseTimer = 0.0f;   // ★ 移動フェーズ経過時間
 	float m_clearTimer = 0.0f;      // 経過時間
 	float m_startTimer = 0.0f;
