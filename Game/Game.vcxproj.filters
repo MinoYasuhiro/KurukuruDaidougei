@@ -50,6 +50,7 @@
     <ClCompile Include="Loading.cpp" />
     <ClCompile Include="LoadingManager.cpp" />
     <ClCompile Include="WaterPuddle.cpp" />
+    <ClCompile Include="QTERadialLines.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -95,5 +96,6 @@
     <ClInclude Include="Loading.h" />
     <ClInclude Include="LoadingManager.h" />
     <ClInclude Include="WaterPuddle.h" />
+    <ClInclude Include="QTERadialLines.h" />
   </ItemGroup>
 </Project>

@@ -24,6 +24,7 @@
 #include "MissEffect.h"
 #include "Arrow.h"
 #include "WaterPuddle.h"
+#include "QTERadialLines.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -56,6 +57,8 @@ bool Game::Start()
 
     m_missEffect = NewGO<MissEffect>(0, "missEffect");
 
+    m_qteRadialLines = NewGO<QTERadialLines>(0, "qteRadialLines");
+    m_qteRadialLines->SetActive(false);
 	//m_audienceManager = NewGO<AudienceManager>(0, "audienceManager");
 
     m_backGround = NewGO<BackGround>(0, "background");
@@ -935,6 +938,22 @@ void Game::RequestQTESuccess()
 
     m_coin->Play();
     m_confetti->Play();
+}
+
+void Game::ShowQTERadialLines()
+{
+    if (m_qteRadialLines != nullptr)
+    {
+        m_qteRadialLines->SetActive(true);
+    }
+}
+
+void Game::HideQTERadialLines()
+{
+    if (m_qteRadialLines != nullptr)
+    {
+        m_qteRadialLines->SetActive(false);
+    }
 }
 
 void Game::Render(RenderContext& rc)
