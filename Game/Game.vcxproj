@@ -239,6 +239,7 @@
     <ClCompile Include="CoinBox.cpp" />
     <ClCompile Include="CoinEffect.cpp" />
     <ClCompile Include="Confetti.cpp" />
+    <ClCompile Include="DangerFrame.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameCamera.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -294,6 +295,7 @@
     <ClInclude Include="CoinBox.h" />
     <ClInclude Include="CoinEffect.h" />
     <ClInclude Include="Confetti.h" />
+    <ClInclude Include="DangerFrame.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameCamera.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
