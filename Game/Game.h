@@ -19,6 +19,7 @@ class Confetti;
 class MissEffect;
 class WaterPuddle;
 class QTERadialLines;
+class DangerFrame;
 enum class GamePhase
 {
 	Start,
@@ -129,6 +130,7 @@ private:
 	Confetti* m_confetti = nullptr;
 	MissEffect* m_missEffect = nullptr;
 	QTERadialLines* m_qteRadialLines = nullptr;
+	DangerFrame* m_dangerFrame = nullptr;
 	float m_movePhaseTimer = 0.0f;   // ★ 移動フェーズ経過時間
 	float m_clearTimer = 0.0f;      // 経過時間
 	float m_startTimer = 0.0f;

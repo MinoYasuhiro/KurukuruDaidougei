@@ -25,6 +25,7 @@
 #include "Arrow.h"
 #include "WaterPuddle.h"
 #include "QTERadialLines.h"
+#include "DangerFrame.h"
 
 GamePhase Game::m_phase = GamePhase::Start;
 GameState Game::m_gameState = GameState::Playing;
@@ -59,6 +60,8 @@ bool Game::Start()
 
     m_qteRadialLines = NewGO<QTERadialLines>(0, "qteRadialLines");
     m_qteRadialLines->SetActive(false);
+
+    m_dangerFrame = NewGO<DangerFrame>(0, "dangerFrame");
 	//m_audienceManager = NewGO<AudienceManager>(0, "audienceManager");
 
     m_backGround = NewGO<BackGround>(0, "background");
@@ -426,6 +429,12 @@ void Game::ResetGame()
     {
         missEffect->Reset();
     }
+
+    if (DangerFrame* dangerFrame = FindGO<DangerFrame>("dangerFrame"))
+    {
+        dangerFrame->Reset();
+    }
+
 
     m_failCount = 0;
 
@@ -955,6 +964,7 @@ void Game::HideQTERadialLines()
         m_qteRadialLines->SetActive(false);
     }
 }
+
 
 void Game::Render(RenderContext& rc)
 {
