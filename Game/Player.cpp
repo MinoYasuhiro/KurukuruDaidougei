@@ -101,13 +101,17 @@ bool Player::Start()
     m_itemOnUmbrella = false;
     m_isRunSEPlaying = false;
 
+
+	// --- プレイヤーの初期位置の設定 ---
+    m_startPos = { 0.0f, 0.0f, 50.0f };
+    m_position = m_startPos;
+
     // --- キャラクターコントローラーの初期化 ---
     m_characterController.Init(10.0f, 50.0f, m_position);
 
-    m_startPos = m_position;
-
     m_rotation.SetRotationY(Math::DegToRad(180.0f));
     m_NewModelRender.SetRotation(m_rotation);
+	m_NewModelRender.SetPosition(m_position);
     m_NewModelRender.Update();
 
     return true;
@@ -933,7 +937,7 @@ void Player::LimitMoveArea()
 {
     const float minX = -800.0f;
     const float maxX = 800.0f;
-    const float minZ = -250.0f;
+    const float minZ = 0.0f;
     const float maxZ = 1000.0f;
 
     if (m_position.x < minX) m_position.x = minX;
