@@ -25,7 +25,7 @@ private:
 	bool m_isEnding = false;
     float m_time = 0.0f;
 	int m_pageIndex = 0;
-	int m_maxPage = 3; // 3枚(後に増やす予定)
+	int m_maxPage = 7; // 7枚
 
 
 	/// <summary>
