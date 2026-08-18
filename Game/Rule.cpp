@@ -31,16 +31,25 @@ bool Rule::Start()
 {
     m_rules.resize(m_maxPage);
     m_rules[0] = new SpriteRender();
-    m_rules[0]->Init("Assets/Sprite/Rule1.DDS", 1920, 1080);
-
-    //m_rules[1] = new SpriteRender();
-    //m_rules[1]->Init("Assets/Sprite/Rule4.DDS", 1920, 1080);
+    m_rules[0]->Init("Assets/Sprite/rule1.DDS", 1920, 1080);
 
     m_rules[1] = new SpriteRender();
-    m_rules[1]->Init("Assets/Sprite/Rule2.DDS", 1920, 1080);
+    m_rules[1]->Init("Assets/Sprite/rule2.DDS", 1920, 1080);
 
     m_rules[2] = new SpriteRender();
-    m_rules[2]->Init("Assets/Sprite/Rule3.DDS", 1920, 1080);
+    m_rules[2]->Init("Assets/Sprite/rule3.DDS", 1920, 1080);
+
+    m_rules[3] = new SpriteRender();
+    m_rules[3]->Init("Assets/Sprite/rule4.DDS", 1920, 1080);
+
+    m_rules[4] = new SpriteRender();
+    m_rules[4]->Init("Assets/Sprite/rule5.DDS", 1920, 1080);
+
+    m_rules[5] = new SpriteRender();
+    m_rules[5]->Init("Assets/Sprite/rule6.DDS", 1920, 1080);
+
+    m_rules[6] = new SpriteRender();
+    m_rules[6]->Init("Assets/Sprite/rule7.DDS", 1920, 1080);
 
 	for (auto& r : m_rules)
 	{
