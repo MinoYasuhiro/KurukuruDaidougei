@@ -607,7 +607,7 @@ void Game::UpdatePlaying()
                     //着地点(これから飛ばしたときに落ちる位置)を計算取得
                     Vector3 landingPosition = current->GetPlannedLandingPosition();
 
-                    landingPosition.y += 1.0f;
+                    landingPosition.y += 5.0f;
 
                     //予測円の位置を着地点に合わせる
                     m_circle->SetPosition(landingPosition);
