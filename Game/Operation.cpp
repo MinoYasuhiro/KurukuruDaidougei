@@ -14,7 +14,7 @@ bool Operation::Start()
 {
 	
 	///操作説明
-	m_SpriteRender.Init("Assets/Sprite/gamePad.DDS", 1920.0f, 1080.0f);
+	m_SpriteRender.Init("Assets/Sprite/Operation.DDS", 1920.0f, 1080.0f);
 	m_SpriteRender.SetPosition(POSITION);
 
 	SEManager::Init();
